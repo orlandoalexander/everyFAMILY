@@ -1,4 +1,6 @@
 import mysql.connector
+from flask import Flask
+app= Flask(__name__)
 
 # Replace with your Cloud SQL instance details
 config = {
@@ -24,3 +26,12 @@ try:
 
 except mysql.connector.Error as err:
     print("Error:", err)
+@app.route('/')
+def hello_world():
+    return 'Hello, World!'
+@app.route('/create_account')
+def create_account(): 
+    return 'create_account'
+
+if __name__ == "__main__":
+    app.run(debug=True)
