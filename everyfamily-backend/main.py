@@ -1,17 +1,22 @@
 import mysql.connector
 from flask import Flask
+from dotenv import load_dotenv
+import os
+
+
 app= Flask(__name__)
 
-# Replace with your Cloud SQL instance details
+load_dotenv()
+
 config = {
-    "user": "root",
-    "password": "3v3ryF@m1ly",
-    "host": "35.197.229.65",
-    "database": "everyfamily",
+    "user": os.getenv("DB_USER"),
+    "password": os.getenv("DB_PASSWORD"),
+    "host": os.getenv("DB_HOST"),
+    "database": os.getenv("DB_NAME"),
 }
 
+
 try:
-    # Establish connection
     conn = mysql.connector.connect(**config)
     cursor = conn.cursor()
 
@@ -26,11 +31,13 @@ try:
 
 except mysql.connector.Error as err:
     print("Error:", err)
+
 @app.route('/')
 def hello_world():
     return 'Hello, World!'
+
 @app.route('/create_account')
-def create_account(): 
+def create_account():
     return 'create_account'
 
 if __name__ == "__main__":
