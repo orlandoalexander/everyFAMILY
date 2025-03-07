@@ -1,0 +1,21 @@
+.dashboard--header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.dashboard--header--logo{
+  max-width: 10%;
+}
+.dashboard--header--search {
+  max-width: 50%;
+}
+
+.dashboard--header--button {
+  box-shadow: none !important;
+}
+
+.ant-input-affix-wrapper {
+  background: rgba(146, 39, 143, 0.10);
+}
