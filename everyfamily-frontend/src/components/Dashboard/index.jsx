@@ -2,7 +2,9 @@ import "./index.css";
 import ResourceCard from "./resourceCard.jsx";
 import React from "react";
 import logo from "../../assets/everyFAMILY-logo.png";
+import feature1 from "../../assets/everyFAMILY-feature1.png";
 import { Input, Button, Row, Flex, Collapse } from "antd";
+import { Plus } from "react-feather";
 
 const { Search } = Input;
 
@@ -66,22 +68,38 @@ function Dashboard() {
     console.log(key);
   };
   return (
-    <main>
+    <div className="dashboard">
       <header className="dashboard--header">
-        <img
-          className="dashboard--header--logo"
-          src={logo}
-          alt="everyFAMILY logo"
-        />
+        <img className="dashboard--header" src={logo} alt="everyFAMILY logo" />
         <Search
-          className="dashboard--header--search"
+          className="dashboard--header-search"
           placeholder="Find resources by name, description etc."
           allowClear
+          size="large"
         />
-        <Button className="dashboard--header--button" type="primary">
+        <Button
+          className="dashboard--header-button"
+          type="primary"
+          icon={<Plus />}
+          size="large"
+        >
           Add new
         </Button>
       </header>
+      <section className="dashboard--featured">
+        <div className="dashboard--featured--container">
+          <img src={feature1} />
+          <h2>Recently added</h2>
+        </div>
+        <div className="dashboard--featured--container">
+          <img src={feature1} />
+          <h2>Popular</h2>
+        </div>
+        <div className="dashboard--featured--container">
+          <img src={feature1} />
+          <h2>Featured</h2>
+        </div>
+      </section>
       <Collapse
         items={items}
         defaultActiveKey={["1"]}
@@ -89,7 +107,7 @@ function Dashboard() {
         onChange={onChange}
         gost
       />
-    </main>
+    </div>
   );
 }
 
