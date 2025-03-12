@@ -13,6 +13,13 @@ const { Search } = Input;
 const allResources = [
   { title: "A", description: "a", category: "All resources" },
   { title: "B", description: "b", category: "All resources" },
+  { title: "B", description: "b", category: "All resources" },
+  { title: "B", description: "b", category: "All resources" },
+  { title: "B", description: "b", category: "All resources" },
+  { title: "B", description: "b", category: "All resources" },
+  { title: "B", description: "b", category: "All resources" },
+  { title: "B", description: "b", category: "All resources" },
+  { title: "B", description: "b", category: "All resources" },
   { title: "C", description: "c", category: "Arrest" },
   { title: "D", description: "d", category: "Court" },
 ];

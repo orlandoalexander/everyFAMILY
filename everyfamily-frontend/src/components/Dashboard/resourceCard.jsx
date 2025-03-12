@@ -14,7 +14,7 @@ function ResourceCard({ title, description }) {
     <div>
       <Col span={8}>
         <Card
-            className="outer--card"
+            className="outer-card"
             hoverable
             size="small"
             actions={actions}
@@ -24,10 +24,10 @@ function ResourceCard({ title, description }) {
             }}
         >
             <div
-                className="outer--card--div"
+                className="outer-card-div"
             >
                 <Card
-                    className="inner--card"
+                    className="inner-card"
                     type="inner"
                     style={{
                         width: 175,
@@ -35,19 +35,20 @@ function ResourceCard({ title, description }) {
                     }}
                     cover={
                         <img
-                            className="inner--card--img"
+                            className="inner-card-img"
                             alt="example"
                             src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png"
                         />
                     }
                 />
                 <p style={{
-                    fontSize: 16,
+                    fontSize: 14,
+                    fontWeight: "bold",
                 }}>
                     {title}
                 </p>
                 <p style={{
-                    fontSize: 14,
+                    fontSize: 12,
                 }}>
                     {description}
                 </p>

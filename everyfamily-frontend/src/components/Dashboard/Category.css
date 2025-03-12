@@ -5,3 +5,7 @@
 .ant-collapse-header {
   padding-left: 0 !important;
 }
+
+.dashboard-category-flex::-webkit-scrollbar {
+  display: none;
+}

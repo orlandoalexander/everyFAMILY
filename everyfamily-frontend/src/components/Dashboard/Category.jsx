@@ -8,7 +8,13 @@ function Category({ categoryKey, label, children }) {
       label: label,
       children: (
         <Row gutter={16}>
-          <Flex>{children}</Flex>
+          <Flex className="dashboard-category-flex"
+              style={{
+                overflowX: "auto", // Enable horizontal scrolling
+                whiteSpace: "nowrap", // Prevent the content from wrapping to the next line
+                width: "100%", // Ensures that the flex container takes up all available space
+              }}
+          >{children}</Flex>
         </Row>
       ),
     },
