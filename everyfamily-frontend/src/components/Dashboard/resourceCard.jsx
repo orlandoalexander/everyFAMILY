@@ -4,11 +4,10 @@ const { Meta } = Card;
 
 function ResourceCard({ title, description }) {
   return (
-    <div className="resource-card">
+    <div>
       <Col span={8}>
         <Card
           hoverable
-          className="card-container"
           size="small"
           style={{
             width: 200,
@@ -33,8 +32,6 @@ function ResourceCard({ title, description }) {
               height: 80,
             }}
           />
-          {/*<p className='card_title'>{title}</p>*/}
-          {/*<p className='card_desciption'>{description}</p>*/}
         </Card>
       </Col>
     </div>
