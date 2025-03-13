@@ -1,0 +1,14 @@
+.article-tag {
+    font-size: 12px;
+    color: gray;
+    display: flex;
+    align-items: center;
+    padding: 5px 10px 10px 120px;
+}
+.video-tag {
+    font-size: 12px;
+    color: gray;
+    display: flex;
+    align-items: center;
+    padding: 5px 10px 10px 120px;
+}

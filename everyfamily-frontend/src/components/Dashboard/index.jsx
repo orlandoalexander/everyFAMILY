@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import "./index.css";
 import ResourceCard from "./ResourceCard";
 import AddResourceModal from "./AddResourceModal";
@@ -11,17 +11,16 @@ import { Plus } from "react-feather";
 const { Search } = Input;
 
 const allResources = [
-  { title: "A", description: "a", category: "All resources" },
-  { title: "B", description: "b", category: "All resources" },
-  { title: "B", description: "b", category: "All resources" },
-  { title: "B", description: "b", category: "All resources" },
-  { title: "B", description: "b", category: "All resources" },
-  { title: "B", description: "b", category: "All resources" },
-  { title: "B", description: "b", category: "All resources" },
-  { title: "B", description: "b", category: "All resources" },
-  { title: "B", description: "b", category: "All resources" },
-  { title: "C", description: "c", category: "Arrest" },
-  { title: "D", description: "d", category: "Court" },
+  { title: "A", description: "a", category: "All resources", type: "article" },
+  { title: "B", description: "b", category: "All resources", type: "article" },
+  { title: "B", description: "b", category: "All resources", type: "article" },
+  { title: "B", description: "b", category: "All resources", type: "article" },
+  { title: "B", description: "b", category: "All resources", type: "article" },
+  { title: "B", description: "b", category: "All resources", type: "article" },
+  { title: "B", description: "b", category: "All resources", type: "article" },
+  { title: "B", description: "b", category: "All resources", type: "article" },
+  { title: "C", description: "c", category: "Arrest", type: "video" },
+  { title: "D", description: "d", category: "Court", type: "video" },
 ];
 const allCategories = ["All resources", "Arrest", "Court", "Imprisonment"];
 
@@ -84,8 +83,8 @@ function Dashboard() {
             label={label}
             children={allResources
               .filter(({ category }) => category === label)
-              .map(({ title, description }, i) => (
-                <ResourceCard key={i} title={title} description={description} />
+              .map(({ title, description, category, type }, i) => (
+                <ResourceCard key={i} title={title} description={description} type={type}/>
               ))}
           />
         ))}
