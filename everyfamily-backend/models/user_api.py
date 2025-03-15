@@ -1,10 +1,10 @@
 from flask import Flask, request, jsonify
-import mysql.connector  # Ensure you have this installed
+import mysql.connector  
 from config import get_db_connection
 
 app = Flask(__name__)
 
-# Create User (Signup)
+
 @app.route("/user", methods=["POST"])
 def create_user():
     data = request.json
@@ -29,7 +29,7 @@ def create_user():
         conn.close()
 
 
-# Read User (Get user details)
+
 @app.route("/user/<int:user_id>", methods=["GET"])
 def get_user(user_id):
     if user_id <= 0:
@@ -52,7 +52,7 @@ def get_user(user_id):
         conn.close()
 
 
-# Update User (Change login status)
+
 @app.route("/user/<int:user_id>", methods=["PUT"])
 def update_user(user_id):
     if user_id <= 0:
@@ -80,7 +80,8 @@ def update_user(user_id):
         conn.close()
 
 
-# Delete User
+
+
 @app.route("/user/<int:user_id>", methods=["DELETE"])
 def delete_user(user_id):
     if user_id <= 0:
