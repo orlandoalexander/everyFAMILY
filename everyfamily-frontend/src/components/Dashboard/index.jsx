@@ -1,12 +1,20 @@
-import React, { useState } from "react";
+import { useState, useContext } from "react";
 import "./index.css";
 import ResourceCard from "./ResourceCard";
+import { AuthContext } from "../../AuthContext";
 import AddResourceModal from "./AddResourceModal";
 import logo from "../../assets/everyFAMILY-logo.png";
 import feature1 from "../../assets/everyFAMILY-feature1.png";
-import { Input, Button } from "antd";
+import { Input, Button, Dropdown } from "antd";
 import Category from "./Category.jsx";
-import { Plus } from "react-feather";
+import {
+  Plus,
+  Key,
+  Menu as MenuIcon,
+  Users,
+  LogOut,
+  Bookmark,
+} from "react-feather";
 
 const { Search } = Input;
 
@@ -25,7 +33,27 @@ const allResources = [
 const allCategories = ["All resources", "Arrest", "Court", "Imprisonment"];
 
 function Dashboard() {
+  const { user } = useContext(AuthContext);
   const [modalOpen, setModalOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const menuItems = [
+    user.role === "admin" && {
+      key: "users",
+      icon: <Users size={15} />,
+      label: "Manage users",
+    },
+    {
+      key: "password",
+      icon: <Key size={15} />,
+      label: "Reset password",
+    },
+    {
+      key: "logout",
+      icon: <LogOut size={15} />,
+      label: "Logout",
+    },
+  ];
 
   const showModal = () => {
     setModalOpen(true);
@@ -50,15 +78,38 @@ function Dashboard() {
           allowClear
           size="large"
         />
-        <Button
-          className="dashboard-header-button"
-          type="primary"
-          icon={<Plus />}
-          size="large"
-          onClick={showModal}
-        >
-          Add new
-        </Button>
+        {user.role === "admin" ? (
+          <div className="dashboard-header-buttons">
+            <Button
+              className="dashboard-header-button"
+              type="primary"
+              icon={<Plus />}
+              size="large"
+              onClick={showModal}
+            >
+              Add new
+            </Button>
+            <Dropdown
+              menu={{ items: menuItems }}
+              trigger={["hover"]}
+              open={menuOpen}
+              onOpenChange={setMenuOpen}
+            >
+              <MenuIcon size={40} style={{ cursor: "pointer" }} />
+            </Dropdown>
+          </div>
+        ) : (
+          <div className="dashboard-header-buttons">
+            <Dropdown
+              menu={{ items: menuItems }}
+              trigger={["hover"]}
+              open={menuOpen}
+              onOpenChange={setMenuOpen}
+            >
+              <MenuIcon size={40} style={{ cursor: "pointer" }} />
+            </Dropdown>
+          </div>
+        )}
       </header>
       <section className="dashboard-featured">
         <div className="dashboard-featured-container">
@@ -71,7 +122,7 @@ function Dashboard() {
         </div>
         <div className="dashboard-featured-container">
           <img src={feature1} />
-          <h2>Featured</h2>
+          <h2>Saved</h2>
         </div>
       </section>
       <div className="dashboard-category">
@@ -84,7 +135,12 @@ function Dashboard() {
             children={allResources
               .filter(({ category }) => category === label)
               .map(({ title, description, category, type }, i) => (
-                <ResourceCard key={i} title={title} description={description} type={type}/>
+                <ResourceCard
+                  key={i}
+                  title={title}
+                  description={description}
+                  type={type}
+                />
               ))}
           />
         ))}

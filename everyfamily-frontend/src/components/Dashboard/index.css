@@ -17,8 +17,15 @@
 .dashboard-header img{
   max-width: 15%;
 }
+
 .dashboard-header-search {
   max-width: 50%;
+}
+
+.dashboard-header-buttons {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
 }
 
 .dashboard-header-button {
@@ -59,7 +66,11 @@
   font-size: 1.7rem;
 }
 
-
 .ant-input-affix-wrapper {
   background: rgba(146, 39, 143, 0.10);
+}
+
+
+.dashboard-category-flex {
+  padding: 1rem 0;
 }
