@@ -1,6 +1,6 @@
 import { Modal, Input, Button, Select, Upload, Form, message } from "antd";
 import "./AddResourceModal.css";
-import { Edit } from "react-feather";
+import { Edit, Link, Grid, Tag, Image } from "react-feather";
 
 const AddResourceModal = ({ open, onCancel, onSubmit }) => {
   const [form] = Form.useForm();
@@ -28,43 +28,57 @@ const AddResourceModal = ({ open, onCancel, onSubmit }) => {
       cancelText="Cancel"
     >
       <Form className="form" form={form} layout="horizontal">
-        <section className="form-item">
-          <div className="form-item-title">
-            {/* <Edit size={15} color="gray" /> */}
-            <p>Name</p>
-          </div>
+        <section>
           <Form.Item
             name="name"
+            label={
+              <div className="form-item-title">
+                <Edit size={15} color="gray" />
+                <p>Name</p>
+              </div>
+            }
             rules={[
               { required: true, message: "Please input the resource name!" },
             ]}
+            colon={false}
+            required={false}
           >
             <Input placeholder="Enter resource name" />
           </Form.Item>
         </section>
 
-        <section className="form-item">
-          <div className="form-item-title">
-            <p>Link</p>
-          </div>
+        <section>
           <Form.Item
             name="link"
+            label={
+              <div className="form-item-title">
+                <Link size={15} color="gray" />
+                <p>Link</p>
+              </div>
+            }
             rules={[
               { required: true, message: "Please input the resource link!" },
             ]}
+            colon={false}
+            required={false}
           >
             <Input placeholder="Enter resource link" />
           </Form.Item>
         </section>
-        <section className="form-item">
-          <div className="form-item-title">
-            <p>Type</p>
-          </div>
+        <section>
           <Form.Item
             name="type"
+            label={
+              <div className="form-item-title">
+                <Grid size={15} color="gray" />
+                <p>Type</p>
+              </div>
+            }
             rules={[
               { required: true, message: "Please select the resource type!" },
             ]}
+            colon={false}
+            required={false}
           >
             <Select placeholder="Select resource type">
               <Select.Option value="article">Article</Select.Option>
@@ -75,13 +89,18 @@ const AddResourceModal = ({ open, onCancel, onSubmit }) => {
           </Form.Item>
         </section>
 
-        <section className="form-item">
-          <div className="form-item-title">
-            <p>Category</p>
-          </div>
+        <section>
           <Form.Item
             name="category"
+            label={
+              <div className="form-item-title">
+                <Tag size={15} color="gray" />
+                <p>Category</p>
+              </div>
+            }
             rules={[{ required: true, message: "Please select the category!" }]}
+            colon={false}
+            required={false}
           >
             <Select placeholder="Select category">
               <Select.Option value="education">Education</Select.Option>
@@ -94,10 +113,17 @@ const AddResourceModal = ({ open, onCancel, onSubmit }) => {
 
         <Form.Item
           name="thumbnail"
-          label="Thumbnail"
+          label={
+            <div className="form-item-title">
+              <Image size={15} color="gray" />
+              <p>Thumbnail</p>
+            </div>
+          }
           valuePropName="fileList"
           getValueFromEvent={(e) => e && e.fileList}
           rules={[{ required: true, message: "Please upload a thumbnail!" }]}
+          required={false}
+          colon={false}
         >
           <Upload
             name="thumbnail"
