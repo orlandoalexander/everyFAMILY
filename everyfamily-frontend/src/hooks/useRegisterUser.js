@@ -12,7 +12,7 @@ const useCreateAccount = () => {
   };
 
   return useMutation(createAccount, {
-    onSuccess: (data, variables) => {
+    onSuccess: (data) => {
       const { id = 1, role = "user", remember = true } = data;
       login({ role, id, remember });
     },
