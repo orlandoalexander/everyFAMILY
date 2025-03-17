@@ -1,3 +1,6 @@
-import "./index.css";
 import SignIn from "./SignIn";
-import { Button } from "antd";
+import SignUp from "./SignUp";
+
+export { SignIn, SignUp };
+
+export default SignIn;
