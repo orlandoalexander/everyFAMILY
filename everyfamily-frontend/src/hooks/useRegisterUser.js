@@ -1,14 +1,20 @@
 import { useMutation } from "react-query";
 import api from "./api";
+import { useContext } from "react";
+import { AuthContext } from "../AuthContext";
 
 const useCreateAccount = () => {
+  const { login } = useContext(AuthContext);
+
   const createAccount = async (data) => {
-    return await api.post("/create_account", data);
+    const response = await api.post("/create_account", data);
+    return response.data;
   };
 
   return useMutation(createAccount, {
-    onSuccess: (success) => {
-      console.log(success);
+    onSuccess: (data, variables) => {
+      const { id = 1, role = "user", remember = true } = data;
+      login({ role, id, remember });
     },
   });
 };
