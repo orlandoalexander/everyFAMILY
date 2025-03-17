@@ -1,0 +1,8 @@
+.resource-type {
+    display: flex;
+    gap: 5px;
+    font-size: 12px;
+    color: gray;
+    align-items: center;
+    padding: 10px 10px 10px 120px;
+}
