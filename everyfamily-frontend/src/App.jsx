@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import Dashboard from "./components/Dashboard/index";
 import Resources from "./components/Resources/index";
 import AddResourceModal from "./components/Resources/AddResourceModal";
+import ManageUsersModal from "./components/Dashboard/ManageUsersModal.jsx";
 import logo from "./assets/everyFAMILY-logo.png";
 import { AuthContext } from "./AuthContext";
 import { Input, Button, Dropdown } from "antd";
@@ -15,12 +16,20 @@ export default function App() {
   const { user } = useContext(AuthContext);
   const [modalOpen, setModalOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [manageUsersOpen, setManageUsersOpen] = useState(false);
+
+  const showManageUsersModal = () => setManageUsersOpen(true);
+  const handleManageUsersCancel = () => setManageUsersOpen(false);
 
   const menuItems = [
     user.role === "admin" && {
       key: "users",
       icon: <Users size={15} />,
-      label: "Manage users",
+      label: (
+          <Button type="text" onClick={showManageUsersModal}>
+            Manage users
+          </Button>
+      ),
     },
     {
       key: "password",
@@ -33,7 +42,13 @@ export default function App() {
       label: "Logout",
     },
   ];
-
+  const usersInfo = [
+    {key: "1", name: "user", email: "user@gmail.com", action: "Remove User"},
+    {key: "2", name: "user", email: "user@gmail.com", action: "Remove User"},
+    {key: "3", name: "user", email: "user@gmail.com", action: "Remove User"},
+    {key: "4", name: "user", email: "user@gmail.com", action: "Remove User"},
+    {key: "5", name: "user", email: "user@gmail.com", action: "Remove User"},
+  ];
   const showModal = () => {
     setModalOpen(true);
   };
@@ -46,6 +61,8 @@ export default function App() {
     console.log("Resource Added: ", resourceData);
     setModalOpen(false);
   };
+
+
 
   return (
     <div className="app">
@@ -99,6 +116,8 @@ export default function App() {
         onCancel={handleModalCancel}
         onSubmit={handleModalSubmit}
       />
+      <ManageUsersModal open={manageUsersOpen} onCancel={handleManageUsersCancel} usersInfo={usersInfo} />
+
     </div>
   );
 }
