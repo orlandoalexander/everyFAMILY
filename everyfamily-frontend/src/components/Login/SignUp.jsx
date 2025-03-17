@@ -3,8 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Form, Input, Button, Checkbox } from "antd";
 import { EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
 import useCreateAccount from "../../hooks/useCreateAccount";
-import everyFamilyLogo from "../../assets/everyFAMILY-logo.png"; // Import logo
-
+import everyFamilyLogo from "../../assets/everyFAMILY-logo.png";
 const RegisterPage = () => {
     const navigate = useNavigate();
 
