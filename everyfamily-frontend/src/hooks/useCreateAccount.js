@@ -13,8 +13,9 @@ const useCreateAccount = () => {
 
   return useMutation(createAccount, {
     onSuccess: (data) => {
-      const { id = 1, role = "user", remember = true } = data;
-      login({ role, id, remember });
+      const { id, role, remember } = data;
+      if (!id || !role) throw new Error('Invalid response data');
+      login({ role, id, remember: remember ?? false });
     },
   });
 };
