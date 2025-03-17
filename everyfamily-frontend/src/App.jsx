@@ -2,6 +2,8 @@ import { useState, useContext } from "react";
 import { Route, Routes } from "react-router-dom";
 import Dashboard from "./components/Dashboard/index";
 import Resources from "./components/Resources/index";
+import {SignIn} from "./components/Login/index.jsx";
+import {SignUp} from "./components/Login/index.jsx";
 import AddResourceModal from "./components/Resources/AddResourceModal";
 import logo from "./assets/everyFAMILY-logo.png";
 import { AuthContext } from "./AuthContext";
