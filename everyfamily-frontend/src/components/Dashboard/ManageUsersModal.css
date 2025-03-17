@@ -32,6 +32,7 @@
 
 .ant-modal-body::-webkit-scrollbar {
     width: 6px;
+    height: 6px;
 }
 
 .ant-modal-body::-webkit-scrollbar-thumb {
