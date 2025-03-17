@@ -103,7 +103,7 @@ const LoginPage = () => {
             <Col xs={0} lg={12} className="bg-blue-600 flex items-center justify-center">
                 <div className="text-center text-white max-w-md p-8">
                     <Title level={2} style={{ color: "white", marginBottom: 16 }}>
-                        Welcome to Our EveryFamily
+                        Welcome to EveryFamily
                     </Title>
                 </div>
             </Col>
