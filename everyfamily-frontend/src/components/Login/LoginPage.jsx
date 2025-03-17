@@ -2,15 +2,11 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Form, Input, Button, Checkbox } from "antd";
 import { EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
-import useLogin from "../../hooks/useLogin";
-import everyFamilyLogo from "../../assets/everyFAMILY-logo.png";
+import everyFamilyLogo from "../../assets/everyFAMILY-logo.png"; // Import logo
 
 const LoginPage = () => {
-    const { mutate: login, isLoading, error } = useLogin();
-
     const onFinish = (values) => {
-        const { email, password, remember } = values;
-        login({ email, password, remember: remember || false });
+        console.log('Received values:', values);
     };
 
     return (
@@ -25,12 +21,6 @@ const LoginPage = () => {
 
             <div className="w-full max-w-md border border-gray-200 rounded-lg p-8 bg-white shadow-sm">
                 <h1 className="text-2xl font-semibold text-center mb-8">Log in</h1>
-
-                {error && (
-                    <div className="mb-4 text-red-500 text-center">
-                        Invalid email or password. Please try again.
-                    </div>
-                )}
 
                 <Form
                     name="login"
@@ -73,13 +63,15 @@ const LoginPage = () => {
                         <Form.Item name="remember" valuePropName="checked" noStyle>
                             <Checkbox>Remember me</Checkbox>
                         </Form.Item>
+                        <Link to="/forgot-password" className="text-gray-500 text-sm">
+                            Forgot your password
+                        </Link>
                     </div>
 
                     <Form.Item>
                         <Button
                             type="primary"
                             htmlType="submit"
-                            loading={isLoading}
                             block
                             style={{
                                 height: "48px",
