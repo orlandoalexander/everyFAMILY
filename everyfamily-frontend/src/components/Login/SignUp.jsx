@@ -1,8 +1,9 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Form, Input, Button, Checkbox, Card, Typography, Row, Col, Alert, Space } from "antd";
-import { UserOutlined, LockOutlined, SafetyOutlined } from "@ant-design/icons";
-import useCreateAccount from "./useRegisterUser";
+import { Form, Input, Button, Checkbox } from "antd";
+import { EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
+import useCreateAccount from "../../hooks/useCreateAccount";
+import everyFamilyLogo from "../../assets/everyFAMILY-logo.png"; // Import logo
 
 const RegisterPage = () => {
     const navigate = useNavigate();
@@ -27,145 +28,152 @@ const RegisterPage = () => {
         );
     };
 
-    const { Title, Text, Paragraph } = Typography;
-
     return (
-        <Row className="min-h-screen bg-gray-50">
-            <Col xs={24} lg={12} className="flex justify-center items-center p-4">
-                <Card bordered={false} className="w-full max-w-md shadow-lg" style={{ borderRadius: 8 }}>
-                    <div className="text-center mb-6">
-                        <Title level={2} style={{ marginBottom: 8 }}>Create an account</Title>
-                        <Paragraph type="secondary">Fill in the details to get started</Paragraph>
+        <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-white">
+            <div className="w-full max-w-md mb-8">
+                <img
+                    src={everyFamilyLogo}
+                    alt="everyFAMILY logo"
+                    className="mb-12 w-64 mx-auto"
+                />
+            </div>
+
+            <div className="w-full max-w-md border border-gray-200 rounded-lg p-8 bg-white shadow-sm">
+                <h1 className="text-2xl font-semibold text-center mb-8">Create account</h1>
+
+                {error && (
+                    <div className="mb-4 text-red-500 text-center">
+                        {error.message || "Something went wrong. Please try again."}
                     </div>
+                )}
 
-                    {error && (
-                        <Alert
-                            message="Registration Failed"
-                            description={error.message || "Something went wrong. Please try again."}
-                            type="error"
-                            showIcon
-                            className="mb-4"
-                        />
-                    )}
-
-                    <Form
-                        name="register"
-                        initialValues={{ agree: false }}
-                        onFinish={onFinish}
-                        layout="vertical"
-                        requiredMark={false}
-                        size="large"
+                <Form
+                    name="register"
+                    initialValues={{ agree: false }}
+                    onFinish={onFinish}
+                    layout="vertical"
+                    requiredMark={false}
+                >
+                    <Form.Item
+                        name="email"
+                        label="Email address"
+                        rules={[
+                            { required: true, message: "Please enter your email" },
+                            { type: "email", message: "Please enter a valid email" }
+                        ]}
                     >
-                        <Form.Item
-                            name="email"
-                            label="Email"
-                            rules={[
-                                { required: true, message: "Please enter your email" },
-                                { type: "email", message: "Please enter a valid email" }
-                            ]}
-                        >
-                            <Input
-                                prefix={<UserOutlined className="site-form-item-icon" />}
-                                placeholder="Enter your email"
-                            />
-                        </Form.Item>
+                        <Input
+                            placeholder=""
+                            size="large"
+                            className="rounded-md"
+                        />
+                    </Form.Item>
 
-                        <Form.Item
-                            name="password"
-                            label="Password"
-                            rules={[
-                                { required: true, message: "Please enter your password" },
-                                { min: 8, message: "Password must be at least 8 characters" }
-                            ]}
-                            hasFeedback
-                        >
-                            <Input.Password
-                                prefix={<LockOutlined className="site-form-item-icon" />}
-                                placeholder="Create a password"
-                            />
-                        </Form.Item>
+                    <Form.Item
+                        name="password"
+                        label="Password"
+                        rules={[
+                            { required: true, message: "Please enter your password" },
+                            { min: 8, message: "Password must be at least 8 characters" }
+                        ]}
+                    >
+                        <Input.Password
+                            placeholder=""
+                            size="large"
+                            className="rounded-md"
+                            iconRender={(visible) => (
+                                visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
+                            )}
+                        />
+                    </Form.Item>
 
-                        <Form.Item
-                            name="confirmPassword"
-                            label="Confirm Password"
-                            dependencies={["password"]}
-                            hasFeedback
-                            rules={[
-                                { required: true, message: "Please confirm your password" },
-                                ({ getFieldValue }) => ({
-                                    validator(_, value) {
-                                        if (!value || getFieldValue("password") === value) {
-                                            return Promise.resolve();
-                                        }
-                                        return Promise.reject(new Error("The two passwords do not match"));
-                                    },
-                                }),
-                            ]}
-                        >
-                            <Input.Password
-                                prefix={<SafetyOutlined className="site-form-item-icon" />}
-                                placeholder="Confirm your password"
-                            />
-                        </Form.Item>
-
-                        <Form.Item
-                            name="agree"
-                            valuePropName="checked"
-                            rules={[
-                                {
-                                    validator: (_, value) =>
-                                        value
-                                            ? Promise.resolve()
-                                            : Promise.reject(new Error("You must agree to the Terms of Service")),
+                    <Form.Item
+                        name="confirmPassword"
+                        label="Confirm Password"
+                        dependencies={["password"]}
+                        rules={[
+                            { required: true, message: "Please confirm your password" },
+                            ({ getFieldValue }) => ({
+                                validator(_, value) {
+                                    if (!value || getFieldValue("password") === value) {
+                                        return Promise.resolve();
+                                    }
+                                    return Promise.reject(new Error("The two passwords do not match"));
                                 },
-                            ]}
+                            }),
+                        ]}
+                    >
+                        <Input.Password
+                            placeholder=""
+                            size="large"
+                            className="rounded-md"
+                            iconRender={(visible) => (
+                                visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
+                            )}
+                        />
+                    </Form.Item>
+
+                    <Form.Item
+                        name="agree"
+                        valuePropName="checked"
+                        rules={[
+                            {
+                                validator: (_, value) =>
+                                    value
+                                        ? Promise.resolve()
+                                        : Promise.reject(new Error("You must agree to the Terms of Service")),
+                            },
+                        ]}
+                    >
+                        <Checkbox>
+                            I agree to the{" "}
+                            <Link to="/terms" className="text-primary">
+                                Terms of Service
+                            </Link>{" "}
+                            and{" "}
+                            <Link to="/privacy" className="text-primary">
+                                Privacy Policy
+                            </Link>
+                        </Checkbox>
+                    </Form.Item>
+
+                    <Form.Item>
+                        <Button
+                            type="primary"
+                            htmlType="submit"
+                            loading={isLoading}
+                            block
+                            style={{
+                                height: "48px",
+                                borderRadius: "500px",
+                                backgroundColor: "#92278F",
+                                fontSize: "16px"
+                            }}
                         >
-                            <Checkbox>
-                                I agree to the{" "}
-                                <Link to="/terms" className="text-primary">
-                                    Terms of Service
-                                </Link>{" "}
-                                and{" "}
-                                <Link to="/privacy" className="text-primary">
-                                    Privacy Policy
-                                </Link>
-                            </Checkbox>
-                        </Form.Item>
+                            Create account
+                        </Button>
+                    </Form.Item>
 
-                        <Form.Item>
+                    <div className="border-t border-gray-200 pt-6 mt-4">
+                        <p className="text-center text-gray-700 mb-4">Already have an account?</p>
+                        <Link to="/login">
                             <Button
-                                type="primary"
-                                htmlType="submit"
-                                loading={isLoading}
                                 block
+                                size="large"
+                                style={{
+                                    height: "48px",
+                                    borderRadius: "500px",
+                                    border: "1px solid #d9d9d9",
+                                    fontSize: "16px"
+                                }}
                             >
-                                Create account
+                                Log in
                             </Button>
-                        </Form.Item>
-
-                        <div className="text-center">
-                            <Space>
-                                <Text type="secondary">Already have an account?</Text>
-                                <Link to="/login" className="text-primary font-medium">
-                                    Sign in
-                                </Link>
-                            </Space>
-                        </div>
-                    </Form>
-                </Card>
-            </Col>
-
-            <Col xs={0} lg={12} className="bg-blue-600 flex items-center justify-center">
-                <div className="text-center text-white max-w-md p-8">
-                    <Title level={2} style={{ color: "white", marginBottom: 16 }}>
-                        Join Our Community
-                    </Title>
-                    <Paragraph style={{ color: "rgba(255, 255, 255, 0.85)", fontSize: 18 }}>
-                        Connect with resources for every family
-                    </Paragraph>
-                </div>
-            </Col>
-        </Row>
+                        </Link>
+                    </div>
+                </Form>
+            </div>
+        </div>
     );
 };
 
