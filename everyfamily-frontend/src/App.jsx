@@ -28,9 +28,9 @@ export default function App() {
       key: "users",
       icon: <Users size={15} />,
       label: (
-        <Button type="text" onClick={showManageUsersModal}>
+        <div type="text" onClick={showManageUsersModal}>
           Manage users
-        </Button>
+        </div>
       ),
     },
     {
