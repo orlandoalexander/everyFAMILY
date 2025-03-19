@@ -2,22 +2,24 @@ import "./resourceCard.css";
 import ResourceType from "./ResourceType.jsx";
 import { Card, Col } from "antd";
 
-function ResourceCard({ title, description, type }) {
+function ResourceCard({ title, description, link, type }) {
   return (
     <div>
       <Col span={8}>
         <Card className="card-container" hoverable size="small">
           <div className="outer-card">
-            <Card
-              className="inner-card"
-              type="inner"
-              cover={
-                <img
-                  alt="example"
-                  src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png"
-                />
-              }
-            />
+            <a href={link} target="_blank" rel="noopener noreferrer">
+              <Card
+                className="inner-card"
+                type="inner"
+                cover={
+                  <img
+                    alt="example"
+                    src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png"
+                  />
+                }
+              />
+            </a>
             <p
               style={{
                 fontSize: 14,
