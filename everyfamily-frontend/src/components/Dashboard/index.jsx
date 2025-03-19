@@ -39,8 +39,8 @@ function Dashboard() {
         {categoryData &&
           categoryData.map((category, index) => (
             <Category
+              key={index}
               categoryKey={index}
-              key={category.category_id}
               label={category.title}
               children={
                 resourceData &&
@@ -60,6 +60,23 @@ function Dashboard() {
               }
             />
           ))}
+        <Category
+          key={"all"}
+          categoryKey={"all"}
+          label={"All resources"}
+          children={
+            resourceData &&
+            resourceData.map((resource, index) => (
+              <ResourceCard
+                key={index}
+                title={resource.title}
+                link={resource.link}
+                description={resource.description}
+                type={resource.type_title}
+              />
+            ))
+          }
+        />
       </div>
     </div>
   );
