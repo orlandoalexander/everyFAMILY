@@ -1,10 +1,25 @@
 import React from "react";
 import {Button, Modal, Table} from "antd";
+import useDeleteAccount from "../../hooks/useDeleteAccount";
 import "./ManageUsersModal.css"
 
 const { Column, ColumnGroup } = Table;
 
 function ManageUsersModal({ open, onCancel, usersInfo, onRemoveUser }) {
+    const { mutate: deleteUser, isLoading } = useDeleteAccount();
+
+    const handleRemoveUser = (user_id) => {
+        deleteUser(user_id, {
+            onSuccess: () => {
+                console.log(`User ${user_id} deleted successfully!`);
+            },
+            onError: (error) => {
+                console.error("Error deleting user:", error);
+            }
+        });
+    };
+
+
     return (
         <Modal
             title="Manage users"
@@ -27,7 +42,7 @@ function ManageUsersModal({ open, onCancel, usersInfo, onRemoveUser }) {
                    title="Action"
                    key="action"
                    render={(text, record) => (
-                       <Button type="text" danger onClick={() => onRemoveUser(record.email)}>
+                       <Button type="text" danger onClick={() => handleRemoveUser(record.user_id)}>
                            Remove User
                        </Button>
                    )}

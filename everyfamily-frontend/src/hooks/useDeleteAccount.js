@@ -6,16 +6,19 @@ import { AuthContext } from "../AuthContext";
 const useDeleteAccount = () => {
     const { logout } = useContext(AuthContext);
 
-    const createAccount = async (data) => {
-        const response = await api.delete("/delete_user", data);
+    const deleteAccount = async (user_id) => {
+        const response = await api.delete(`/user/${user_id}`);  // Pass user_id in URL
         return response.data;
     };
 
-    return useMutation(createAccount, {
-        onSuccess: (data) => {
-            const { id, role, remember } = data;
-            if (!id || !role) throw new Error('Invalid response data');
-            logout({ role, id, remember: remember ?? false });
+    return useMutation({
+        mutationFn: deleteAccount,  // Correct way to define mutation
+        onSuccess: () => {
+            console.log("User deleted successfully");
+            logout();
+        },
+        onError: (error) => {
+            console.error("Error deleting user:", error);
         },
     });
 };
