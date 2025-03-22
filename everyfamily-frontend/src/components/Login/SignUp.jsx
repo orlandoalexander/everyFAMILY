@@ -1,12 +1,12 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
 import { Form, Input, Button, Checkbox } from "antd";
 import { EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
 import useCreateAccount from "../../hooks/useCreateAccount";
+import { useNavigate } from "react-router-dom";
 import everyFamilyLogo from "../../assets/everyFAMILY-logo.png";
-const RegisterPage = () => {
-    const navigate = useNavigate();
 
+const SignUp = ({ onBackToLogin }) => {
+    const navigate = useNavigate();
     const { mutate: createAccount, isLoading, error } = useCreateAccount();
 
     const onFinish = (values) => {
@@ -21,7 +21,7 @@ const RegisterPage = () => {
             },
             {
                 onSuccess: () => {
-                    navigate("/dashboard");
+                    navigate("/");
                 }
             }
         );
@@ -126,13 +126,13 @@ const RegisterPage = () => {
                     >
                         <Checkbox>
                             I agree to the{" "}
-                            <Link to="/terms" className="text-primary">
+                            <a href="#" className="text-primary">
                                 Terms of Service
-                            </Link>{" "}
+                            </a>{" "}
                             and{" "}
-                            <Link to="/privacy" className="text-primary">
+                            <a href="#" className="text-primary">
                                 Privacy Policy
-                            </Link>
+                            </a>
                         </Checkbox>
                     </Form.Item>
 
@@ -155,20 +155,19 @@ const RegisterPage = () => {
 
                     <div className="border-t border-gray-200 pt-6 mt-4">
                         <p className="text-center text-gray-700 mb-4">Already have an account?</p>
-                        <Link to="/login">
-                            <Button
-                                block
-                                size="large"
-                                style={{
-                                    height: "48px",
-                                    borderRadius: "500px",
-                                    border: "1px solid #d9d9d9",
-                                    fontSize: "16px"
-                                }}
-                            >
-                                Log in
-                            </Button>
-                        </Link>
+                        <Button
+                            block
+                            size="large"
+                            onClick={onBackToLogin}
+                            style={{
+                                height: "48px",
+                                borderRadius: "500px",
+                                border: "1px solid #d9d9d9",
+                                fontSize: "16px"
+                            }}
+                        >
+                            Log in
+                        </Button>
                     </div>
                 </Form>
             </div>
@@ -176,4 +175,4 @@ const RegisterPage = () => {
     );
 };
 
-export default RegisterPage;
+export default SignUp;

@@ -1,6 +1,19 @@
+import React, { useState } from "react";
 import SignIn from "./SignIn.jsx";
 import SignUp from "./SignUp.jsx";
 
-export { SignIn, SignUp };
+const Login = () => {
+    const [isLoginView, setIsLoginView] = useState(true);
 
-export default SignIn;
+    const toggleView = () => {
+        setIsLoginView(!isLoginView);
+    };
+
+    return isLoginView ? (
+        <SignIn onSwitchToSignUp={toggleView} />
+    ) : (
+        <SignUp onBackToLogin={toggleView} />
+    );
+};
+
+export default Login;
