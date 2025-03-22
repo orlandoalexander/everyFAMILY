@@ -1,108 +1,140 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Form, Input, Button, Checkbox } from "antd";
-import { EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
-import everyFamilyLogo from "../../assets/everyFAMILY-logo.png"; // Import logo
+import { EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
+import useLogin from "../../hooks/useLogin";
+import everyFamilyLogo from "../../assets/everyFAMILY-logo.png";
+import "./SignIn.css";
 
-const LoginPage = () => {
-  const onFinish = (values) => {
-    console.log("Received values:", values);
-  };
+const SignIn = () => {
+    const navigate = useNavigate();
+    const { mutate: login, isPending, error } = useLogin();
 
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-white">
-      <div className="w-full max-w-md mb-8">
-        <img
-          src={everyFamilyLogo}
-          alt="everyFAMILY logo"
-          className="mb-12 w-64 mx-auto"
-        />
-      </div>
+    const onFinish = (values) => {
+        const { email, password, remember = false } = values;
 
-      <div className="w-full max-w-md border border-gray-200 rounded-lg p-8 bg-white shadow-sm">
-        <h1 className="text-2xl font-semibold text-center mb-8">Log in</h1>
+        login(
+            { email, password, remember },
+            {
+                onSuccess: () => {
+                    navigate("/");
+                }
+            }
+        );
+    };
 
-        <Form
-          name="login"
-          initialValues={{ remember: false }}
-          onFinish={onFinish}
-          layout="vertical"
-          requiredMark={false}
-        >
-          <Form.Item
-            name="email"
-            label="Email address"
-            rules={[
-              { required: true, message: "Please enter your email" },
-              { type: "email", message: "Please enter a valid email" },
-            ]}
-          >
-            <Input placeholder="" size="large" className="rounded-md" />
-          </Form.Item>
+    return (
+        <div className="signin-container">
+            <div className="logo-container">
+                <img
+                    src={everyFamilyLogo}
+                    alt="everyFAMILY logo"
+                    className="logo"
+                />
+            </div>
 
-          <Form.Item
-            name="password"
-            label="Password"
-            rules={[{ required: true, message: "Please enter your password" }]}
-          >
-            <Input.Password
-              placeholder=""
-              size="large"
-              className="rounded-md"
-              iconRender={(visible) =>
-                visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
-              }
-            />
-          </Form.Item>
+            <div className="form-container">
+                <h1 className="form-title">Log in</h1>
 
-          <div className="flex justify-between items-center mb-4">
-            <Form.Item name="remember" valuePropName="checked" noStyle>
-              <Checkbox>Remember me</Checkbox>
-            </Form.Item>
-            <Link to="/forgot-password" className="text-gray-500 text-sm">
-              Forgot your password
-            </Link>
-          </div>
+                {error && (
+                    <div className="error-message">
+                        {error.message || "Something went wrong. Please try again."}
+                    </div>
+                )}
 
-          <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              block
-              style={{
-                height: "48px",
-                borderRadius: "500px",
-                backgroundColor: "#92278F",
-                fontSize: "16px",
-              }}
-            >
-              Log in
-            </Button>
-          </Form.Item>
+                <Form
+                    name="signin"
+                    onFinish={onFinish}
+                    layout="vertical"
+                    requiredMark={false}
+                    initialValues={{ remember: false }}
+                >
+                    <Form.Item
+                        name="email"
+                        label="Email address"
+                        rules={[
+                            { required: true, message: "Please enter your email" },
+                            { type: "email", message: "Please enter a valid email" }
+                        ]}
+                    >
+                        <Input
+                            placeholder=""
+                            size="large"
+                            className="input-field"
+                        />
+                    </Form.Item>
 
-          <div className="border-t border-gray-200 pt-6 mt-4">
-            <p className="text-center text-gray-700 mb-4">
-              Don't have an account?
-            </p>
-            <Link to="/register">
-              <Button
-                block
-                size="large"
-                style={{
-                  height: "48px",
-                  borderRadius: "500px",
-                  border: "1px solid #d9d9d9",
-                  fontSize: "16px",
-                }}
-              >
-                Create account
-              </Button>
-            </Link>
-          </div>
-        </Form>
-      </div>
-    </div>
-  );
+                    <Form.Item
+                        name="password"
+                        label="Password"
+                        rules={[
+                            { required: true, message: "Please enter your password" }
+                        ]}
+                    >
+                        <Input.Password
+                            placeholder=""
+                            size="large"
+                            className="input-field"
+                            iconRender={(visible) => (
+                                visible ? <EyeOutlined /> : <EyeInvisibleOutlined />
+                            )}
+                        />
+                    </Form.Item>
+
+                    <div style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        marginBottom: "24px"
+                    }}>
+                        <Form.Item
+                            name="remember"
+                            valuePropName="checked"
+                            noStyle
+                        >
+                            <Checkbox>Remember me</Checkbox>
+                        </Form.Item>
+                        <Link
+                            to="/forgot-password"
+                            style={{
+                                color: "#666666",
+                                fontSize: "14px"
+                            }}
+                        >
+                            Forgot your password
+                        </Link>
+                    </div>
+
+                    <Form.Item>
+                        <Button
+                            type="primary"
+                            htmlType="submit"
+                            loading={isPending}
+                            block
+                            className="login-button"
+                        >
+                            Log in
+                        </Button>
+                    </Form.Item>
+
+                    <div className="divider"></div>
+
+                    <div className="create-account-section">
+                        <p className="create-account-text">Don't have an account?</p>
+                        <Link to="/register" style={{ width: "100%" }}>
+                            <Button
+                                block
+                                size="large"
+                                className="create-account-button"
+                            >
+                                Create account
+                            </Button>
+                        </Link>
+                    </div>
+                </Form>
+            </div>
+        </div>
+    );
 };
 
-export default LoginPage;
+export default SignIn;

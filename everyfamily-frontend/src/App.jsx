@@ -2,7 +2,7 @@ import { useState, useContext } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 import Dashboard from "./components/Dashboard/index";
 import Resources from "./components/Resources/index";
-import Login from "./components/Login/index";
+import Login, {SignUp} from "./components/Login/index";
 import AddResourceModal from "./components/Resources/AddResourceModal";
 import ManageUsersModal from "./components/Dashboard/ManageUsersModal.jsx";
 import logo from "./assets/everyFAMILY-logo.png";
@@ -20,6 +20,9 @@ export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [manageUsersOpen, setManageUsersOpen] = useState(false);
 
+  // Check if current path is login or register
+  const isAuthPage = location.pathname === "/login" || location.pathname === "/register";
+
   const showManageUsersModal = () => setManageUsersOpen(true);
   const handleManageUsersCancel = () => setManageUsersOpen(false);
 
@@ -28,9 +31,9 @@ export default function App() {
       key: "users",
       icon: <Users size={15} />,
       label: (
-        <div type="text" onClick={showManageUsersModal}>
-          Manage users
-        </div>
+          <div type="text" onClick={showManageUsersModal}>
+            Manage users
+          </div>
       ),
     },
     {
@@ -65,65 +68,66 @@ export default function App() {
   };
 
   return (
-    <div className="app">
-      {location.pathname !== "/login" && (
-        <header className="dashboard-header">
-          <img className="dashboard-header" src={logo} alt="everyFAMILY logo" />
-          <Search
-            className="dashboard-header-search"
-            placeholder="Find resources by name, description etc."
-            allowClear
-            size="large"
-          />
-          {user.role === "admin" ? (
-            <div className="dashboard-header-buttons">
-              <Button
-                className="dashboard-header-button"
-                type="primary"
-                icon={<Plus />}
-                size="large"
-                onClick={showModal}
-              >
-                Add new
-              </Button>
-              <Dropdown
-                menu={{ items: menuItems }}
-                trigger={["hover"]}
-                open={menuOpen}
-                onOpenChange={setMenuOpen}
-              >
-                <MenuIcon size={40} style={{ cursor: "pointer" }} />
-              </Dropdown>
-            </div>
-          ) : (
-            <div className="dashboard-header-buttons">
-              <Dropdown
-                menu={{ items: menuItems }}
-                trigger={["hover"]}
-                open={menuOpen}
-                onOpenChange={setMenuOpen}
-              >
-                <MenuIcon size={40} style={{ cursor: "pointer" }} />
-              </Dropdown>
-            </div>
-          )}
-        </header>
-      )}
-      <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/resources/:resourceType?" element={<Resources />} />
-      </Routes>
-      <AddResourceModal
-        open={modalOpen}
-        onCancel={handleModalCancel}
-        onSubmit={handleModalSubmit}
-      />
-      <ManageUsersModal
-        open={manageUsersOpen}
-        onCancel={handleManageUsersCancel}
-        usersInfo={usersInfo}
-      />
-    </div>
+      <div className="app" style={{ backgroundColor: isAuthPage ? 'white' : undefined }}>
+        {!isAuthPage && (
+            <header className="dashboard-header">
+              <img className="dashboard-header" src={logo} alt="everyFAMILY logo" />
+              <Search
+                  className="dashboard-header-search"
+                  placeholder="Find resources by name, description etc."
+                  allowClear
+                  size="large"
+              />
+              {user.role === "admin" ? (
+                  <div className="dashboard-header-buttons">
+                    <Button
+                        className="dashboard-header-button"
+                        type="primary"
+                        icon={<Plus />}
+                        size="large"
+                        onClick={showModal}
+                    >
+                      Add new
+                    </Button>
+                    <Dropdown
+                        menu={{ items: menuItems }}
+                        trigger={["hover"]}
+                        open={menuOpen}
+                        onOpenChange={setMenuOpen}
+                    >
+                      <MenuIcon size={40} style={{ cursor: "pointer" }} />
+                    </Dropdown>
+                  </div>
+              ) : (
+                  <div className="dashboard-header-buttons">
+                    <Dropdown
+                        menu={{ items: menuItems }}
+                        trigger={["hover"]}
+                        open={menuOpen}
+                        onOpenChange={setMenuOpen}
+                    >
+                      <MenuIcon size={40} style={{ cursor: "pointer" }} />
+                    </Dropdown>
+                  </div>
+              )}
+            </header>
+        )}
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<SignUp />} />
+          <Route path="/resources/:resourceType?" element={<Resources />} />
+        </Routes>
+        <AddResourceModal
+            open={modalOpen}
+            onCancel={handleModalCancel}
+            onSubmit={handleModalSubmit}
+        />
+        <ManageUsersModal
+            open={manageUsersOpen}
+            onCancel={handleManageUsersCancel}
+            usersInfo={usersInfo}
+        />
+      </div>
   );
 }

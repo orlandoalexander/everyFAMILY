@@ -1,54 +1,55 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Form, Input, Button, Checkbox } from "antd";
-import { EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
+import { Form, Input, Button } from "antd";
+import { EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
 import useCreateAccount from "../../hooks/useCreateAccount";
 import everyFamilyLogo from "../../assets/everyFAMILY-logo.png";
-const RegisterPage = () => {
-    const navigate = useNavigate();
+import "./SignUp.css";
 
-    const { mutate: createAccount, isLoading, error } = useCreateAccount();
+const SignUp = () => {
+    const navigate = useNavigate();
+    const { mutate: createAccount, isPending, error } = useCreateAccount();
 
     const onFinish = (values) => {
-        const { email, password } = values;
+        const { email, password, referralCode } = values;
 
         createAccount(
             {
                 email,
                 password,
                 role: "user",
-                remember: true
+                remember: true,
+                referralCode
             },
             {
                 onSuccess: () => {
-                    navigate("/dashboard");
+                    navigate("/");
                 }
             }
         );
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-white">
-            <div className="w-full max-w-md mb-8">
+        <div className="signup-container">
+            <div className="logo-container">
                 <img
                     src={everyFamilyLogo}
                     alt="everyFAMILY logo"
-                    className="mb-12 w-64 mx-auto"
+                    className="logo"
                 />
             </div>
 
-            <div className="w-full max-w-md border border-gray-200 rounded-lg p-8 bg-white shadow-sm">
-                <h1 className="text-2xl font-semibold text-center mb-8">Create account</h1>
+            <div className="form-container">
+                <h1 className="form-title">Create account</h1>
 
                 {error && (
-                    <div className="mb-4 text-red-500 text-center">
+                    <div className="error-message">
                         {error.message || "Something went wrong. Please try again."}
                     </div>
                 )}
 
                 <Form
-                    name="register"
-                    initialValues={{ agree: false }}
+                    name="signup"
                     onFinish={onFinish}
                     layout="vertical"
                     requiredMark={false}
@@ -64,7 +65,7 @@ const RegisterPage = () => {
                         <Input
                             placeholder=""
                             size="large"
-                            className="rounded-md"
+                            className="input-field"
                         />
                     </Form.Item>
 
@@ -73,98 +74,51 @@ const RegisterPage = () => {
                         label="Password"
                         rules={[
                             { required: true, message: "Please enter your password" },
-                            { min: 8, message: "Password must be at least 8 characters" }
+                            { min: 6, message: "Password must be at least 6 characters" }
                         ]}
                     >
                         <Input.Password
                             placeholder=""
                             size="large"
-                            className="rounded-md"
+                            className="input-field"
                             iconRender={(visible) => (
-                                visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
+                                visible ? <EyeOutlined /> : <EyeInvisibleOutlined />
                             )}
                         />
                     </Form.Item>
 
                     <Form.Item
-                        name="confirmPassword"
-                        label="Confirm Password"
-                        dependencies={["password"]}
-                        rules={[
-                            { required: true, message: "Please confirm your password" },
-                            ({ getFieldValue }) => ({
-                                validator(_, value) {
-                                    if (!value || getFieldValue("password") === value) {
-                                        return Promise.resolve();
-                                    }
-                                    return Promise.reject(new Error("The two passwords do not match"));
-                                },
-                            }),
-                        ]}
+                        name="referralCode"
+                        label="Referral code"
                     >
-                        <Input.Password
-                            placeholder=""
+                        <Input
+                            placeholder="Enter your referral code"
                             size="large"
-                            className="rounded-md"
-                            iconRender={(visible) => (
-                                visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
-                            )}
+                            className="input-field"
                         />
-                    </Form.Item>
-
-                    <Form.Item
-                        name="agree"
-                        valuePropName="checked"
-                        rules={[
-                            {
-                                validator: (_, value) =>
-                                    value
-                                        ? Promise.resolve()
-                                        : Promise.reject(new Error("You must agree to the Terms of Service")),
-                            },
-                        ]}
-                    >
-                        <Checkbox>
-                            I agree to the{" "}
-                            <Link to="/terms" className="text-primary">
-                                Terms of Service
-                            </Link>{" "}
-                            and{" "}
-                            <Link to="/privacy" className="text-primary">
-                                Privacy Policy
-                            </Link>
-                        </Checkbox>
                     </Form.Item>
 
                     <Form.Item>
                         <Button
                             type="primary"
                             htmlType="submit"
-                            loading={isLoading}
+                            loading={isPending}
                             block
-                            style={{
-                                height: "48px",
-                                borderRadius: "500px",
-                                backgroundColor: "#92278F",
-                                fontSize: "16px"
-                            }}
+                            className="create-account-button"
                         >
                             Create account
                         </Button>
                     </Form.Item>
 
-                    <div className="border-t border-gray-200 pt-6 mt-4">
-                        <p className="text-center text-gray-700 mb-4">Already have an account?</p>
-                        <Link to="/login">
+                    <div className="divider"></div>
+
+                    <div className="login-section">
+                        <p className="login-text">Already have an account?</p>
+                        <Link to="/login" style={{ width: "100%" }}>
                             <Button
                                 block
                                 size="large"
-                                style={{
-                                    height: "48px",
-                                    borderRadius: "500px",
-                                    border: "1px solid #d9d9d9",
-                                    fontSize: "16px"
-                                }}
+                                className="login-button"
                             >
                                 Log in
                             </Button>
@@ -176,4 +130,4 @@ const RegisterPage = () => {
     );
 };
 
-export default RegisterPage;
+export default SignUp;
