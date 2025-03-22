@@ -13,9 +13,16 @@ function ManageUsersModal({ open, onCancel, usersInfo, onRemoveUser }) {
             footer={null}
         >
            <div>
-           <Table dataSource={usersInfo} pagination={false}>
-               <Column title="Name" dataIndex="name" />
-               <Column title="Email" dataIndex="email"></Column>
+           <Table
+               dataSource={usersInfo}
+               pagination={false}
+               scroll={{ x: "max-content" }}
+           >
+               <Column title="Name" dataIndex="name" width={100} />
+               <Column title="Email" dataIndex="email" width={200}/>
+               <Column title="Organisation role" dataIndex="organisationRole"/>
+               <Column title="Local authority" dataIndex="localAuthority"/>
+               <Column title="Last logged in time" dataIndex="lastLoggedInTime"/>
                <Column
                    title="Action"
                    key="action"
