@@ -1,5 +1,5 @@
-import SignIn from "./LoginPage.jsx";
-import SignUp from "./RegisterPage.jsx";
+import SignIn from "./SignIn.jsx";
+import SignUp from "./SignUp.jsx";
 
 export { SignIn, SignUp };
 

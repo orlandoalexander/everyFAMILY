@@ -1,9 +1,8 @@
 import { useState, useContext } from "react";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import Dashboard from "./components/Dashboard/index";
 import Resources from "./components/Resources/index";
-import {SignIn} from "./components/Login/index.jsx";
-import {SignUp} from "./components/Login/index.jsx";
+import Login from "./components/Login/index";
 import AddResourceModal from "./components/Resources/AddResourceModal";
 import ManageUsersModal from "./components/Dashboard/ManageUsersModal.jsx";
 import logo from "./assets/everyFAMILY-logo.png";
@@ -16,6 +15,7 @@ const { Search } = Input;
 
 export default function App() {
   const { user } = useContext(AuthContext);
+  const location = useLocation();
   const [modalOpen, setModalOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [manageUsersOpen, setManageUsersOpen] = useState(false);
@@ -28,9 +28,9 @@ export default function App() {
       key: "users",
       icon: <Users size={15} />,
       label: (
-          <Button type="text" onClick={showManageUsersModal}>
-            Manage users
-          </Button>
+        <div type="text" onClick={showManageUsersModal}>
+          Manage users
+        </div>
       ),
     },
     {
@@ -45,11 +45,11 @@ export default function App() {
     },
   ];
   const usersInfo = [
-    {key: "1", name: "user", email: "user@gmail.com", action: "Remove User"},
-    {key: "2", name: "user", email: "user@gmail.com", action: "Remove User"},
-    {key: "3", name: "user", email: "user@gmail.com", action: "Remove User"},
-    {key: "4", name: "user", email: "user@gmail.com", action: "Remove User"},
-    {key: "5", name: "user", email: "user@gmail.com", action: "Remove User"},
+    { key: "1", name: "user", email: "user@gmail.com", action: "Remove User" },
+    { key: "2", name: "user", email: "user@gmail.com", action: "Remove User" },
+    { key: "3", name: "user", email: "user@gmail.com", action: "Remove User" },
+    { key: "4", name: "user", email: "user@gmail.com", action: "Remove User" },
+    { key: "5", name: "user", email: "user@gmail.com", action: "Remove User" },
   ];
   const showModal = () => {
     setModalOpen(true);
@@ -64,53 +64,54 @@ export default function App() {
     setModalOpen(false);
   };
 
-
-
   return (
     <div className="app">
-      <header className="dashboard-header">
-        <img className="dashboard-header" src={logo} alt="everyFAMILY logo" />
-        <Search
-          className="dashboard-header-search"
-          placeholder="Find resources by name, description etc."
-          allowClear
-          size="large"
-        />
-        {user.role === "admin" ? (
-          <div className="dashboard-header-buttons">
-            <Button
-              className="dashboard-header-button"
-              type="primary"
-              icon={<Plus />}
-              size="large"
-              onClick={showModal}
-            >
-              Add new
-            </Button>
-            <Dropdown
-              menu={{ items: menuItems }}
-              trigger={["hover"]}
-              open={menuOpen}
-              onOpenChange={setMenuOpen}
-            >
-              <MenuIcon size={40} style={{ cursor: "pointer" }} />
-            </Dropdown>
-          </div>
-        ) : (
-          <div className="dashboard-header-buttons">
-            <Dropdown
-              menu={{ items: menuItems }}
-              trigger={["hover"]}
-              open={menuOpen}
-              onOpenChange={setMenuOpen}
-            >
-              <MenuIcon size={40} style={{ cursor: "pointer" }} />
-            </Dropdown>
-          </div>
-        )}
-      </header>
+      {location.pathname !== "/login" && (
+        <header className="dashboard-header">
+          <img className="dashboard-header" src={logo} alt="everyFAMILY logo" />
+          <Search
+            className="dashboard-header-search"
+            placeholder="Find resources by name, description etc."
+            allowClear
+            size="large"
+          />
+          {user.role === "admin" ? (
+            <div className="dashboard-header-buttons">
+              <Button
+                className="dashboard-header-button"
+                type="primary"
+                icon={<Plus />}
+                size="large"
+                onClick={showModal}
+              >
+                Add new
+              </Button>
+              <Dropdown
+                menu={{ items: menuItems }}
+                trigger={["hover"]}
+                open={menuOpen}
+                onOpenChange={setMenuOpen}
+              >
+                <MenuIcon size={40} style={{ cursor: "pointer" }} />
+              </Dropdown>
+            </div>
+          ) : (
+            <div className="dashboard-header-buttons">
+              <Dropdown
+                menu={{ items: menuItems }}
+                trigger={["hover"]}
+                open={menuOpen}
+                onOpenChange={setMenuOpen}
+              >
+                <MenuIcon size={40} style={{ cursor: "pointer" }} />
+              </Dropdown>
+            </div>
+          )}
+        </header>
+      )}
       <Routes>
         <Route path="/" element={<Dashboard />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/resources/:resourceType?" element={<Resources />} />
       </Routes>
       <AddResourceModal
@@ -118,8 +119,11 @@ export default function App() {
         onCancel={handleModalCancel}
         onSubmit={handleModalSubmit}
       />
-      <ManageUsersModal open={manageUsersOpen} onCancel={handleManageUsersCancel} usersInfo={usersInfo} />
-
+      <ManageUsersModal
+        open={manageUsersOpen}
+        onCancel={handleManageUsersCancel}
+        usersInfo={usersInfo}
+      />
     </div>
   );
 }

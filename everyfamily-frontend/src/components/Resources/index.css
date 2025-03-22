@@ -1,5 +1,6 @@
 .resources-container {
   max-height: 80vh;
   overflow-y: scroll;
-  padding-bottom: 20px;
+  overflow-x: hidden;
+  padding: 20px;
 }

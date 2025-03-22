@@ -1,23 +1,23 @@
 import "./index.css";
 import ResourceCard from "../Resources/ResourceCard.jsx";
+import useGetCategories from "../../hooks/useGetCategories";
+import useGetResources from "../../hooks/useGetResources";
 import feature1 from "../../assets/everyFAMILY-feature1.png";
 import Category from "./Category.jsx";
 
-const allResources = [
-  { title: "A", description: "a", category: "All resources", type: "article" },
-  { title: "B", description: "b", category: "All resources", type: "article" },
-  { title: "B", description: "b", category: "All resources", type: "article" },
-  { title: "B", description: "b", category: "All resources", type: "article" },
-  { title: "B", description: "b", category: "All resources", type: "article" },
-  { title: "B", description: "b", category: "All resources", type: "article" },
-  { title: "B", description: "b", category: "All resources", type: "article" },
-  { title: "B", description: "b", category: "All resources", type: "article" },
-  { title: "C", description: "c", category: "Arrest", type: "video" },
-  { title: "D", description: "d", category: "Court", type: "video" },
-];
-const allCategories = ["All resources", "Arrest", "Court", "Imprisonment"];
-
 function Dashboard() {
+  const {
+    data: categoryData,
+    isLoading: categoryIsLoading,
+    isError: categoryIsError,
+  } = useGetCategories();
+
+  const {
+    data: resourceData,
+    isLoading: resourceIsLoading,
+    isError: resourceIsError,
+  } = useGetResources();
+
   return (
     <div className="dashboard">
       <section className="dashboard-featured">
@@ -36,23 +36,47 @@ function Dashboard() {
       </section>
       <div className="dashboard-category">
         <h1>Browse by category</h1>
-        {allCategories.map((label, index) => (
-          <Category
-            categoryKey={index}
-            key={index}
-            label={label}
-            children={allResources
-              .filter(({ category }) => category === label)
-              .map(({ title, description, category, type }, i) => (
-                <ResourceCard
-                  key={i}
-                  title={title}
-                  description={description}
-                  type={type}
-                />
-              ))}
-          />
-        ))}
+        {categoryData &&
+          categoryData.map((category, index) => (
+            <Category
+              key={index}
+              categoryKey={index}
+              label={category.title}
+              children={
+                resourceData &&
+                resourceData
+                  .filter(
+                    ({ category_id }) => category_id === category.category_id
+                  )
+                  .map((resource, index) => (
+                    <ResourceCard
+                      key={index}
+                      title={resource.title}
+                      link={resource.link}
+                      description={resource.description}
+                      type={resource.type_title}
+                    />
+                  ))
+              }
+            />
+          ))}
+        <Category
+          key={"all"}
+          categoryKey={"all"}
+          label={"All resources"}
+          children={
+            resourceData &&
+            resourceData.map((resource, index) => (
+              <ResourceCard
+                key={index}
+                title={resource.title}
+                link={resource.link}
+                description={resource.description}
+                type={resource.type_title}
+              />
+            ))
+          }
+        />
       </div>
     </div>
   );

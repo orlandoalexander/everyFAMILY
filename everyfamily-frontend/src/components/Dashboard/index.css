@@ -1,3 +1,9 @@
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
 .dashboard-featured {
   display: flex;
   gap: 2rem;
