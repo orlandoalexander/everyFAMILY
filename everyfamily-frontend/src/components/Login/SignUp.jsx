@@ -1,12 +1,12 @@
 import React from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Form, Input, Button, Checkbox } from "antd";
 import { EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
 import useCreateAccount from "../../hooks/useCreateAccount";
-import { useNavigate } from "react-router-dom";
 import everyFamilyLogo from "../../assets/everyFAMILY-logo.png";
-
-const SignUp = ({ onBackToLogin }) => {
+const RegisterPage = () => {
     const navigate = useNavigate();
+
     const { mutate: createAccount, isLoading, error } = useCreateAccount();
 
     const onFinish = (values) => {
@@ -21,7 +21,7 @@ const SignUp = ({ onBackToLogin }) => {
             },
             {
                 onSuccess: () => {
-                    navigate("/");
+                    navigate("/dashboard");
                 }
             }
         );
@@ -126,13 +126,13 @@ const SignUp = ({ onBackToLogin }) => {
                     >
                         <Checkbox>
                             I agree to the{" "}
-                            <a href="#" className="text-primary">
+                            <Link to="/terms" className="text-primary">
                                 Terms of Service
-                            </a>{" "}
+                            </Link>{" "}
                             and{" "}
-                            <a href="#" className="text-primary">
+                            <Link to="/privacy" className="text-primary">
                                 Privacy Policy
-                            </a>
+                            </Link>
                         </Checkbox>
                     </Form.Item>
 
@@ -155,19 +155,20 @@ const SignUp = ({ onBackToLogin }) => {
 
                     <div className="border-t border-gray-200 pt-6 mt-4">
                         <p className="text-center text-gray-700 mb-4">Already have an account?</p>
-                        <Button
-                            block
-                            size="large"
-                            onClick={onBackToLogin}
-                            style={{
-                                height: "48px",
-                                borderRadius: "500px",
-                                border: "1px solid #d9d9d9",
-                                fontSize: "16px"
-                            }}
-                        >
-                            Log in
-                        </Button>
+                        <Link to="/login">
+                            <Button
+                                block
+                                size="large"
+                                style={{
+                                    height: "48px",
+                                    borderRadius: "500px",
+                                    border: "1px solid #d9d9d9",
+                                    fontSize: "16px"
+                                }}
+                            >
+                                Log in
+                            </Button>
+                        </Link>
                     </div>
                 </Form>
             </div>
@@ -175,4 +176,4 @@ const SignUp = ({ onBackToLogin }) => {
     );
 };
 
-export default SignUp;
+export default RegisterPage;
