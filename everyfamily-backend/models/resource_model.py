@@ -16,13 +16,14 @@ class Resource(Base):
     type_id = Column(Integer, ForeignKey('types.type_id'), nullable=False)
     upload_user_id = Column(String, nullable=False)
     created_on = Column(DateTime, default=func.now())
+    thumbnail_url = Column(String, nullable=False)
 
     # Relationships
     category = relationship(Category, back_populates="resources")
     type = relationship("Type", back_populates="resources")
 
     def __repr__(self):
-        return f"<Resource(id={self.resource_id}, description={self.description}, link={self.link}, category_id={self.category_id}, type_id={self.type_id}, upload_user_id={self.upload_user_id}, created_on={self.created_on})>"
+        return f"<Resource(id={self.resource_id}, description={self.description}, link={self.link}, thumbnail_url={self.thumbnail_url} category_id={self.category_id}, type_id={self.type_id}, upload_user_id={self.upload_user_id}, created_on={self.created_on})>"
 
 def fetch_resources(session):
     return (session.query(Resource, Category.title.label('category_title'), Type.title.label('type_title'))
