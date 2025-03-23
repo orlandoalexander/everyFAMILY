@@ -13,7 +13,7 @@ class Referral(Base):
         return f"<Referral(id={self.id}, title={self.title}, status={self.status}>"
 
 def validate_referral_code(session, referral_code_title):
-    referral_code = session.query(Referral).filter_by(title=referral_code_title).first()
+    referral_code = session.query(Referral).filter_by(title=referral_code_title, status="active").first()
     return bool(referral_code)
 
 def add_referral_code(session, referral_code_title):

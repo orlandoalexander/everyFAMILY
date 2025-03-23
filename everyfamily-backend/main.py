@@ -134,28 +134,35 @@ def create_category():
     return jsonify({"message": "Category created successfully."}), 201
 
 
-@app.route('/validate_new_account', methods=['GET'])
-def validate_referral():
-    referral_code_title = request.args.get('code')
-    email = request.args.get('email')
-    if not referral_code_title or not email:
-        return jsonify({"error": "Missing parameters"}), 400
-
-    session = Session()
-    referral_code_is_valid = validate_referral_code(session, referral_code_title)
-    email_exists = check_email_exists(session, email)
-
-    session.close()
-
-    return jsonify({"valid": referral_code_is_valid and not email_exists})
-
-
 @app.route('/signup', methods=['POST'])
 def signup():
     data = request.get_json()
 
     email = data.get('email')
     password = data.get('password')
+    referral_code = data.get('referral_code')
+
+    session = Session()
+
+    referral_code_valid = validate_referral_code(session, referral_code)
+
+    if session.query(User).filter_by(email=email).first():
+        return jsonify({"message": "Account with this email already exists"}), 400
+
+    if not referral_code_valid:
+        return jsonify({"message": "Referral code is not valid"}), 400
+
+    user_id = add_user(session, email, password)
+
+    session.close()
+
+    return jsonify({"message": "Account created successfully", "user_id": user_id}), 201
+
+@app.route('/user', methods=['PUT'])
+def modify_user():
+    data = request.get_json()
+
+    user_id = data.get('id')
     first_name = data.get('first_name')
     last_name = data.get('last_name')
     role = data.get('role')
@@ -163,16 +170,33 @@ def signup():
     organisation = data.get('organisation')
     organisation_role = data.get('organisation_role')
 
+    if not user_id:
+        return jsonify({"message": "User ID is required"}), 400
+
     session = Session()
+    user = session.query(User).filter_by(id=user_id).first()
 
-    if session.query(User).filter_by(email=email).first():
-        return jsonify({"message": "Email already exists"}), 400
+    if not user:
+        session.close()
+        return jsonify({"message": "User not found"}), 404
 
-    user_id = add_user(session, email, password, first_name, last_name, role, local_authority, organisation, organisation_role)
+    if first_name is not None:
+        user.first_name = first_name
+    if last_name is not None:
+        user.last_name = last_name
+    if role is not None:
+        user.role = role
+    if local_authority is not None:
+        user.local_authority = local_authority
+    if organisation is not None:
+        user.organisation = organisation
+    if organisation_role is not None:
+        user.organisation_role = organisation_role
 
+    session.commit()
     session.close()
 
-    return jsonify({"message": "User created successfully", "user_id": user_id}), 201
+    return jsonify({"message": "User updated successfully"}), 200
 
 @app.route('/signin', methods=['POST'])
 def login():

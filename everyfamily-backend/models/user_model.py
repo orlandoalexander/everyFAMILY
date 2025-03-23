@@ -22,10 +22,6 @@ class User(Base):
 def fetch_users(session):
     return session.query(User).all()
 
-def check_email_exists(session, user_email):
-    user = session.query(User).filter_by(title=user_email).first()
-    return bool(user)
-
 def validate_user(session, email, password):
     user = session.query(User).filter_by(email=email).first()
     if user and check_password_hash(user.password, password):
