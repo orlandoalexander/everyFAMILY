@@ -55,6 +55,7 @@ function Dashboard() {
                       link={resource.link}
                       description={resource.description}
                       type={resource.type_title}
+                      thumbnail_url={resource.thumbnail_url}
                     />
                   ))
               }
@@ -73,6 +74,7 @@ function Dashboard() {
                 link={resource.link}
                 description={resource.description}
                 type={resource.type_title}
+                thumbnail_url={resource.thumbnail_url}
               />
             ))
           }

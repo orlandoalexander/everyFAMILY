@@ -31,8 +31,6 @@ function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
 
-  const [form] = Form.useForm();
-
   const addResource = useAddResource();
 
   const showManageUsersModal = () => setManageUsersOpen(true);
@@ -44,16 +42,14 @@ function App() {
 
   const handleResourceModalCancel = () => {
     setResourceModalOpen(false);
-    form.resetFields();
   };
 
   const handleResourceModalSubmit = (resourceData) => {
     addResource.mutate(resourceData, {
       onSuccess: () => {
+        setResourceModalOpen(false);
         messageApi.success("Resource added successfully");
         console.log("Resource added successfully!");
-        setResourceModalOpen(false);
-        form.resetFields();
       },
       onError: (err) => {
         console.error("Failed to add resource", err);
@@ -134,7 +130,7 @@ function App() {
       )}
       <Routes>
         <Route path="/" element={<Dashboard />} />
-        {/* <Route path="/login" element={<Login />} /> */}
+        <Route path="/login" element={<Login />} />
         <Route path="/resources/:resourceType?" element={<Resources />} />
       </Routes>
       {contextHolder}
@@ -143,7 +139,6 @@ function App() {
         onCancel={handleResourceModalCancel}
         onSubmit={handleResourceModalSubmit}
         user={user}
-        form={form}
       />
       <ManageUsersModal
         open={manageUsersOpen}
