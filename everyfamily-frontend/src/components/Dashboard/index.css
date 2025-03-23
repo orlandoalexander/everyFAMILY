@@ -2,11 +2,13 @@
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  max-width: 100%;
+  /* max-width: 150rem; */
 }
 
 .dashboard-featured {
   display: flex;
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
 .dashboard-featured-container {

@@ -1,22 +1,93 @@
-import { Modal, Input, Button, Select, Upload, Form, message } from "antd";
+import { useState } from "react";
+import {
+  Modal,
+  Input,
+  Button,
+  Select,
+  Upload,
+  Divider,
+  Space,
+  Form,
+  message,
+} from "antd";
+import useGetCategories from "../../hooks/useGetCategories";
+import useGetTypes from "../../hooks/useGetTypes";
+import useAddType from "../../hooks/useAddType";
+import useAddCategory from "../../hooks/useAddCategory";
 import "./AddResourceModal.css";
-import { Edit, Link, Grid, Tag, Image } from "react-feather";
+import {
+  Type,
+  Link,
+  Grid,
+  Tag,
+  Image,
+  Plus,
+  AlignJustify,
+} from "react-feather";
+import { getLinkPreview, getPreviewFromContent } from "link-preview-js";
 
-const AddResourceModal = ({ open, onCancel, onSubmit }) => {
-  const [form] = Form.useForm();
+function AddResourceModal({ open, onCancel, onSubmit, user, form }) {
+  const [newType, setNewType] = useState("");
+  const [newCategory, setNewCategory] = useState("");
+  const [messageApi, contextHolder] = message.useMessage();
+
+  const addType = useAddType();
+  const addCategory = useAddCategory();
 
   const handleSubmit = () => {
     form
       .validateFields()
       .then((values) => {
-        onSubmit(values);
-        message.success("Resource added successfully");
-        form.resetFields();
+        const { link } = values;
+
+        const urlPattern = /^(https?:\/\/[^\s$.?#].[^\s]*)$/i;
+        if (!urlPattern.test(link)) {
+          messageApi.error("Please enter a valid URL");
+          return;
+        }
+
+        onSubmit({ ...values, upload_user_id: user.id });
       })
       .catch((error) => {
-        message.error("Please fill all the fields");
+        messageApi.error("Please fill all the fields");
       });
   };
+
+  const handleSetNewType = () => {
+    if (!newType) {
+      messageApi.warning("Please enter new resource type");
+    } else if (
+      typeData.some(
+        (item) => item.title.toLowerCase() === newType.toLowerCase()
+      )
+    ) {
+      messageApi.warning("Resource type already exists");
+    }
+    {
+      addType.mutate({ title: newType });
+      setNewType("");
+    }
+  };
+
+  const handleSetNewCategory = () => {
+    if (!newCategory) {
+      messageApi.warning("Please enter new resource category");
+    } else if (
+      categoryData.some(
+        (item) => item.title.toLowerCase() === newCategory.toLowerCase()
+      )
+    ) {
+      messageApi.warning("Resource Category already exists");
+    }
+    {
+      addCategory.mutate({ title: newCategory });
+      setNewCategory("");
+    }
+  };
+
+  const { data: categoryData } = useGetCategories();
+
+  const { data: typeData } = useGetTypes();
 
   return (
     <Modal
@@ -26,90 +97,160 @@ const AddResourceModal = ({ open, onCancel, onSubmit }) => {
       onOk={handleSubmit}
       okText="Submit"
       cancelText="Cancel"
+      maskClosable={false}
     >
       <Form className="form" form={form} layout="horizontal">
-        <section>
-          <Form.Item
-            name="name"
-            label={
-              <div className="form-item-title">
-                <Edit size={15} color="gray" />
-                <p>Name</p>
-              </div>
-            }
-            rules={[
-              { required: true, message: "Please input the resource name!" },
-            ]}
-            colon={false}
-            required={false}
-          >
-            <Input placeholder="Enter resource name" />
-          </Form.Item>
-        </section>
+        {contextHolder}
+        <Form.Item
+          name="title"
+          label={
+            <div className="form-item-title">
+              <Type size={15} color="gray" />
+              <p>Name</p>
+            </div>
+          }
+          rules={[{ required: true, message: "" }]}
+          colon={false}
+          required={false}
+        >
+          <Input placeholder="Enter resource name" />
+        </Form.Item>
+        <Form.Item
+          name="description"
+          label={
+            <div className="form-item-title">
+              <AlignJustify size={15} color="gray" />
+              <p>Description</p>
+            </div>
+          }
+          rules={[{ required: false }]}
+          colon={false}
+        >
+          <Input placeholder="Enter resource description" />
+        </Form.Item>
 
-        <section>
-          <Form.Item
-            name="link"
-            label={
-              <div className="form-item-title">
-                <Link size={15} color="gray" />
-                <p>Link</p>
-              </div>
-            }
-            rules={[
-              { required: true, message: "Please input the resource link!" },
-            ]}
-            colon={false}
-            required={false}
+        <Form.Item
+          name="type"
+          label={
+            <div className="form-item-title">
+              <Grid size={15} color="gray" />
+              <p>Type</p>
+            </div>
+          }
+          rules={[{ required: true, message: "" }]}
+          colon={false}
+          required={false}
+        >
+          <Select
+            placeholder="Select resource type"
+            dropdownRender={(menu) => (
+              <>
+                {menu}
+                <Divider
+                  style={{
+                    margin: "8px 0",
+                  }}
+                />
+                <Space
+                  style={{
+                    padding: "0 8px 4px",
+                  }}
+                >
+                  <Input
+                    placeholder="New resource type"
+                    value={newType}
+                    onChange={(e) => setNewType(e.target.value)}
+                    onKeyDown={(e) => e.stopPropagation()}
+                  />
+                  {contextHolder}
+                  <Button
+                    type="text"
+                    icon={<Plus />}
+                    onClick={handleSetNewType}
+                  >
+                    Add
+                  </Button>
+                </Space>
+              </>
+            )}
           >
-            <Input placeholder="Enter resource link" />
-          </Form.Item>
-        </section>
-        <section>
-          <Form.Item
-            name="type"
-            label={
-              <div className="form-item-title">
-                <Grid size={15} color="gray" />
-                <p>Type</p>
-              </div>
-            }
-            rules={[
-              { required: true, message: "Please select the resource type!" },
-            ]}
-            colon={false}
-            required={false}
-          >
-            <Select placeholder="Select resource type">
-              <Select.Option value="article">Article</Select.Option>
-              <Select.Option value="video">Video</Select.Option>
-              <Select.Option value="book">Book</Select.Option>
-              <Select.Option value="website">Website</Select.Option>
-            </Select>
-          </Form.Item>
-        </section>
+            {typeData &&
+              typeData.map((item, index) => (
+                <Select.Option key={item.title} value={item.title}>
+                  {item.title}
+                </Select.Option>
+              ))}
+          </Select>
+        </Form.Item>
 
-        <section>
-          <Form.Item
-            name="category"
-            label={
-              <div className="form-item-title">
-                <Tag size={15} color="gray" />
-                <p>Category</p>
-              </div>
-            }
-            rules={[{ required: true, message: "Please select the category!" }]}
-            colon={false}
-            required={false}
+        <Form.Item
+          name="category"
+          label={
+            <div className="form-item-title">
+              <Tag size={15} color="gray" />
+              <p>Category</p>
+            </div>
+          }
+          rules={[{ required: true, message: "" }]}
+          colon={false}
+          required={false}
+        >
+          <Select
+            placeholder="Select category"
+            dropdownRender={(menu) => (
+              <>
+                {menu}
+                <Divider
+                  style={{
+                    margin: "8px 0",
+                  }}
+                />
+                <Space
+                  style={{
+                    padding: "0 8px 4px",
+                  }}
+                >
+                  <Input
+                    placeholder="New category"
+                    value={newCategory}
+                    onChange={(e) => setNewCategory(e.target.value)}
+                    onKeyDown={(e) => e.stopPropagation()}
+                  />
+                  {contextHolder}
+                  <Button
+                    type="text"
+                    icon={<Plus />}
+                    onClick={handleSetNewCategory}
+                  >
+                    Add
+                  </Button>
+                </Space>
+              </>
+            )}
           >
-            <Select placeholder="Select category">
-              <Select.Option value="education">Education</Select.Option>
-              <Select.Option value="technology">Technology</Select.Option>
-              <Select.Option value="science">Science</Select.Option>
-              <Select.Option value="art">Art</Select.Option>
-            </Select>
-          </Form.Item>
-        </section>
+            {categoryData &&
+              categoryData.map((item, index) => (
+                <Select.Option key={index} value={item.title}>
+                  {item.title}
+                </Select.Option>
+              ))}
+          </Select>
+        </Form.Item>
+
+        <Form.Item
+          name="link"
+          label={
+            <div className="form-item-title">
+              <Link size={15} color="gray" />
+              <p>Link</p>
+            </div>
+          }
+          rules={[{ required: true, message: "" }]}
+          colon={false}
+          required={false}
+        >
+          <Input placeholder="Enter resource link" />
+        </Form.Item>
 
         <Form.Item
           name="thumbnail"
@@ -121,8 +262,11 @@ const AddResourceModal = ({ open, onCancel, onSubmit }) => {
           }
           valuePropName="fileList"
           getValueFromEvent={(e) => e && e.fileList}
-          rules={[{ required: true, message: "Please upload a thumbnail!" }]}
-          required={false}
+          rules={[
+            {
+              required: false,
+            },
+          ]}
           colon={false}
         >
           <Upload
@@ -137,6 +281,6 @@ const AddResourceModal = ({ open, onCancel, onSubmit }) => {
       </Form>
     </Modal>
   );
-};
+}
 
 export default AddResourceModal;

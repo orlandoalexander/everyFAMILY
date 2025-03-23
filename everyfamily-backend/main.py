@@ -4,6 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from models.resource_model import *
 from models.category_model import *
 from models.type_model import *
+from models.type_model import *
 from dotenv import load_dotenv
 import os
 from flask_cors import CORS
@@ -27,7 +28,7 @@ def home():
 def upload_resource():
     data = request.get_json()
     title = data.get("title")
-    description = data.get("description")
+    description = data.get("description", "")
     link = data.get("link")
     category = data.get("category")
     type = data.get("type")
@@ -36,8 +37,8 @@ def upload_resource():
     session = Session()
 
     # Check if category and type exists and create if not
-    category_id = create_category(session, category)
-    type_id = create_type(session, type)
+    category_id = add_category(session, category)
+    type_id = add_type(session, type)
 
     new_resource = Resource(title=title, description=description, link=link, category_id=category_id, type_id=type_id, upload_user_id=upload_user_id)
     session.add(new_resource)
@@ -66,7 +67,6 @@ def get_resources():
         "type_title": resource.type_title,
         "upload_user_id": resource.Resource.upload_user_id,
         "created_on": resource.Resource.created_on,
-        "status": resource.Resource.status
     } for resource in resources]
 
     session.close()
@@ -89,6 +89,44 @@ def get_categories():
 
     return jsonify(categories_data)
 
+
+@app.route("/types" , methods=["GET"])
+def get_types():
+    session = Session()
+
+    types = fetch_types(session)
+
+    types_data = [{
+        "type_id": type.type_id,
+        "title": type.title
+    } for type in types]
+
+    session.close()
+
+    return jsonify(types_data)
+
+@app.route("/types", methods=["POST"])
+def create_type():
+    session = Session()
+
+    new_type_title = request.json.get('title', '').strip()
+
+    add_type(session, new_type_title)
+
+    session.close()
+    return jsonify({"message": "Type created successfully."}), 201
+
+
+@app.route("/categories", methods=["POST"])
+def create_category():
+    session = Session()
+
+    new_category_title = request.json.get('title', '').strip()
+
+    add_category(session, new_category_title)
+
+    session.close()
+    return jsonify({"message": "Category created successfully."}), 201
 
 if __name__ == "__main__":
     app.run(port=5001, debug=True)  # Changed port to 5001

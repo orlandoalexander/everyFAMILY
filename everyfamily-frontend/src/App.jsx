@@ -1,27 +1,65 @@
 import { useState, useContext } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
-import Dashboard from "./components/Dashboard/index";
-import Resources from "./components/Resources/index";
-import Login from "./components/Login/index";
-import AddResourceModal from "./components/Resources/AddResourceModal";
+import Dashboard from "./components/Dashboard/index.jsx";
+import Resources from "./components/Resources/index.jsx";
+import Login from "./components/Login/index.jsx";
+import AddResourceModal from "./components/Resources/AddResourceModal.jsx";
 import ManageUsersModal from "./components/Dashboard/ManageUsersModal.jsx";
+import useAddResource from "./hooks/useAddResource.js";
 import logo from "./assets/everyFAMILY-logo.png";
-import { AuthContext } from "./AuthContext";
-import { Input, Button, Dropdown } from "antd";
+import AuthContext from "./AuthContext.jsx";
+import { Input, Button, Dropdown, Form, message } from "antd";
 import { Plus, Key, Menu as MenuIcon, Users, LogOut } from "react-feather";
+import "@ant-design/v5-patch-for-react-19";
 import "./App.css";
 
 const { Search } = Input;
 
-export default function App() {
+const usersInfo = [
+  { key: "1", name: "user", email: "user@gmail.com", action: "Remove User" },
+  { key: "2", name: "user", email: "user@gmail.com", action: "Remove User" },
+  { key: "3", name: "user", email: "user@gmail.com", action: "Remove User" },
+  { key: "4", name: "user", email: "user@gmail.com", action: "Remove User" },
+  { key: "5", name: "user", email: "user@gmail.com", action: "Remove User" },
+];
+
+function App() {
   const { user } = useContext(AuthContext);
   const location = useLocation();
-  const [modalOpen, setModalOpen] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [resourceModalOpen, setResourceModalOpen] = useState(false);
   const [manageUsersOpen, setManageUsersOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [messageApi, contextHolder] = message.useMessage();
+
+  const [form] = Form.useForm();
+
+  const addResource = useAddResource();
 
   const showManageUsersModal = () => setManageUsersOpen(true);
   const handleManageUsersCancel = () => setManageUsersOpen(false);
+
+  const showResourceModal = () => {
+    setResourceModalOpen(true);
+  };
+
+  const handleResourceModalCancel = () => {
+    setResourceModalOpen(false);
+    form.resetFields();
+  };
+
+  const handleResourceModalSubmit = (resourceData) => {
+    addResource.mutate(resourceData, {
+      onSuccess: () => {
+        messageApi.success("Resource added successfully");
+        console.log("Resource added successfully!");
+        setResourceModalOpen(false);
+        form.resetFields();
+      },
+      onError: (err) => {
+        console.error("Failed to add resource", err);
+      },
+    });
+  };
 
   const menuItems = [
     user.role === "admin" && {
@@ -44,25 +82,6 @@ export default function App() {
       label: "Logout",
     },
   ];
-  const usersInfo = [
-    { key: "1", name: "user", email: "user@gmail.com", action: "Remove User" },
-    { key: "2", name: "user", email: "user@gmail.com", action: "Remove User" },
-    { key: "3", name: "user", email: "user@gmail.com", action: "Remove User" },
-    { key: "4", name: "user", email: "user@gmail.com", action: "Remove User" },
-    { key: "5", name: "user", email: "user@gmail.com", action: "Remove User" },
-  ];
-  const showModal = () => {
-    setModalOpen(true);
-  };
-
-  const handleModalCancel = () => {
-    setModalOpen(false);
-  };
-
-  const handleModalSubmit = (resourceData) => {
-    console.log("Resource Added: ", resourceData);
-    setModalOpen(false);
-  };
 
   return (
     <div className="app">
@@ -82,7 +101,7 @@ export default function App() {
                 type="primary"
                 icon={<Plus />}
                 size="large"
-                onClick={showModal}
+                onClick={showResourceModal}
               >
                 Add new
               </Button>
@@ -92,7 +111,11 @@ export default function App() {
                 open={menuOpen}
                 onOpenChange={setMenuOpen}
               >
-                <MenuIcon size={40} style={{ cursor: "pointer" }} />
+                <MenuIcon
+                  size={40}
+                  color="black"
+                  style={{ cursor: "pointer" }}
+                />
               </Dropdown>
             </div>
           ) : (
@@ -111,13 +134,16 @@ export default function App() {
       )}
       <Routes>
         <Route path="/" element={<Dashboard />} />
-        <Route path="/login" element={<Login />} />
+        {/* <Route path="/login" element={<Login />} /> */}
         <Route path="/resources/:resourceType?" element={<Resources />} />
       </Routes>
+      {contextHolder}
       <AddResourceModal
-        open={modalOpen}
-        onCancel={handleModalCancel}
-        onSubmit={handleModalSubmit}
+        open={resourceModalOpen}
+        onCancel={handleResourceModalCancel}
+        onSubmit={handleResourceModalSubmit}
+        user={user}
+        form={form}
       />
       <ManageUsersModal
         open={manageUsersOpen}
@@ -127,3 +153,5 @@ export default function App() {
     </div>
   );
 }
+
+export default App;

@@ -14,10 +14,10 @@ class Type(Base):
     def __repr__(self):
         return f"<Type(id={self.id}, title={self.title}>"
 
-def get_types(session):
+def fetch_types(session):
     return session.query(Type).all()
 
-def create_type(session, type_title):
+def add_type(session, type_title):
     type = session.query(Type).filter_by(title=type_title).first()
     if not type:
         new_type = Type(title=type_title)
