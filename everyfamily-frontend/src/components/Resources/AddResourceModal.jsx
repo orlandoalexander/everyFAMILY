@@ -27,7 +27,14 @@ import {
 
 const thumbnailURLAPIKey = import.meta.env.VITE_LINK_PREVIEW_API_KEY;
 
-const fetchLinkMetadata = async (url) => {
+const isValidURL = (url) => {
+  // Regular expression to check URL structure
+  const regex =
+    /^(https?:\/\/)?([a-z0-9]+([-\w]*[a-z0-9])*\.)+[a-z0-9]{2,}(:\d+)?(\/[-\w]*)*(\?[;&a-z0-9%_+=-]*)?(#[a-z0-9_-]*)?$/i;
+  return regex.test(url);
+};
+
+const fetchLinkThumbnail = async (url) => {
   const apiUrl = `https://api.linkpreview.net/?key=${thumbnailURLAPIKey}&q=${encodeURIComponent(
     url
   )}`;
@@ -57,8 +64,7 @@ function AddResourceModal({ open, onCancel, onSubmit, user }) {
       .then((values) => {
         const { link } = values;
 
-        const urlPattern = /^(https?:\/\/[^\s$.?#].[^\s]*)$/i;
-        if (!urlPattern.test(link)) {
+        if (!isValidURL(link)) {
           messageApi.error("Please enter a valid URL");
           return;
         }
@@ -117,22 +123,24 @@ function AddResourceModal({ open, onCancel, onSubmit, user }) {
   };
 
   useEffect(() => {
-    if (linkURL) {
-      const timeoutId = setTimeout(() => {
-        const fetchData = async () => {
+    const fetchData = async () => {
+      if (linkURL) {
+        const isValid = isValidURL(linkURL);
+        if (isValid) {
+          console.log("URL is valid, fetching metadata...");
           try {
-            const data = await fetchLinkMetadata(linkURL);
+            const data = await fetchLinkThumbnail(linkURL);
             setThumbnailURL(data.image || null);
           } catch (error) {
             setThumbnailURL(null);
           }
-        };
+        } else {
+          setThumbnailURL(null);
+        }
+      }
+    };
 
-        fetchData();
-      }, 1000);
-
-      return () => clearTimeout(timeoutId);
-    }
+    fetchData();
   }, [linkURL]);
 
   return (
