@@ -5,7 +5,7 @@ from . import Base
 class Type(Base):
     __tablename__ = 'types'
 
-    type_id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     title = Column(String, unique=True, nullable=False)
 
     # Back-reference to Resource
@@ -23,5 +23,5 @@ def add_type(session, type_title):
         new_type = Type(title=type_title)
         session.add(new_type)
         session.commit()
-        return new_type.type_id
-    return type.type_id
+        return new_type.id
+    return type.id

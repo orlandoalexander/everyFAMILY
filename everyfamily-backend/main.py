@@ -3,8 +3,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from models.resource_model import *
 from models.category_model import *
+from models.referral_model import *
 from models.type_model import *
-from models.type_model import *
+from models.user_model import *
 from dotenv import load_dotenv
 import os
 from flask_cors import CORS
@@ -60,7 +61,7 @@ def get_resources():
 
     # Convert to JSON format
     resources_data = [{
-        "resource_id": resource.Resource.resource_id,
+        "id": resource.Resource.id,
         "title": resource.Resource.title,
         "description": resource.Resource.description,
         "link": resource.Resource.link,
@@ -85,7 +86,7 @@ def get_categories():
     categories = fetch_categories(session)
 
     categories_data = [{
-        "category_id": category.category_id,
+        "id": category.id,
         "title": category.title
     } for category in categories]
 
@@ -101,7 +102,7 @@ def get_types():
     types = fetch_types(session)
 
     types_data = [{
-        "type_id": type.type_id,
+        "id": type.id,
         "title": type.title
     } for type in types]
 
@@ -132,5 +133,63 @@ def create_category():
     session.close()
     return jsonify({"message": "Category created successfully."}), 201
 
+
+@app.route('/validate_new_account', methods=['GET'])
+def validate_referral():
+    referral_code_title = request.args.get('code')
+    email = request.args.get('email')
+    if not referral_code_title or not email:
+        return jsonify({"error": "Missing parameters"}), 400
+
+    session = Session()
+    referral_code_is_valid = validate_referral_code(session, referral_code_title)
+    email_exists = check_email_exists(session, email)
+
+    session.close()
+
+    return jsonify({"valid": referral_code_is_valid and not email_exists})
+
+
+@app.route('/signup', methods=['POST'])
+def signup():
+    data = request.get_json()
+
+    email = data.get('email')
+    password = data.get('password')
+    first_name = data.get('first_name')
+    last_name = data.get('last_name')
+    role = data.get('role')
+    local_authority = data.get('local_authority')
+    organisation = data.get('organisation')
+    organisation_role = data.get('organisation_role')
+
+    session = Session()
+
+    if session.query(User).filter_by(email=email).first():
+        return jsonify({"message": "Email already exists"}), 400
+
+    user_id = add_user(session, email, password, first_name, last_name, role, local_authority, organisation, organisation_role)
+
+    session.close()
+
+    return jsonify({"message": "User created successfully", "user_id": user_id}), 201
+
+@app.route('/signin', methods=['POST'])
+def login():
+    data = request.get_json()
+
+    email = data.get('email')
+    password = data.get('password')
+
+    session = Session()
+
+    if validate_user(session, email, password):
+        session.close()
+        return jsonify({"message": "Login successful"}), 200
+    else:
+        session.close()
+        return jsonify({"message": "Invalid email or password"}), 401
+
+
 if __name__ == "__main__":
-    app.run(port=5001, debug=True)  # Changed port to 5001
+    app.run(port=5001, debug=True)
