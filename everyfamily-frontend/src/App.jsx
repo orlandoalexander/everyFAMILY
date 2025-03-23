@@ -2,7 +2,7 @@ import { useState, useContext } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 import Dashboard from "./components/Dashboard/index.jsx";
 import Resources from "./components/Resources/index.jsx";
-import Login from "./components/Login/index.jsx";
+import Login, {SignUp} from "./components/Login/index.jsx";
 import AddResourceModal from "./components/Resources/AddResourceModal.jsx";
 import ManageUsersModal from "./components/Dashboard/ManageUsersModal.jsx";
 import useAddResource from "./hooks/useAddResource.js";
@@ -31,8 +31,6 @@ function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
 
-  const [form] = Form.useForm();
-
   const addResource = useAddResource();
 
   const showManageUsersModal = () => setManageUsersOpen(true);
@@ -44,16 +42,14 @@ function App() {
 
   const handleResourceModalCancel = () => {
     setResourceModalOpen(false);
-    form.resetFields();
   };
 
   const handleResourceModalSubmit = (resourceData) => {
     addResource.mutate(resourceData, {
       onSuccess: () => {
+        setResourceModalOpen(false);
         messageApi.success("Resource added successfully");
         console.log("Resource added successfully!");
-        setResourceModalOpen(false);
-        form.resetFields();
       },
       onError: (err) => {
         console.error("Failed to add resource", err);
@@ -134,7 +130,8 @@ function App() {
       )}
       <Routes>
         <Route path="/" element={<Dashboard />} />
-        {/* <Route path="/login" element={<Login />} /> */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<SignUp />} />
         <Route path="/resources/:resourceType?" element={<Resources />} />
       </Routes>
       {contextHolder}
@@ -143,7 +140,6 @@ function App() {
         onCancel={handleResourceModalCancel}
         onSubmit={handleResourceModalSubmit}
         user={user}
-        form={form}
       />
       <ManageUsersModal
         open={manageUsersOpen}

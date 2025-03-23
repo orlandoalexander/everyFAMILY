@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import api from "./api";
 import { useContext } from "react";
-import { AuthContext } from "../AuthContext";
+import AuthContext from "../AuthContext";
 
 const useLogin = () => {
     const { login } = useContext(AuthContext);

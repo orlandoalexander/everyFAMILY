@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Modal,
   Input,
   Button,
   Select,
-  Upload,
+  Image,
   Divider,
   Space,
   Form,
@@ -20,19 +20,43 @@ import {
   Link,
   Grid,
   Tag,
-  Image,
   Plus,
+  Image as ImageIcon,
   AlignJustify,
 } from "react-feather";
-import { getLinkPreview, getPreviewFromContent } from "link-preview-js";
 
-function AddResourceModal({ open, onCancel, onSubmit, user, form }) {
+const thumbnailURLAPIKey = import.meta.env.VITE_LINK_PREVIEW_API_KEY;
+
+const isValidURL = (url) => {
+  // Regular expression to check URL structure
+  const regex =
+    /^(https?:\/\/)?([a-z0-9]+([-\w]*[a-z0-9])*\.)+[a-z0-9]{2,}(:\d+)?(\/[-\w]*)*(\?[;&a-z0-9%_+=-]*)?(#[a-z0-9_-]*)?$/i;
+  return regex.test(url);
+};
+
+const fetchLinkThumbnail = async (url) => {
+  const apiUrl = `https://api.linkpreview.net/?key=${thumbnailURLAPIKey}&q=${encodeURIComponent(
+    url
+  )}`;
+  const response = await fetch(apiUrl);
+  const data = await response.json();
+  return data;
+};
+
+function AddResourceModal({ open, onCancel, onSubmit, user }) {
   const [newType, setNewType] = useState("");
   const [newCategory, setNewCategory] = useState("");
+  const [linkURL, setLinkURL] = useState(null);
+  const [thumbnailURL, setThumbnailURL] = useState(null);
   const [messageApi, contextHolder] = message.useMessage();
+
+  const [form] = Form.useForm();
 
   const addType = useAddType();
   const addCategory = useAddCategory();
+
+  const { data: categoryData } = useGetCategories();
+  const { data: typeData } = useGetTypes();
 
   const handleSubmit = () => {
     form
@@ -40,17 +64,30 @@ function AddResourceModal({ open, onCancel, onSubmit, user, form }) {
       .then((values) => {
         const { link } = values;
 
-        const urlPattern = /^(https?:\/\/[^\s$.?#].[^\s]*)$/i;
-        if (!urlPattern.test(link)) {
+        if (!isValidURL(link)) {
           messageApi.error("Please enter a valid URL");
           return;
         }
+        onSubmit({
+          ...values,
+          thumbnail_url: thumbnailURL,
+          upload_user_id: user.id,
+        });
 
-        onSubmit({ ...values, upload_user_id: user.id });
+        form.resetFields();
+        setThumbnailURL(null);
+        setLinkURL(null);
       })
       .catch((error) => {
-        messageApi.error("Please fill all the fields");
+        messageApi.error("Please complete all the fields");
       });
+  };
+
+  const handleClose = () => {
+    onCancel();
+    form.resetFields();
+    setThumbnailURL(null);
+    setLinkURL(null);
   };
 
   const handleSetNewType = () => {
@@ -85,19 +122,37 @@ function AddResourceModal({ open, onCancel, onSubmit, user, form }) {
     }
   };
 
-  const { data: categoryData } = useGetCategories();
+  useEffect(() => {
+    const fetchData = async () => {
+      if (linkURL) {
+        const isValid = isValidURL(linkURL);
+        if (isValid) {
+          console.log("URL is valid, fetching metadata...");
+          try {
+            const data = await fetchLinkThumbnail(linkURL);
+            setThumbnailURL(data.image || null);
+          } catch (error) {
+            setThumbnailURL(null);
+          }
+        } else {
+          setThumbnailURL(null);
+        }
+      }
+    };
 
-  const { data: typeData } = useGetTypes();
+    fetchData();
+  }, [linkURL]);
 
   return (
     <Modal
       title="Add new resource"
       open={open}
-      onCancel={onCancel}
+      onCancel={handleClose}
       onOk={handleSubmit}
       okText="Submit"
       cancelText="Cancel"
       maskClosable={false}
+      width={600}
     >
       <Form className="form" form={form} layout="horizontal">
         {contextHolder}
@@ -126,7 +181,7 @@ function AddResourceModal({ open, onCancel, onSubmit, user, form }) {
           rules={[{ required: false }]}
           colon={false}
         >
-          <Input placeholder="Enter resource description" />
+          <Input.TextArea placeholder="Enter resource description" />
         </Form.Item>
 
         <Form.Item
@@ -249,35 +304,45 @@ function AddResourceModal({ open, onCancel, onSubmit, user, form }) {
           colon={false}
           required={false}
         >
-          <Input placeholder="Enter resource link" />
+          <Input
+            placeholder="Enter resource link"
+            value={linkURL}
+            onChange={(e) => setLinkURL(e.target.value)}
+          />
         </Form.Item>
 
-        <Form.Item
-          name="thumbnail"
-          label={
-            <div className="form-item-title">
-              <Image size={15} color="gray" />
-              <p>Thumbnail</p>
-            </div>
-          }
-          valuePropName="fileList"
-          getValueFromEvent={(e) => e && e.fileList}
-          rules={[
-            {
-              required: false,
-            },
-          ]}
-          colon={false}
-        >
-          <Upload
+        {linkURL && (
+          <Form.Item
             name="thumbnail"
-            listType="picture"
-            maxCount={1}
-            beforeUpload={() => false} // Prevent auto upload
+            label={
+              <div className="form-item-title">
+                <ImageIcon size={15} color="gray" />
+                <p>Thumbnail</p>
+              </div>
+            }
+            rules={[
+              {
+                required: false,
+              },
+            ]}
+            colon={false}
           >
-            <Button>Upload Thumbnail</Button>
-          </Upload>
-        </Form.Item>
+            <Image
+              width={150}
+              src={thumbnailURL}
+              fallback="https://placehold.co/600x400/432666/FFF?text=Thumbnail+\n+Unavailable"
+            />
+
+            {/* <Upload
+              name="thumbnail"
+              listType="picture"
+              maxCount={1}
+              beforeUpload={() => false} // Prevent auto upload
+            >
+              <Button>Upload Thumbnail</Button>
+            </Upload> */}
+          </Form.Item>
+        )}
       </Form>
     </Modal>
   );

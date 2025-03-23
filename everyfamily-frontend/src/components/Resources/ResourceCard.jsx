@@ -1,8 +1,14 @@
 import "./resourceCard.css";
-import ResourceType from "./ResourceType.jsx";
 import { Card, Col } from "antd";
 
-function ResourceCard({ title, description, link, type }) {
+function ResourceCard({
+  title,
+  description,
+  link,
+  type,
+  thumbnail_url,
+  category_title,
+}) {
   return (
     <div>
       <Col span={8}>
@@ -15,7 +21,10 @@ function ResourceCard({ title, description, link, type }) {
                 cover={
                   <img
                     alt="example"
-                    src="https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png"
+                    src={
+                      thumbnail_url ||
+                      "https://placehold.co/300x200/432666/FFF?text=Thumbnail+\n+Unavailable"
+                    }
                   />
                 }
               />
@@ -41,7 +50,7 @@ function ResourceCard({ title, description, link, type }) {
             </p>
           </div>
           <div className="card-footer">
-            <ResourceType type={type} />
+            <div className="resource-category">{category_title}</div>
           </div>
         </Card>
       </Col>

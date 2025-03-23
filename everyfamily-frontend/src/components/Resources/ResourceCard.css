@@ -24,7 +24,23 @@
 }
 .card-footer {
     display: flex;
+    height: 30px;
     width: 175px;
     padding-top: 5px;
     border-top: 1px solid #ddd;
+}
+.resource-category {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+  color: gray;
+}
+.resource-type {
+  display: flex;
+  gap: 5px;
+  font-size: 12px;
+  color: gray;
+  align-items: center;
+  padding: 10px 10px 10px 120px;
 }

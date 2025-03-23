@@ -18,6 +18,8 @@ function Resources({ resourceType }) {
               link={resource.link}
               description={resource.description}
               type={resource.type_title}
+              thumbnail_url={resource.thumbnail_url}
+              category_title={resource.category_title}
             />
           ))}
       </Row>
