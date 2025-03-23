@@ -1,7 +1,7 @@
 import "./index.css";
 import ResourceCard from "../Resources/ResourceCard.jsx";
-import useGetCategories from "../../hooks/useGetCategories";
-import useGetResources from "../../hooks/useGetResources";
+import useGetCategories from "../../hooks/useGetCategories.js";
+import useGetResources from "../../hooks/useGetResources.js";
 import feature1 from "../../assets/everyFAMILY-feature1.png";
 import Category from "./Category.jsx";
 
@@ -55,6 +55,7 @@ function Dashboard() {
                       link={resource.link}
                       description={resource.description}
                       type={resource.type_title}
+                      thumbnail_url={resource.thumbnail_url}
                     />
                   ))
               }
@@ -73,6 +74,7 @@ function Dashboard() {
                 link={resource.link}
                 description={resource.description}
                 type={resource.type_title}
+                thumbnail_url={resource.thumbnail_url}
               />
             ))
           }

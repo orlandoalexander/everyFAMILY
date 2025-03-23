@@ -14,7 +14,7 @@ class Category(Base):
     def __repr__(self):
         return f"<Category(category_id={self.category_id}, name={self.title})>"
 
-def create_category(session, category_title):
+def add_category(session, category_title):
     category = session.query(Category).filter_by(title=category_title).first()
     if not category:
         new_category = Category(title=category_title)

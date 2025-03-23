@@ -29,3 +29,11 @@
 .ant-modal-footer button {
   box-shadow: none !important;
 }
+
+.ant-modal-content {
+  height: 100% !important;
+}
+
+.ant-modal-body {
+  max-height: 500px !important;
+}

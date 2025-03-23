@@ -1,142 +1,351 @@
-import { Modal, Input, Button, Select, Upload, Form, message } from "antd";
+import { useState, useEffect } from "react";
+import {
+  Modal,
+  Input,
+  Button,
+  Select,
+  Image,
+  Divider,
+  Space,
+  Form,
+  message,
+} from "antd";
+import useGetCategories from "../../hooks/useGetCategories";
+import useGetTypes from "../../hooks/useGetTypes";
+import useAddType from "../../hooks/useAddType";
+import useAddCategory from "../../hooks/useAddCategory";
 import "./AddResourceModal.css";
-import { Edit, Link, Grid, Tag, Image } from "react-feather";
+import {
+  Type,
+  Link,
+  Grid,
+  Tag,
+  Plus,
+  Image as ImageIcon,
+  AlignJustify,
+} from "react-feather";
 
-const AddResourceModal = ({ open, onCancel, onSubmit }) => {
+const thumbnailURLAPIKey = import.meta.env.VITE_LINK_PREVIEW_API_KEY;
+
+const isValidURL = (url) => {
+  // Regular expression to check URL structure
+  const regex =
+    /^(https?:\/\/)?([a-z0-9]+([-\w]*[a-z0-9])*\.)+[a-z0-9]{2,}(:\d+)?(\/[-\w]*)*(\?[;&a-z0-9%_+=-]*)?(#[a-z0-9_-]*)?$/i;
+  return regex.test(url);
+};
+
+const fetchLinkThumbnail = async (url) => {
+  const apiUrl = `https://api.linkpreview.net/?key=${thumbnailURLAPIKey}&q=${encodeURIComponent(
+    url
+  )}`;
+  const response = await fetch(apiUrl);
+  const data = await response.json();
+  return data;
+};
+
+function AddResourceModal({ open, onCancel, onSubmit, user }) {
+  const [newType, setNewType] = useState("");
+  const [newCategory, setNewCategory] = useState("");
+  const [linkURL, setLinkURL] = useState(null);
+  const [thumbnailURL, setThumbnailURL] = useState(null);
+  const [messageApi, contextHolder] = message.useMessage();
+
   const [form] = Form.useForm();
+
+  const addType = useAddType();
+  const addCategory = useAddCategory();
+
+  const { data: categoryData } = useGetCategories();
+  const { data: typeData } = useGetTypes();
 
   const handleSubmit = () => {
     form
       .validateFields()
       .then((values) => {
-        onSubmit(values);
-        message.success("Resource added successfully");
+        const { link } = values;
+
+        if (!isValidURL(link)) {
+          messageApi.error("Please enter a valid URL");
+          return;
+        }
+        onSubmit({
+          ...values,
+          thumbnail_url: thumbnailURL,
+          upload_user_id: user.id,
+        });
+
         form.resetFields();
+        setThumbnailURL(null);
+        setLinkURL(null);
       })
       .catch((error) => {
-        message.error("Please fill all the fields");
+        messageApi.error("Please complete all the fields");
       });
   };
+
+  const handleClose = () => {
+    onCancel();
+    form.resetFields();
+    setThumbnailURL(null);
+    setLinkURL(null);
+  };
+
+  const handleSetNewType = () => {
+    if (!newType) {
+      messageApi.warning("Please enter new resource type");
+    } else if (
+      typeData.some(
+        (item) => item.title.toLowerCase() === newType.toLowerCase()
+      )
+    ) {
+      messageApi.warning("Resource type already exists");
+    }
+    {
+      addType.mutate({ title: newType });
+      setNewType("");
+    }
+  };
+
+  const handleSetNewCategory = () => {
+    if (!newCategory) {
+      messageApi.warning("Please enter new resource category");
+    } else if (
+      categoryData.some(
+        (item) => item.title.toLowerCase() === newCategory.toLowerCase()
+      )
+    ) {
+      messageApi.warning("Resource Category already exists");
+    }
+    {
+      addCategory.mutate({ title: newCategory });
+      setNewCategory("");
+    }
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (linkURL) {
+        const isValid = isValidURL(linkURL);
+        if (isValid) {
+          console.log("URL is valid, fetching metadata...");
+          try {
+            const data = await fetchLinkThumbnail(linkURL);
+            setThumbnailURL(data.image || null);
+          } catch (error) {
+            setThumbnailURL(null);
+          }
+        } else {
+          setThumbnailURL(null);
+        }
+      }
+    };
+
+    fetchData();
+  }, [linkURL]);
 
   return (
     <Modal
       title="Add new resource"
       open={open}
-      onCancel={onCancel}
+      onCancel={handleClose}
       onOk={handleSubmit}
       okText="Submit"
       cancelText="Cancel"
+      maskClosable={false}
+      width={600}
     >
       <Form className="form" form={form} layout="horizontal">
-        <section>
-          <Form.Item
-            name="name"
-            label={
-              <div className="form-item-title">
-                <Edit size={15} color="gray" />
-                <p>Name</p>
-              </div>
-            }
-            rules={[
-              { required: true, message: "Please input the resource name!" },
-            ]}
-            colon={false}
-            required={false}
-          >
-            <Input placeholder="Enter resource name" />
-          </Form.Item>
-        </section>
-
-        <section>
-          <Form.Item
-            name="link"
-            label={
-              <div className="form-item-title">
-                <Link size={15} color="gray" />
-                <p>Link</p>
-              </div>
-            }
-            rules={[
-              { required: true, message: "Please input the resource link!" },
-            ]}
-            colon={false}
-            required={false}
-          >
-            <Input placeholder="Enter resource link" />
-          </Form.Item>
-        </section>
-        <section>
-          <Form.Item
-            name="type"
-            label={
-              <div className="form-item-title">
-                <Grid size={15} color="gray" />
-                <p>Type</p>
-              </div>
-            }
-            rules={[
-              { required: true, message: "Please select the resource type!" },
-            ]}
-            colon={false}
-            required={false}
-          >
-            <Select placeholder="Select resource type">
-              <Select.Option value="article">Article</Select.Option>
-              <Select.Option value="video">Video</Select.Option>
-              <Select.Option value="book">Book</Select.Option>
-              <Select.Option value="website">Website</Select.Option>
-            </Select>
-          </Form.Item>
-        </section>
-
-        <section>
-          <Form.Item
-            name="category"
-            label={
-              <div className="form-item-title">
-                <Tag size={15} color="gray" />
-                <p>Category</p>
-              </div>
-            }
-            rules={[{ required: true, message: "Please select the category!" }]}
-            colon={false}
-            required={false}
-          >
-            <Select placeholder="Select category">
-              <Select.Option value="education">Education</Select.Option>
-              <Select.Option value="technology">Technology</Select.Option>
-              <Select.Option value="science">Science</Select.Option>
-              <Select.Option value="art">Art</Select.Option>
-            </Select>
-          </Form.Item>
-        </section>
-
+        {contextHolder}
         <Form.Item
-          name="thumbnail"
+          name="title"
           label={
             <div className="form-item-title">
-              <Image size={15} color="gray" />
-              <p>Thumbnail</p>
+              <Type size={15} color="gray" />
+              <p>Name</p>
             </div>
           }
-          valuePropName="fileList"
-          getValueFromEvent={(e) => e && e.fileList}
-          rules={[{ required: true, message: "Please upload a thumbnail!" }]}
+          rules={[{ required: true, message: "" }]}
+          colon={false}
           required={false}
+        >
+          <Input placeholder="Enter resource name" />
+        </Form.Item>
+        <Form.Item
+          name="description"
+          label={
+            <div className="form-item-title">
+              <AlignJustify size={15} color="gray" />
+              <p>Description</p>
+            </div>
+          }
+          rules={[{ required: false }]}
           colon={false}
         >
-          <Upload
-            name="thumbnail"
-            listType="picture"
-            maxCount={1}
-            beforeUpload={() => false} // Prevent auto upload
-          >
-            <Button>Upload Thumbnail</Button>
-          </Upload>
+          <Input.TextArea placeholder="Enter resource description" />
         </Form.Item>
+
+        <Form.Item
+          name="type"
+          label={
+            <div className="form-item-title">
+              <Grid size={15} color="gray" />
+              <p>Type</p>
+            </div>
+          }
+          rules={[{ required: true, message: "" }]}
+          colon={false}
+          required={false}
+        >
+          <Select
+            placeholder="Select resource type"
+            dropdownRender={(menu) => (
+              <>
+                {menu}
+                <Divider
+                  style={{
+                    margin: "8px 0",
+                  }}
+                />
+                <Space
+                  style={{
+                    padding: "0 8px 4px",
+                  }}
+                >
+                  <Input
+                    placeholder="New resource type"
+                    value={newType}
+                    onChange={(e) => setNewType(e.target.value)}
+                    onKeyDown={(e) => e.stopPropagation()}
+                  />
+                  {contextHolder}
+                  <Button
+                    type="text"
+                    icon={<Plus />}
+                    onClick={handleSetNewType}
+                  >
+                    Add
+                  </Button>
+                </Space>
+              </>
+            )}
+          >
+            {typeData &&
+              typeData.map((item, index) => (
+                <Select.Option key={item.title} value={item.title}>
+                  {item.title}
+                </Select.Option>
+              ))}
+          </Select>
+        </Form.Item>
+
+        <Form.Item
+          name="category"
+          label={
+            <div className="form-item-title">
+              <Tag size={15} color="gray" />
+              <p>Category</p>
+            </div>
+          }
+          rules={[{ required: true, message: "" }]}
+          colon={false}
+          required={false}
+        >
+          <Select
+            placeholder="Select category"
+            dropdownRender={(menu) => (
+              <>
+                {menu}
+                <Divider
+                  style={{
+                    margin: "8px 0",
+                  }}
+                />
+                <Space
+                  style={{
+                    padding: "0 8px 4px",
+                  }}
+                >
+                  <Input
+                    placeholder="New category"
+                    value={newCategory}
+                    onChange={(e) => setNewCategory(e.target.value)}
+                    onKeyDown={(e) => e.stopPropagation()}
+                  />
+                  {contextHolder}
+                  <Button
+                    type="text"
+                    icon={<Plus />}
+                    onClick={handleSetNewCategory}
+                  >
+                    Add
+                  </Button>
+                </Space>
+              </>
+            )}
+          >
+            {categoryData &&
+              categoryData.map((item, index) => (
+                <Select.Option key={index} value={item.title}>
+                  {item.title}
+                </Select.Option>
+              ))}
+          </Select>
+        </Form.Item>
+
+        <Form.Item
+          name="link"
+          label={
+            <div className="form-item-title">
+              <Link size={15} color="gray" />
+              <p>Link</p>
+            </div>
+          }
+          rules={[{ required: true, message: "" }]}
+          colon={false}
+          required={false}
+        >
+          <Input
+            placeholder="Enter resource link"
+            value={linkURL}
+            onChange={(e) => setLinkURL(e.target.value)}
+          />
+        </Form.Item>
+
+        {linkURL && (
+          <Form.Item
+            name="thumbnail"
+            label={
+              <div className="form-item-title">
+                <ImageIcon size={15} color="gray" />
+                <p>Thumbnail</p>
+              </div>
+            }
+            rules={[
+              {
+                required: false,
+              },
+            ]}
+            colon={false}
+          >
+            <Image
+              width={150}
+              src={thumbnailURL}
+              fallback="https://placehold.co/600x400/432666/FFF?text=Thumbnail+\n+Unavailable"
+            />
+
+            {/* <Upload
+              name="thumbnail"
+              listType="picture"
+              maxCount={1}
+              beforeUpload={() => false} // Prevent auto upload
+            >
+              <Button>Upload Thumbnail</Button>
+            </Upload> */}
+          </Form.Item>
+        )}
       </Form>
     </Modal>
   );
-};
+}
 
 export default AddResourceModal;
