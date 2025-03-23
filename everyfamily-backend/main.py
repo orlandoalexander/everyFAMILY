@@ -30,6 +30,7 @@ def upload_resource():
     title = data.get("title")
     description = data.get("description", "")
     link = data.get("link")
+    thumbnail_url = data.get("thumbnail_url")
     category = data.get("category")
     type = data.get("type")
     upload_user_id = data.get("upload_user_id")
@@ -40,7 +41,7 @@ def upload_resource():
     category_id = add_category(session, category)
     type_id = add_type(session, type)
 
-    new_resource = Resource(title=title, description=description, link=link, category_id=category_id, type_id=type_id, upload_user_id=upload_user_id)
+    new_resource = Resource(title=title, description=description, link=link, thumbnail_url=thumbnail_url, category_id=category_id, type_id=type_id, upload_user_id=upload_user_id)
     session.add(new_resource)
     session.commit()
     session.close()
@@ -55,12 +56,15 @@ def get_resources():
     # Perform a join between Resource and Category tables
     resources = fetch_resources(session)
 
+    resources.sort(key=lambda x: x.Resource.created_on, reverse=True)
+
     # Convert to JSON format
     resources_data = [{
         "resource_id": resource.Resource.resource_id,
         "title": resource.Resource.title,
         "description": resource.Resource.description,
         "link": resource.Resource.link,
+        "thumbnail_url": resource.Resource.thumbnail_url,
         "category_id": resource.Resource.category_id,
         "category_title": resource.category_title,
         "type_id": resource.Resource.type_id,
