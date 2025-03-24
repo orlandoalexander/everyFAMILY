@@ -54,10 +54,12 @@ def upload_resource():
 def get_resources():
     session = Session()
 
-    # Perform a join between Resource and Category tables
-    resources = fetch_resources(session)
+    user_id = request.args.get("user_id")
 
-    resources.sort(key=lambda x: x.Resource.created_on, reverse=True)
+    # Perform a join between Resource and Category tables
+    resources = fetch_resources(session, user_id)
+
+    resources.sort(key=lambda x: x.Resource.created_at, reverse=True)
 
     # Convert to JSON format
     resources_data = [{
@@ -71,7 +73,9 @@ def get_resources():
         "type_id": resource.Resource.type_id,
         "type_title": resource.type_title,
         "upload_user_id": resource.Resource.upload_user_id,
-        "created_on": resource.Resource.created_on,
+        "created_at": resource.Resource.created_at,
+        "featured": resource.Resource.featured,
+        "saved": resource.saved
     } for resource in resources]
 
     session.close()
@@ -134,7 +138,7 @@ def create_category():
     return jsonify({"message": "Category created successfully."}), 201
 
 
-@app.route('/signup', methods=['POST'])
+@app.route('/user', methods=['POST'])
 def signup():
     data = request.get_json()
 
@@ -198,7 +202,7 @@ def modify_user():
 
     return jsonify({"message": "User updated successfully"}), 200
 
-@app.route('/signin', methods=['POST'])
+@app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
 

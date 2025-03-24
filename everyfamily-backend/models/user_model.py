@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String
 from werkzeug.security import check_password_hash, generate_password_hash
+from sqlalchemy.orm import relationship
 from . import Base
 
 
@@ -15,6 +16,8 @@ class User(Base):
     local_authority = Column(String, nullable=True)
     organisation = Column(String, nullable=True)
     organisation_role = Column(String, nullable=True)
+
+    user_resources = relationship("UserResource", back_populates="user")
 
     def __repr__(self):
         return f"<User(id={self.id}, email={self.email}, first_name={self.first_name}, last_name={self.last_name})>"
