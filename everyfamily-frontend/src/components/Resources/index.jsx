@@ -47,12 +47,7 @@ function Resources() {
     return matchesType && matchesCategory && matchesSearch && matchesFilter;
   });
 
-  return isLoading || isFetching ? (
-    <Spin
-      size="large"
-      style={{ position: "absolute", top: "50%", left: "50%" }}
-    />
-  ) : (
+  return (
     <div className="resources-container">
       <h2>
         {resourceFilter
@@ -65,30 +60,37 @@ function Resources() {
           ? `All '${resourceCategory}' resources`
           : "Resources"}
       </h2>
-      <Row gutter={[20, 20]} align="middle">
-        {filteredResources &&
-          (filteredResources.length === 0 ? (
-            <Empty
-              description="No resources found"
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-              style={{ position: "absolute", top: "50%", left: "50%" }}
-            />
-          ) : (
-            filteredResources.map((resource, index) => (
-              <ResourceCard
-                key={index}
-                title={resource.title}
-                link={resource.link}
-                description={resource.description}
-                type={resource.type_title}
-                thumbnail_url={resource.thumbnail_url}
-                category={resource.category_title}
-                saved={resource.saved}
-                featured={resource.featured}
+      {isLoading || isFetching ? (
+        <Spin
+          size="large"
+          style={{ position: "absolute", top: "50%", left: "50%" }}
+        />
+      ) : (
+        <Row gutter={[20, 20]} align="middle">
+          {filteredResources &&
+            (filteredResources.length === 0 ? (
+              <Empty
+                description="No resources found"
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                style={{ position: "absolute", top: "50%", left: "50%" }}
               />
-            ))
-          ))}
-      </Row>
+            ) : (
+              filteredResources.map((resource, index) => (
+                <ResourceCard
+                  key={index}
+                  title={resource.title}
+                  link={resource.link}
+                  description={resource.description}
+                  type={resource.type_title}
+                  thumbnail_url={resource.thumbnail_url}
+                  category={resource.category_title}
+                  saved={resource.saved}
+                  featured={resource.featured}
+                />
+              ))
+            ))}
+        </Row>
+      )}
     </div>
   );
 }

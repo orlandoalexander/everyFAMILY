@@ -18,7 +18,6 @@
 .dashboard-header img{
   max-width: 15%;
   cursor: pointer;
-  user-select: none !important;
 }
 
 .dashboard-header-search {
