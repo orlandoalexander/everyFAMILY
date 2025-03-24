@@ -1,10 +1,10 @@
-.form {
+.resource-form {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
-.form-item-title{
+.resource-form-item-title{
   display: flex;
   align-items: center;
   gap: 10px;

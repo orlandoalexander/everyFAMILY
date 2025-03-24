@@ -155,12 +155,12 @@ function AddResourceModal({ open, onCancel, onSubmit, user }) {
       maskClosable={false}
       width={600}
     >
-      <Form className="form" form={form} layout="horizontal">
+      <Form className="resource-form" form={form} layout="horizontal">
         {contextHolder}
         <Form.Item
           name="title"
           label={
-            <div className="form-item-title">
+            <div className="resource-form-item-title">
               <Type size={15} color="gray" />
               <p>Name</p>
             </div>

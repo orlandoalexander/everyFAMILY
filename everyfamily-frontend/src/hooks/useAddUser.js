@@ -7,7 +7,7 @@ const useCreateAccount = () => {
   const { login } = useContext(AuthContext);
 
   const createAccount = async (data) => {
-    const response = await api.post("/create_account", data);
+    const response = await api.post("/user", data);
     return response.data;
   };
 
