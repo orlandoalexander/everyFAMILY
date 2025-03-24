@@ -14,9 +14,6 @@ const useGetResources = () => {
   return useQuery({
     queryKey: ["resources"],
     queryFn: getResources,
-    staleTime: 5 * 60 * 1000,
-    cacheTime: 10 * 60 * 1000,
-    keepPreviousData: true,
   });
 };
 
