@@ -1,5 +1,8 @@
+import { useContext } from "react";
 import "./resourceCard.css";
-import { Card, Col } from "antd";
+import { Card, Col, Button } from "antd";
+import { Grid, Tag, Bookmark, Star } from "react-feather";
+import AuthContext from "../../AuthContext";
 
 function ResourceCard({
   title,
@@ -9,6 +12,8 @@ function ResourceCard({
   thumbnail_url,
   category_title,
 }) {
+  const { user } = useContext(AuthContext);
+
   return (
     <div>
       <Col span={8}>
@@ -49,9 +54,29 @@ function ResourceCard({
               {description}
             </p>
           </div>
-          <div className="card-footer">
-            <div className="resource-category">{category_title}</div>
-          </div>
+          <section className="card-footer">
+            <div className="card-footer-details">
+              <div>
+                <Tag color="gray" size={10} />
+                <p>{category_title}</p>
+              </div>
+              <div>
+                <Grid color="gray" size={10} />
+                <p>{type}</p>
+              </div>
+            </div>
+            {user.role === "admin" ? (
+              <Button
+                type="text"
+                icon={<Star color="gray" strokeWidth={1.5} size={27} />}
+              />
+            ) : (
+              <Button
+                type="text"
+                icon={<Bookmark color="gray" strokeWidth={1.5} size={27} />}
+              />
+            )}
+          </section>
         </Card>
       </Col>
     </div>

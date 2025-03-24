@@ -20,7 +20,13 @@ function ManageUsersModal({ open, onCancel, usersInfo, onRemoveUser }) {
   };
 
   return (
-    <Modal title="Manage users" open={open} onCancel={onCancel} footer={null}>
+    <Modal
+      title="Manage users"
+      width={700}
+      open={open}
+      onCancel={onCancel}
+      footer={null}
+    >
       <div>
         <Table
           dataSource={usersInfo}
@@ -35,6 +41,7 @@ function ManageUsersModal({ open, onCancel, usersInfo, onRemoveUser }) {
           <Column
             title="Action"
             key="action"
+            fixed="right"
             render={(text, record) => (
               <Button
                 type="text"

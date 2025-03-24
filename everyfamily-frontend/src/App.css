@@ -6,7 +6,6 @@
   padding: 1rem 2rem;
   gap: 1.5rem;
   box-sizing: border-box;
-  align-items: center;
 }
 
 .logo {
@@ -31,13 +30,12 @@
 
 .dashboard-header img{
   max-width: 15%;
-  /* max-width: 13rem; */
 }
 
 .dashboard-header-search {
   max-width: 50%;
-  /* max-width: 50rem; */
 }
+
 
 .dashboard-header-buttons {
   display: flex;
@@ -71,4 +69,12 @@
 
 .read-the-docs {
   color: #888;
+}
+
+.ant-input-outlined:focus {
+  box-shadow: none !important;
+}
+
+.ant-input-outlined:focus-within {
+  box-shadow: none !important;
 }

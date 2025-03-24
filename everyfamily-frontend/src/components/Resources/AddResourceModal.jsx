@@ -174,7 +174,7 @@ function AddResourceModal({ open, onCancel, onSubmit, user }) {
         <Form.Item
           name="description"
           label={
-            <div className="form-item-title">
+            <div className="resource-form-item-title">
               <AlignJustify size={15} color="gray" />
               <p>Description</p>
             </div>
@@ -188,7 +188,7 @@ function AddResourceModal({ open, onCancel, onSubmit, user }) {
         <Form.Item
           name="type"
           label={
-            <div className="form-item-title">
+            <div className="resource-form-item-title">
               <Grid size={15} color="gray" />
               <p>Type</p>
             </div>
@@ -242,7 +242,7 @@ function AddResourceModal({ open, onCancel, onSubmit, user }) {
         <Form.Item
           name="category"
           label={
-            <div className="form-item-title">
+            <div className="resource-form-item-title">
               <Tag size={15} color="gray" />
               <p>Category</p>
             </div>
@@ -296,7 +296,7 @@ function AddResourceModal({ open, onCancel, onSubmit, user }) {
         <Form.Item
           name="link"
           label={
-            <div className="form-item-title">
+            <div className="resource-form-item-title">
               <Link size={15} color="gray" />
               <p>Link</p>
             </div>
@@ -316,7 +316,7 @@ function AddResourceModal({ open, onCancel, onSubmit, user }) {
           <Form.Item
             name="thumbnail"
             label={
-              <div className="form-item-title">
+              <div className="resource-item-title">
                 <ImageIcon size={15} color="gray" />
                 <p>Thumbnail</p>
               </div>

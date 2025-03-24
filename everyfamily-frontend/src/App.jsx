@@ -1,5 +1,5 @@
 import { useState, useContext } from "react";
-import { Route, Routes, useLocation } from "react-router-dom";
+import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import Dashboard from "./components/Dashboard/index";
 import Resources from "./components/Resources/index";
 import CreateAccount from "./components/Auth/CreateAccount";
@@ -9,7 +9,7 @@ import ManageUsersModal from "./components/Dashboard/ManageUsersModal";
 import useAddResource from "./hooks/useAddResource";
 import logo from "./assets/everyFAMILY-logo.png";
 import AuthContext from "./AuthContext";
-import { Input, Button, Dropdown, Form, message } from "antd";
+import { Input, Button, Dropdown, message } from "antd";
 import { Plus, Key, Menu as MenuIcon, Users, LogOut } from "react-feather";
 import "@ant-design/v5-patch-for-react-19";
 import "./App.css";
@@ -27,6 +27,8 @@ const usersInfo = [
 function App() {
   const { user } = useContext(AuthContext);
   const location = useLocation();
+  const navigate = useNavigate();
+
   const [resourceModalOpen, setResourceModalOpen] = useState(false);
   const [manageUsersOpen, setManageUsersOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -80,6 +82,12 @@ function App() {
     },
   ];
 
+  const handleSearch = (value) => {
+    const searchParams = new URLSearchParams(location.search);
+    searchParams.set("search", value);
+    navigate(`/resources?${searchParams.toString()}`);
+  };
+
   return (
     <div className="app">
       {location.pathname === "/login" ||
@@ -95,6 +103,7 @@ function App() {
             placeholder="Find resources by name, description etc."
             allowClear
             size="large"
+            onSearch={handleSearch}
           />
           {user.role === "admin" ? (
             <div className="dashboard-header-buttons">
