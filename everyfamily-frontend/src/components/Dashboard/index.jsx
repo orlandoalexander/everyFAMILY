@@ -34,40 +34,38 @@ function Dashboard() {
           <h2>Saved</h2>
         </div>
       </section>
-      <div className="dashboard-category">
-        <h1>Browse by category</h1>
-        {categoryData &&
-          categoryData.map((category, index) => (
-            <Category
-              key={index}
-              categoryKey={index}
-              label={category.title}
-              children={
-                resourceData &&
-                resourceData
-                  .filter(
-                    ({ category_id }) => category_id === category.category_id
-                  )
-                  .map((resource, index) => (
-                    <ResourceCard
-                      key={index}
-                      title={resource.title}
-                      link={resource.link}
-                      description={resource.description}
-                      type={resource.type_title}
-                      thumbnail_url={resource.thumbnail_url}
-                    />
-                  ))
-              }
-            />
-          ))}
-        <Category
-          key={"all"}
-          categoryKey={"all"}
-          label={"All resources"}
-          children={
-            resourceData &&
-            resourceData.map((resource, index) => (
+      {resourceData && (
+        <div className="dashboard-category">
+          <h1>Browse by category</h1>
+          {categoryData &&
+            categoryData.map((category, index) => (
+              <Category
+                key={index}
+                categoryKey={index}
+                label={category.title}
+                children={
+                  resourceData &&
+                  resourceData
+                    .filter(({ category_id }) => category_id === category.id)
+                    .map((resource, index) => (
+                      <ResourceCard
+                        key={index}
+                        title={resource.title}
+                        link={resource.link}
+                        description={resource.description}
+                        type={resource.type_title}
+                        thumbnail_url={resource.thumbnail_url}
+                      />
+                    ))
+                }
+              />
+            ))}
+
+          <Category
+            key={"all"}
+            categoryKey={"all"}
+            label={"All resources"}
+            children={resourceData.map((resource, index) => (
               <ResourceCard
                 key={index}
                 title={resource.title}
@@ -76,10 +74,10 @@ function Dashboard() {
                 type={resource.type_title}
                 thumbnail_url={resource.thumbnail_url}
               />
-            ))
-          }
-        />
-      </div>
+            ))}
+          />
+        </div>
+      )}
     </div>
   );
 }

@@ -94,6 +94,7 @@ function AddResourceModal({ open, onCancel, onSubmit, user }) {
     if (!newType) {
       messageApi.warning("Please enter new resource type");
     } else if (
+      typeData &&
       typeData.some(
         (item) => item.title.toLowerCase() === newType.toLowerCase()
       )
