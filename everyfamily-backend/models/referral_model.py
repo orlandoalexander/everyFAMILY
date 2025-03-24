@@ -12,6 +12,11 @@ class Referral(Base):
     def __repr__(self):
         return f"<Referral(id={self.id}, title={self.title}, status={self.status}>"
 
+def fetch_referral_codes(session, referral_id=None):
+    if referral_id:
+        return session.query(Referral).get(referral_id)
+    return session.query(Referral).all()
+
 def validate_referral_code(session, referral_code_title):
     referral_code = session.query(Referral).filter_by(title=referral_code_title, status="active").first()
     return bool(referral_code)

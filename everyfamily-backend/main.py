@@ -6,6 +6,7 @@ from models.category_model import *
 from models.referral_model import *
 from models.type_model import *
 from models.user_model import *
+from models.user_resource_model import *
 from dotenv import load_dotenv
 import os
 from flask_cors import CORS
@@ -26,7 +27,7 @@ def home():
 
 
 @app.route("/resources", methods=["POST"])
-def upload_resource():
+def create_resource():
     data = request.get_json()
     title = data.get("title")
     description = data.get("description", "")
@@ -56,12 +57,10 @@ def get_resources():
 
     user_id = request.args.get("user_id")
 
-    # Perform a join between Resource and Category tables
     resources = fetch_resources(session, user_id)
 
     resources.sort(key=lambda x: x.Resource.created_at, reverse=True)
 
-    # Convert to JSON format
     resources_data = [{
         "id": resource.Resource.id,
         "title": resource.Resource.title,
@@ -89,14 +88,11 @@ def get_categories():
 
     categories = fetch_categories(session)
 
-    categories_data = [{
-        "id": category.id,
-        "title": category.title
-    } for category in categories]
+    categories_list = [{"id": category.id, "title": category.title} for category in categories]
 
     session.close()
 
-    return jsonify(categories_data)
+    return jsonify(categories_list)
 
 
 @app.route("/types" , methods=["GET"])
@@ -105,20 +101,20 @@ def get_types():
 
     types = fetch_types(session)
 
-    types_data = [{
-        "id": type.id,
-        "title": type.title
-    } for type in types]
+    types_list = [{"id": type.id, "title": type.title} for type in types]
 
     session.close()
 
-    return jsonify(types_data)
+    return jsonify(types_list)
 
 @app.route("/types", methods=["POST"])
 def create_type():
-    session = Session()
-
     new_type_title = request.json.get('title', '').strip()
+
+    if not new_type_title:
+        return jsonify({"message": "Type is required"}), 400
+
+    session = Session()
 
     add_type(session, new_type_title)
 
@@ -128,23 +124,63 @@ def create_type():
 
 @app.route("/categories", methods=["POST"])
 def create_category():
-    session = Session()
-
     new_category_title = request.json.get('title', '').strip()
+
+    if not new_category_title:
+        return jsonify({"message": "Type is required"}), 400
+
+    session = Session()
 
     add_category(session, new_category_title)
 
     session.close()
     return jsonify({"message": "Category created successfully."}), 201
 
+@app.route('/users', methods=['GET'])
+def get_users():
+    session = Session()
+
+    users = fetch_users(session)
+
+    users_list = [{
+        "email": user.email,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+        "role": user.role,
+        "local_authority": user.local_authority,
+        "organisation": user.organisation,
+        "organisation_role": user.organisation_role
+    } for user in users]
+
+    session.close()
+
+    return jsonify(users_list), 200
+
+@app.route('/users/<int:user_id>', methods=["DELETE"])
+def delete_user(user_id):
+    session = Session()
+
+    user = fetch_users(session, user_id)
+
+    if not user:
+        return jsonify({"message": "User not found"}), 404
+
+    session.delete(user)
+    session.commit()
+    session.close()
+
+    return jsonify({"message": "User deleted successfully"}), 200
 
 @app.route('/users', methods=['POST'])
-def signup():
+def create_user():
     data = request.get_json()
 
     email = data.get('email')
     password = data.get('password')
     referral_code = data.get('referral_code')
+
+    if not email or not password:
+        return jsonify({"message": "Email and password is required"}), 400
 
     session = Session()
 
@@ -178,7 +214,7 @@ def modify_user():
         return jsonify({"message": "User ID is required"}), 400
 
     session = Session()
-    user = session.query(User).filter_by(id=user_id).first()
+    user = get_users(session, user_id)
 
     if not user:
         session.close()
@@ -213,10 +249,96 @@ def login():
 
     if validate_user(session, email, password):
         session.close()
+        # TODO add to logins table
         return jsonify({"message": "Login successful"}), 200
     else:
         session.close()
         return jsonify({"message": "Invalid email or password"}), 401
+
+
+@app.route('/referral_codes', methods=["GET"])
+def get_referral_codes():
+    session = Session()
+
+    referral_codes = fetch_referral_codes(session)
+
+    referral_codes_list = [{"id": referral_code.id, "title": referral_code.title, "status": referral_code.status} for referral_code in referral_codes]
+
+    session.close()
+
+    return jsonify(referral_codes_list), 200
+
+
+@app.route('/referral_codes', methods=["POST"])
+def create_referral_code():
+    data = request.get_json()
+
+    referral_code = data.get('referral_code')
+
+    if not referral_code:
+        return jsonify({"message": "Referral code is required"}), 400
+
+    session = Session()
+
+    add_referral_code(session, referral_code)
+
+    return jsonify({"message": "Referral code created successfully"}), 201
+
+
+@app.route('/referral_codes/<int:referral_id>', methods=["PUT"])
+def update_referral_code(referral_id):
+    data = request.get_json()
+    status = data.get('status')
+
+    if not status:
+        return jsonify({"message": "Status is required"}), 400
+
+    session = Session()
+
+    referral_code = fetch_referral_codes(session, referral_id)
+
+    if not referral_code:
+        return jsonify({"message": "Referral code not found"}), 404
+
+    referral_code.status = status
+    session.commit()
+    session.close()
+
+    return jsonify({"message": "Referral code status updated successfully"}), 200
+
+
+@app.route('/referral_codes/<int:referral_id>', methods=["DELETE"])
+def delete_referral_code(referral_id):
+    session = Session()
+
+    referral_code = fetch_referral_codes(session, referral_id)
+
+    if not referral_code:
+        return jsonify({"message": "Referral code not found"}), 404
+
+    session.delete(referral_code)
+    session.commit()
+    session.close()
+
+    return jsonify({"message": "Referral code deleted successfully"}), 200
+
+
+@app.route("/user_resources", methods=["POST"])
+def create_user_resource():
+    data = request.get_json()
+
+    user_id = data.get('user_id')
+    resource_id = data.get('resource_id')
+
+    if not user_id or not resource_id:
+        return jsonify({"message": "User ID and resource ID is required"}), 400
+
+    session = Session()
+
+    add_user_resource(session, user_id, resource_id)
+
+    session.close()
+    return jsonify({"message": "Resource saved successfully."}), 201
 
 
 if __name__ == "__main__":

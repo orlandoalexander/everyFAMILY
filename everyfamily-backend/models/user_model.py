@@ -22,7 +22,9 @@ class User(Base):
     def __repr__(self):
         return f"<User(id={self.id}, email={self.email}, first_name={self.first_name}, last_name={self.last_name})>"
 
-def fetch_users(session):
+def fetch_users(session, user_id=None):
+    if user_id:
+        return session.query(User).get(user_id)
     return session.query(User).all()
 
 def validate_user(session, email, password):
