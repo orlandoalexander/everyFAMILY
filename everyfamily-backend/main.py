@@ -81,6 +81,57 @@ def get_resources():
 
     return jsonify(resources_data)
 
+@app.route("/resources/<int:resource_id>", methods=["PUT"])
+def modify_resource(resource_id):
+    session = Session()
+    resource = session.query(Resource).filter_by(id=resource_id).first()
+    if not resource:
+        session.close()
+        return jsonify({"message": "Resource not found"}), 404
+
+    data = request.get_json()
+
+    # Update fields if provided in the request
+    if "title" in data:
+        resource.title = data["title"]
+    if "description" in data:
+        resource.description = data["description"]
+    if "link" in data:
+        resource.link = data["link"]
+    if "thumbnail_url" in data:
+        resource.thumbnail_url = data["thumbnail_url"]
+    if "category" in data:
+        # Ensure category exists and get its id
+        resource.category_id = add_category(session, data["category"])
+    if "type" in data:
+        # Ensure type exists and get its id
+        resource.type_id = add_type(session, data["type"])
+    if "upload_user_id" in data:
+        resource.upload_user_id = data["upload_user_id"]
+
+
+    session.commit()
+    session.close()
+    return jsonify({"message": "Resource updated successfully"}), 200
+
+@app.route("/resources", methods=["DELETE"])
+def delete_resource():
+    data = request.get_json()
+    resource_id = data.get("id")
+    title = data.get("title")
+    if not resource_id:
+        return jsonify({"message": "Resource id is required"}), 400
+
+    session = Session()
+    resource = session.query(Resource).filter_by(id=resource_id,title=title).first()
+    if not resource:
+        session.close()
+        return jsonify({"message": "Resource not found"}), 404
+
+    session.delete(resource)
+    session.commit()
+    session.close()
+    return jsonify({"message": "Resource deleted successfully"}), 200
 
 @app.route("/categories" , methods=["GET"])
 def get_categories():
