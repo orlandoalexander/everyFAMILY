@@ -138,7 +138,7 @@ def create_category():
     return jsonify({"message": "Category created successfully."}), 201
 
 
-@app.route('/user', methods=['POST'])
+@app.route('/users', methods=['POST'])
 def signup():
     data = request.get_json()
 
@@ -162,7 +162,7 @@ def signup():
 
     return jsonify({"message": "Account created successfully", "user_id": user_id}), 201
 
-@app.route('/user', methods=['PUT'])
+@app.route('/users', methods=['PUT'])
 def modify_user():
     data = request.get_json()
 
