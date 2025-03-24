@@ -118,12 +118,11 @@ def modify_resource(resource_id):
 def delete_resource():
     data = request.get_json()
     resource_id = data.get("id")
-    title = data.get("title")
     if not resource_id:
         return jsonify({"message": "Resource id is required"}), 400
 
     session = Session()
-    resource = session.query(Resource).filter_by(id=resource_id,title=title).first()
+    resource = session.query(Resource).filter_by(id=resource_id).first()
     if not resource:
         session.close()
         return jsonify({"message": "Resource not found"}), 404
