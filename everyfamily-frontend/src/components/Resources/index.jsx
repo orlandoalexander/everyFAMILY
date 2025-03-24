@@ -1,17 +1,22 @@
-import { Row } from "antd";
-import { useLocation } from "react-router-dom"; // for URL parameters
+import { useLocation } from "react-router-dom";
 import useGetResources from "../../hooks/useGetResources.js";
 import ResourceCard from "./ResourceCard.jsx";
+import { Row, Empty, Spin } from "antd";
 import "./index.css";
 
 function Resources() {
-  const { data, isLoading, isError } = useGetResources();
   const location = useLocation();
 
   const queryParams = new URLSearchParams(location.search);
   const resourceType = queryParams.get("type");
   const resourceCategory = queryParams.get("category");
   const searchQuery = queryParams.get("search") || "";
+  const resourceFilter = queryParams.get("filter");
+
+  const oneMonthAgo = new Date();
+  oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
+  const { data, isLoading, isError, isFetching } = useGetResources();
 
   const filteredResources = data?.filter((resource) => {
     const matchesType = resourceType
@@ -24,27 +29,64 @@ function Resources() {
       : true;
     const matchesSearch = searchQuery
       ? resource.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        resource.description.toLowerCase().includes(searchQuery.toLowerCase())
+        resource.description
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        resource.category_title.toLowerCase() === searchQuery.toLowerCase()
       : true;
 
-    return matchesType && matchesCategory && matchesSearch;
+    const matchesFilter =
+      resourceFilter === "recent"
+        ? new Date(resource.created_at) >= oneMonthAgo
+        : resourceFilter === "featured"
+        ? resource.featured === true
+        : resourceFilter === "saved"
+        ? resource.saved === true
+        : true;
+
+    return matchesType && matchesCategory && matchesSearch && matchesFilter;
   });
 
-  return (
+  return isLoading || isFetching ? (
+    <Spin
+      size="large"
+      style={{ position: "absolute", top: "50%", left: "50%" }}
+    />
+  ) : (
     <div className="resources-container">
-      <h2>All resources</h2>
+      <h2>
+        {resourceFilter
+          ? `${
+              resourceFilter.charAt(0).toUpperCase() +
+              resourceFilter.slice(1) +
+              (resourceFilter === "recent" ? "ly added" : "")
+            }  resources`
+          : resourceCategory
+          ? `All '${resourceCategory}' resources`
+          : "Resources"}
+      </h2>
       <Row gutter={[20, 20]} align="middle">
         {filteredResources &&
-          filteredResources.map((resource, index) => (
-            <ResourceCard
-              key={index}
-              title={resource.title}
-              link={resource.link}
-              description={resource.description}
-              type={resource.type_title}
-              thumbnail_url={resource.thumbnail_url}
-              category_title={resource.category_title}
+          (filteredResources.length === 0 ? (
+            <Empty
+              description="No resources found"
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              style={{ position: "absolute", top: "50%", left: "50%" }}
             />
+          ) : (
+            filteredResources.map((resource, index) => (
+              <ResourceCard
+                key={index}
+                title={resource.title}
+                link={resource.link}
+                description={resource.description}
+                type={resource.type_title}
+                thumbnail_url={resource.thumbnail_url}
+                category={resource.category_title}
+                saved={resource.saved}
+                featured={resource.featured}
+              />
+            ))
           ))}
       </Row>
     </div>
