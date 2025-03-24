@@ -57,7 +57,7 @@ def get_resources():
 
     user_id = request.args.get("user_id")
 
-    resources = fetch_resources(session, user_id)
+    resources = fetch_resources(session, user_id=user_id)
 
     resources.sort(key=lambda x: x.Resource.created_at, reverse=True)
 
@@ -114,15 +114,14 @@ def modify_resource(resource_id):
     session.close()
     return jsonify({"message": "Resource updated successfully"}), 200
 
-@app.route("/resources", methods=["DELETE"])
-def delete_resource():
-    data = request.get_json()
-    resource_id = data.get("id")
+@app.route("/resources/<int:resource_id>", methods=["DELETE"])
+def delete_resource(resource_id):
     if not resource_id:
         return jsonify({"message": "Resource id is required"}), 400
 
     session = Session()
-    resource = session.query(Resource).filter_by(id=resource_id).first()
+    resource = fetch_resources(session,resource_id=resource_id)
+
     if not resource:
         session.close()
         return jsonify({"message": "Resource not found"}), 404
@@ -210,7 +209,7 @@ def get_users():
 def delete_user(user_id):
     session = Session()
 
-    user = fetch_users(session, user_id)
+    user = fetch_users(session, user_id=user_id)
 
     if not user:
         return jsonify({"message": "User not found"}), 404
@@ -306,7 +305,7 @@ def login():
         return jsonify({"message": "Invalid email or password"}), 401
 
 
-@app.route('/referral_codes', methods=["GET"])
+@app.route('/referrals', methods=["GET"])
 def get_referral_codes():
     session = Session()
 
@@ -319,23 +318,23 @@ def get_referral_codes():
     return jsonify(referral_codes_list), 200
 
 
-@app.route('/referral_codes', methods=["POST"])
+@app.route('/referrals', methods=["POST"])
 def create_referral_code():
     data = request.get_json()
 
-    referral_code = data.get('referral_code')
+    new_referral_code_title = data.get('title')
 
-    if not referral_code:
+    if not new_referral_code_title:
         return jsonify({"message": "Referral code is required"}), 400
 
     session = Session()
 
-    add_referral_code(session, referral_code)
+    add_referral_code(session, new_referral_code_title)
 
     return jsonify({"message": "Referral code created successfully"}), 201
 
 
-@app.route('/referral_codes/<int:referral_id>', methods=["PUT"])
+@app.route('/referrals/<int:referral_id>', methods=["PUT"])
 def update_referral_code(referral_id):
     data = request.get_json()
     status = data.get('status')
@@ -345,7 +344,7 @@ def update_referral_code(referral_id):
 
     session = Session()
 
-    referral_code = fetch_referral_codes(session, referral_id)
+    referral_code = fetch_referral_codes(session, referral_id=referral_id)
 
     if not referral_code:
         return jsonify({"message": "Referral code not found"}), 404
@@ -357,11 +356,11 @@ def update_referral_code(referral_id):
     return jsonify({"message": "Referral code status updated successfully"}), 200
 
 
-@app.route('/referral_codes/<int:referral_id>', methods=["DELETE"])
+@app.route('/referrals/<int:referral_id>', methods=["DELETE"])
 def delete_referral_code(referral_id):
     session = Session()
 
-    referral_code = fetch_referral_codes(session, referral_id)
+    referral_code = fetch_referral_codes(session, referral_id=referral_id)
 
     if not referral_code:
         return jsonify({"message": "Referral code not found"}), 404

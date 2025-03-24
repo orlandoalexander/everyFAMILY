@@ -28,7 +28,10 @@ class Resource(Base):
     def __repr__(self):
         return f"<Resource(id={self.id}, title={self.title}, description={self.description}, link={self.link}, category_id={self.category_id}>"
 
-def fetch_resources(session, user_id=None):
+def fetch_resources(session, user_id=None, resource_id=None):
+    if resource_id:
+        return session.query(Resource).get(resource_id)
+
     query = (
         session.query(
             Resource,
