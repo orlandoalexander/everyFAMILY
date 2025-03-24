@@ -23,6 +23,11 @@
   object-fit: cover;
   filter: brightness(50%);
   border-radius: 30px;
+  cursor: pointer;
+}
+
+.dashboard-featured-container h2 {
+  cursor: pointer;
 }
 
 .dashboard-featured-container h2 {
@@ -40,10 +45,20 @@
   font-size: 1.7rem;
 }
 
+.dashboard-category-title {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.dashboard-category-title span {
+  font-size: 9px;
+  color: gray;
+}
+
 .ant-input-affix-wrapper {
   background: rgba(146, 39, 143, 0.10);
 }
-
 
 .dashboard-category-flex {
   padding: 1rem 0;

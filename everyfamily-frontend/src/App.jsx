@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import Dashboard from "./components/Dashboard/index";
 import Resources from "./components/Resources/index";
@@ -33,6 +33,7 @@ function App() {
   const [manageUsersOpen, setManageUsersOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
+  const [searchText, setSearchText] = useState("");
 
   const addResource = useAddResource();
 
@@ -60,6 +61,20 @@ function App() {
     });
   };
 
+  const handleSearch = (value) => {
+    const searchParams = new URLSearchParams(location.search);
+    searchParams.set("search", value);
+    navigate(`/resources?${searchParams.toString()}`);
+  };
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const search = searchParams.get("search");
+    if (search) {
+      setSearchText(search);
+    }
+  }, [location]);
+
   const menuItems = [
     user.role === "admin" && {
       key: "users",
@@ -82,28 +97,33 @@ function App() {
     },
   ];
 
-  const handleSearch = (value) => {
-    const searchParams = new URLSearchParams(location.search);
-    searchParams.set("search", value);
-    navigate(`/resources?${searchParams.toString()}`);
-  };
-
   return (
     <div className="app">
       {location.pathname === "/login" ||
       location.pathname === "/create_account" ? (
         <header className="dashboard-header">
-          <img className="dashboard-header" src={logo} alt="everyFAMILY logo" />
+          <img
+            src={logo}
+            alt="everyFAMILY logo"
+            onClick={() => navigate("/")}
+          />
         </header>
       ) : (
         <header className="dashboard-header">
-          <img className="dashboard-header" src={logo} alt="everyFAMILY logo" />
+          <img
+            src={logo}
+            alt="everyFAMILY logo"
+            onClick={() => navigate("/")}
+          />
+
           <Search
             className="dashboard-header-search"
             placeholder="Find resources by name, description etc."
             allowClear
             size="large"
+            value={searchText}
             onSearch={handleSearch}
+            onChange={(e) => setSearchText(e.target.value)}
           />
           {user.role === "admin" ? (
             <div className="dashboard-header-buttons">

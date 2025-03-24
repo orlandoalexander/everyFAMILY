@@ -10,7 +10,9 @@ function ResourceCard({
   link,
   type,
   thumbnail_url,
-  category_title,
+  category,
+  saved,
+  featured,
 }) {
   const { user } = useContext(AuthContext);
 
@@ -58,7 +60,7 @@ function ResourceCard({
             <div className="card-footer-details">
               <div>
                 <Tag color="gray" size={10} />
-                <p>{category_title}</p>
+                <p>{category}</p>
               </div>
               <div>
                 <Grid color="gray" size={10} />
@@ -66,14 +68,42 @@ function ResourceCard({
               </div>
             </div>
             {user.role === "admin" ? (
-              <Button
-                type="text"
-                icon={<Star color="gray" strokeWidth={1.5} size={27} />}
-              />
+              <div className="card-footer-buttons">
+                <Button
+                  type="text"
+                  icon={
+                    <Star
+                      color="gray"
+                      strokeWidth={1.5}
+                      size={27}
+                      fill={featured ? "gray" : "transparent"}
+                    />
+                  }
+                />
+
+                <Button
+                  type="text"
+                  icon={
+                    <Bookmark
+                      color="gray"
+                      strokeWidth={1.5}
+                      size={27}
+                      fill={saved ? "gray" : "transparent"}
+                    />
+                  }
+                />
+              </div>
             ) : (
               <Button
                 type="text"
-                icon={<Bookmark color="gray" strokeWidth={1.5} size={27} />}
+                icon={
+                  <Bookmark
+                    color="gray"
+                    strokeWidth={1.5}
+                    size={27}
+                    fill={saved ? "gray" : ""}
+                  />
+                }
               />
             )}
           </section>
