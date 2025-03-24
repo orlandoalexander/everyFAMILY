@@ -27,7 +27,7 @@ function Dashboard() {
         </div>
         <div className="dashboard-featured-container">
           <img src={feature1} />
-          <h2>Popular</h2>
+          <h2>Featured</h2>
         </div>
         <div className="dashboard-featured-container">
           <img src={feature1} />

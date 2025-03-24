@@ -1,14 +1,15 @@
 import { useState, useContext } from "react";
-import { Route, Routes, useLocation } from "react-router-dom";
-import Dashboard from "./components/Dashboard/index.jsx";
-import Resources from "./components/Resources/index.jsx";
-import Login, {SignUp} from "./components/Login/index.jsx";
-import AddResourceModal from "./components/Resources/AddResourceModal.jsx";
-import ManageUsersModal from "./components/Dashboard/ManageUsersModal.jsx";
-import useAddResource from "./hooks/useAddResource.js";
+import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import Dashboard from "./components/Dashboard/index";
+import Resources from "./components/Resources/index";
+import CreateAccount from "./components/Auth/CreateAccount";
+import Login from "./components/Auth/Login";
+import AddResourceModal from "./components/Resources/AddResourceModal";
+import ManageUsersModal from "./components/Dashboard/ManageUsersModal";
+import useAddResource from "./hooks/useAddResource";
 import logo from "./assets/everyFAMILY-logo.png";
-import AuthContext from "./AuthContext.jsx";
-import { Input, Button, Dropdown, Form, message } from "antd";
+import AuthContext from "./AuthContext";
+import { Input, Button, Dropdown, message } from "antd";
 import { Plus, Key, Menu as MenuIcon, Users, LogOut } from "react-feather";
 import "@ant-design/v5-patch-for-react-19";
 import "./App.css";
@@ -26,6 +27,8 @@ const usersInfo = [
 function App() {
   const { user } = useContext(AuthContext);
   const location = useLocation();
+  const navigate = useNavigate();
+
   const [resourceModalOpen, setResourceModalOpen] = useState(false);
   const [manageUsersOpen, setManageUsersOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -70,7 +73,7 @@ function App() {
     {
       key: "password",
       icon: <Key size={15} />,
-      label: "Reset password",
+      label: "Change password",
     },
     {
       key: "logout",
@@ -79,9 +82,20 @@ function App() {
     },
   ];
 
+  const handleSearch = (value) => {
+    const searchParams = new URLSearchParams(location.search);
+    searchParams.set("search", value);
+    navigate(`/resources?${searchParams.toString()}`);
+  };
+
   return (
     <div className="app">
-      {location.pathname !== "/login" && (
+      {location.pathname === "/login" ||
+      location.pathname === "/create_account" ? (
+        <header className="dashboard-header">
+          <img className="dashboard-header" src={logo} alt="everyFAMILY logo" />
+        </header>
+      ) : (
         <header className="dashboard-header">
           <img className="dashboard-header" src={logo} alt="everyFAMILY logo" />
           <Search
@@ -89,6 +103,7 @@ function App() {
             placeholder="Find resources by name, description etc."
             allowClear
             size="large"
+            onSearch={handleSearch}
           />
           {user.role === "admin" ? (
             <div className="dashboard-header-buttons">
@@ -131,7 +146,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<SignUp />} />
+        <Route path="/create_account" element={<CreateAccount />} />
         <Route path="/resources/:resourceType?" element={<Resources />} />
       </Routes>
       {contextHolder}

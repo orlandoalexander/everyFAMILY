@@ -24,23 +24,32 @@
 }
 .card-footer {
     display: flex;
+    justify-content: space-between;
     height: 30px;
     width: 175px;
-    padding-top: 5px;
     border-top: 1px solid #ddd;
+    padding-top: 7px;
 }
-.resource-category {
+
+.card-footer-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.card-footer-details div {
+  height: 18px;;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+}
+
+.card-footer-details p {
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 12px;
   color: gray;
-}
-.resource-type {
-  display: flex;
-  gap: 5px;
-  font-size: 12px;
-  color: gray;
-  align-items: center;
-  padding: 10px 10px 10px 120px;
 }
