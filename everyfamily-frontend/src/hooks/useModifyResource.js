@@ -1,16 +1,16 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "./api";
 
-const useDeleteResource = () => {
+const useModifyResource = () => {
     const queryClient = useQueryClient();
 
-    const deleteResource = async ({ resourceId, data }) => {
-        const response = await api.delete(`/resources/${resourceId}`, data);
+    const modifyResource = async ({ resourceId, data }) => {
+        const response = await api.put(`/resources/${resourceId}`, data);
         return response.data;
     };
 
     return useMutation({
-        mutationFn: deleteResource,
+        mutationFn: modifyResource,
         onSuccess: () => {
             queryClient.invalidateQueries(["resources"]);
         },
@@ -20,4 +20,4 @@ const useDeleteResource = () => {
     });
 };
 
-export default useDeleteResource;
+export default useModifyResource;
