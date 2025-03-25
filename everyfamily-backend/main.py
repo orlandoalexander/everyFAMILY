@@ -192,6 +192,7 @@ def get_users():
     users = fetch_users(session)
 
     users_list = [{
+        "id": user.id,
         "email": user.email,
         "first_name": user.first_name,
         "last_name": user.last_name,
