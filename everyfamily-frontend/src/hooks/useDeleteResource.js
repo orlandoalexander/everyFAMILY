@@ -4,8 +4,8 @@ import api from "./api";
 const useDeleteResource = () => {
     const queryClient = useQueryClient();
 
-    const deleteResource = async ({ resourceId, data }) => {
-        const response = await api.delete(`/resources/${resourceId}`, data);
+    const deleteResource = async (data) => {
+        const response = await api.delete(`/resources/${data.id}`, data);
         return response.data;
     };
 
