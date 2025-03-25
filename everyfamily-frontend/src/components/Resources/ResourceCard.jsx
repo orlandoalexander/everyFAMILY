@@ -4,6 +4,8 @@ import { Card, Col, Button } from "antd";
 import { Grid, Tag, Bookmark, Star } from "react-feather";
 import AuthContext from "../../AuthContext";
 
+const ensureHttps = (url) => (url.startsWith("http") ? url : `https://${url}`);
+
 function ResourceCard({
   title,
   description,
@@ -15,13 +17,14 @@ function ResourceCard({
   featured,
 }) {
   const { user } = useContext(AuthContext);
+  const safeLink = ensureHttps(link);
 
   return (
     <div>
       <Col span={8}>
         <Card className="card-container" hoverable size="small">
           <div className="outer-card">
-            <a href={link} target="_blank" rel="noopener noreferrer">
+            <a href={safeLink} target="_blank" rel="noopener noreferrer">
               <Card
                 className="inner-card"
                 type="inner"
