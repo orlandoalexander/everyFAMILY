@@ -5,6 +5,7 @@ import { EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
 import useLogin from "../../hooks/useLogin";
 import useForgotPassword from "../../hooks/useForgotPassword";
 import "./index.css";
+import "./Login.css";
 
 function Login() {
   const navigate = useNavigate();
@@ -102,7 +103,7 @@ function Login() {
             />
           </Form.Item>
 
-          <div className="login-options ">
+          <div className="login-options">
             <Form.Item name="remember" valuePropName="checked" noStyle>
               <Checkbox>Remember me</Checkbox>
             </Form.Item>
