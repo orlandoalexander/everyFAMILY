@@ -111,11 +111,12 @@ function AddResourceModal({ open, onCancel, onSubmit, user }) {
     if (!newCategory) {
       messageApi.warning("Please enter new resource category");
     } else if (
+      categoryData &&
       categoryData.some(
         (item) => item.title.toLowerCase() === newCategory.toLowerCase()
       )
     ) {
-      messageApi.warning("Resource Category already exists");
+      messageApi.warning("Resource category already exists");
     }
     {
       addCategory.mutate({ title: newCategory });

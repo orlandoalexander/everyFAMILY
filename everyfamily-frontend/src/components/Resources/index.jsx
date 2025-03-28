@@ -17,7 +17,7 @@ function Resources() {
   oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
 
   const { data, isLoading, isError, isFetching } = useGetResources();
-  console.log(data);
+
   const filteredResources = data?.filter((resource) => {
     const matchesType = resourceType
       ? resource.type_title.toLowerCase().includes(resourceType.toLowerCase())
