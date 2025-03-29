@@ -2,13 +2,27 @@ import { useMutation } from "@tanstack/react-query";
 import api from "./api";
 import { useContext } from "react";
 import AuthContext from "../AuthContext";
+import { useNavigate } from "react-router-dom";
 
 const useCreateAccount = () => {
   const { login } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const createAccount = async (data) => {
-    const response = await api.post("/user", data);
-    return response.data;
+    const { email, password, referralCode, remember } = data;
+
+    const payload = {
+      email: email,
+      password: password,
+      role: "user",
+      referral_code: referralCode
+    };
+
+    const response = await api.post("/user", payload);
+    return {
+      ...response.data,
+      remember
+    };
   };
 
   return useMutation({
@@ -17,6 +31,7 @@ const useCreateAccount = () => {
       const { id, role, remember } = data;
       if (!id || !role) throw new Error("Invalid response data");
       login({ role, id, remember: remember ?? false });
+      navigate("/complete_profile");
     },
   });
 };
