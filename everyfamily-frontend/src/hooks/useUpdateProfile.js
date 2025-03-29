@@ -7,7 +7,15 @@ const useUpdateProfile = () => {
     const { user } = useContext(AuthContext);
 
     const updateProfile = async (data) => {
-        const response = await api.put(`/user/${user.id}`, data);
+        const payload = {
+            first_name: data.firstName,
+            last_name: data.lastName,
+            local_authority: data.localAuthority,
+            organisation: data.organisation,
+            organisation_role: data.organisationRole
+        };
+
+        const response = await api.put(`/user/${user.id}`, payload);
         return response.data;
     };
 

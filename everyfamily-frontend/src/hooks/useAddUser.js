@@ -9,8 +9,20 @@ const useCreateAccount = () => {
   const navigate = useNavigate();
 
   const createAccount = async (data) => {
-    const response = await api.post("/user", data);
-    return response.data;
+    const { email, password, referralCode, remember } = data;
+
+    const payload = {
+      email: email,
+      password: password,
+      role: "user",
+      referral_code: referralCode
+    };
+
+    const response = await api.post("/user", payload);
+    return {
+      ...response.data,
+      remember
+    };
   };
 
   return useMutation({

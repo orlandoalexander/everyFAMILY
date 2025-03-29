@@ -1,8 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Form, Input, Button, message } from "antd";
-import { useMutation } from "@tanstack/react-query";
-import api from "../../hooks/api";
+import useUpdateProfile from "../../hooks/useUpdateProfile";
 import { useContext } from "react";
 import AuthContext from "../../AuthContext";
 import "../Auth/index.css";
@@ -13,24 +12,20 @@ function UserProfileSetup() {
     const { user } = useContext(AuthContext);
     const [messageApi, contextHolder] = message.useMessage();
 
-    const updateUserProfile = useMutation({
-        mutationFn: async (userData) => {
-            const response = await api.put(`/user/${user.id}`, userData);
-            return response.data;
-        },
-        onSuccess: () => {
-            messageApi.success("Profile updated successfully");
-            navigate("/");
-        },
-        onError: (error) => {
-            messageApi.error(
-                error.message || "Failed to update profile. Please try again."
-            );
-        },
-    });
+    const updateProfile = useUpdateProfile();
 
     const onFinish = (values) => {
-        updateUserProfile.mutate(values);
+        updateProfile.mutate(values, {
+            onSuccess: () => {
+                messageApi.success("Profile updated successfully");
+                setTimeout(() => navigate("/"), 1500);
+            },
+            onError: (error) => {
+                messageApi.error(
+                    error?.response?.data?.message || "Failed to update profile. Please try again."
+                );
+            }
+        });
     };
 
     return (
@@ -38,6 +33,12 @@ function UserProfileSetup() {
             <div className="auth-form-container">
                 {contextHolder}
                 <h1 className="auth-form-title">Complete your profile</h1>
+
+                {updateProfile.isError && (
+                    <div className="error-message">
+                        {updateProfile.error?.response?.data?.message || "Something went wrong. Please try again."}
+                    </div>
+                )}
 
                 <Form
                     name="user-profile"
@@ -100,7 +101,7 @@ function UserProfileSetup() {
                         <Button
                             type="primary"
                             htmlType="submit"
-                            loading={updateUserProfile.isPending}
+                            loading={updateProfile.isPending}
                             block
                             className="submit-button"
                         >
