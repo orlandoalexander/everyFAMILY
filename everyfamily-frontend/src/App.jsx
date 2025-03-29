@@ -7,14 +7,16 @@ import Login from "./components/Auth/Login";
 import UserProfileSetup from "./components/Auth/UserProfileSetup";
 import AddResourceModal from "./components/Resources/AddResourceModal";
 import ManageUsersModal from "./components/Dashboard/ManageUsersModal";
+import ReferralCodesModal from "./components/Dashboard/ReferralCodesModal.jsx";
 import useAddResource from "./hooks/useAddResource";
 import logo from "./assets/everyFAMILY-logo.png";
 import AuthContext from "./AuthContext";
 import { Input, Button, Dropdown, message } from "antd";
-import { Plus, Key, Menu as MenuIcon, Users, LogOut } from "react-feather";
+import { Plus, Key, Menu as MenuIcon, Users, LogOut, Hash } from "react-feather";
 import "@ant-design/v5-patch-for-react-19";
 import "./App.css";
 import useGetUsers from "./hooks/useGetUsers";
+import useGetReferralCodes from "./hooks/useGetReferralCodes";
 
 const { Search } = Input;
 
@@ -36,12 +38,16 @@ function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   const [searchText, setSearchText] = useState("");
-
+  const [referralCodesOpen, setReferralCodesOpen] = useState(false);
   const addResource = useAddResource();
   const { data: users, isLoading, error } = useGetUsers();
+  const { data: referralCodes } = useGetReferralCodes();
 
   const showManageUsersModal = () => setManageUsersOpen(true);
   const handleManageUsersCancel = () => setManageUsersOpen(false);
+
+  const showReferralCodesModal = () => setReferralCodesOpen(true);
+  const handleReferralCodesCancel = () => setReferralCodesOpen(false);
 
   const showResourceModal = () => {
     setResourceModalOpen(true);
@@ -85,6 +91,15 @@ function App() {
       label: (
           <div type="text" onClick={showManageUsersModal}>
             Manage users
+          </div>
+      ),
+    },
+    user.role === "admin" && {
+      key: "referral codes",
+      icon: <Hash size={15} />,
+      label: (
+          <div type="text" onClick={showReferralCodesModal}>
+            Referral codes
           </div>
       ),
     },
@@ -194,6 +209,12 @@ function App() {
             onCancel={handleManageUsersCancel}
             usersInfo={users || []}
         />
+        <ReferralCodesModal
+            open={referralCodesOpen}
+            onCancel={handleReferralCodesCancel}
+            referralCodes={referralCodes}
+        />
+
       </div>
   );
 }
