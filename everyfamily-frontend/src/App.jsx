@@ -26,7 +26,7 @@ const usersInfo = [
 ];
 
 function App() {
-  const { user } = useContext(AuthContext);
+  const { user, logout } = useContext(AuthContext);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -94,7 +94,14 @@ function App() {
     {
       key: "logout",
       icon: <LogOut size={15} />,
-      label: "Logout",
+      label: (
+          <div onClick={() => {
+            logout();
+            navigate("/login");
+          }}>
+            Logout
+          </div>
+      ),
     },
   ];
 
