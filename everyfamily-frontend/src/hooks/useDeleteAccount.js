@@ -6,8 +6,8 @@ import AuthContext from "../AuthContext";
 const useDeleteAccount = () => {
   const { logout } = useContext(AuthContext);
 
-  const deleteAccount = async (user_id) => {
-    const response = await api.delete(`/user/${user_id}`); // Pass user_id in URL
+  const deleteAccount = async (id) => {
+    const response = await api.delete(`/user/${id}`); // Pass user_id in URL
     return response.data;
   };
 

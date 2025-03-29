@@ -13,6 +13,7 @@ import { Input, Button, Dropdown, message } from "antd";
 import { Plus, Key, Menu as MenuIcon, Users, LogOut } from "react-feather";
 import "@ant-design/v5-patch-for-react-19";
 import "./App.css";
+import useGetUsers from "./hooks/useGetUsers";
 
 const { Search } = Input;
 
@@ -34,8 +35,9 @@ function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   const [searchText, setSearchText] = useState("");
-
+  // const [users, setUsers] = useState([]);
   const addResource = useAddResource();
+  const { data: users, isLoading, error } = useGetUsers();
 
   const showManageUsersModal = () => setManageUsersOpen(true);
   const handleManageUsersCancel = () => setManageUsersOpen(false);
@@ -74,6 +76,20 @@ function App() {
       setSearchText(search);
     }
   }, [location]);
+
+  // useEffect(() => {
+  //   if (manageUsersOpen) {
+  //     async function fetchUsers() {
+  //       try {
+  //         const fetchedUsers = await useGetUsers();
+  //         setUsers(fetchedUsers);
+  //       } catch (error) {
+  //         console.error("Failed to fetch users:", error);
+  //       }
+  //     }
+  //     fetchUsers();
+  //   }
+  // }, [manageUsersOpen]);
 
   const menuItems = [
     user.role === "admin" && {
@@ -179,7 +195,7 @@ function App() {
       <ManageUsersModal
         open={manageUsersOpen}
         onCancel={handleManageUsersCancel}
-        usersInfo={usersInfo}
+        usersInfo={users || []}
       />
     </div>
   );

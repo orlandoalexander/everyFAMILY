@@ -8,10 +8,10 @@ const { Column, ColumnGroup } = Table;
 function ManageUsersModal({ open, onCancel, usersInfo, onRemoveUser }) {
   const { mutate: deleteUser, isLoading } = useDeleteAccount();
 
-  const handleRemoveUser = (user_id) => {
-    deleteUser(user_id, {
+  const handleRemoveUser = (id) => {
+    deleteUser(id, {
       onSuccess: () => {
-        console.log(`User ${user_id} deleted successfully!`);
+        console.log(`User ${id} deleted successfully!`);
       },
       onError: (error) => {
         console.error("Error deleting user:", error);
@@ -32,6 +32,7 @@ function ManageUsersModal({ open, onCancel, usersInfo, onRemoveUser }) {
           dataSource={usersInfo}
           pagination={false}
           scroll={{ x: "max-content" }}
+          rowKey="id"
         >
           <Column title="Name" dataIndex="name" width={100} />
           <Column title="Email" dataIndex="email" width={200} />
@@ -46,7 +47,7 @@ function ManageUsersModal({ open, onCancel, usersInfo, onRemoveUser }) {
               <Button
                 type="text"
                 danger
-                onClick={() => handleRemoveUser(record.user_id)}
+                onClick={() => handleRemoveUser(record.id)}
               >
                 Remove User
               </Button>
