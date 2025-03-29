@@ -4,6 +4,7 @@ import Dashboard from "./components/Dashboard/index";
 import Resources from "./components/Resources/index";
 import CreateAccount from "./components/Auth/CreateAccount";
 import Login from "./components/Auth/Login";
+import UserProfileSetup from "./components/Auth/UserProfileSetup";
 import AddResourceModal from "./components/Resources/AddResourceModal";
 import ManageUsersModal from "./components/Dashboard/ManageUsersModal";
 import useAddResource from "./hooks/useAddResource";
@@ -80,9 +81,9 @@ function App() {
       key: "users",
       icon: <Users size={15} />,
       label: (
-        <div type="text" onClick={showManageUsersModal}>
-          Manage users
-        </div>
+          <div type="text" onClick={showManageUsersModal}>
+            Manage users
+          </div>
       ),
     },
     {
@@ -97,91 +98,93 @@ function App() {
     },
   ];
 
+
+  const isSimpleHeaderPage =
+      location.pathname === "/login" ||
+      location.pathname === "/create_account" ||
+      location.pathname === "/complete_profile";
+
   return (
-    <div className="app">
-      {location.pathname === "/login" ||
-      location.pathname === "/create_account" ? (
+      <div className="app">
         <header className="dashboard-header">
           <img
-            src={logo}
-            alt="everyFAMILY logo"
-            onClick={() => navigate("/")}
-          />
-        </header>
-      ) : (
-        <header className="dashboard-header">
-          <img
-            src={logo}
-            alt="everyFAMILY logo"
-            onClick={() => navigate("/")}
+              src={logo}
+              alt="everyFAMILY logo"
+              onClick={() => navigate("/")}
           />
 
-          <Search
-            className="dashboard-header-search"
-            placeholder="Find resources by name, description etc."
-            allowClear
-            size="large"
-            value={searchText}
-            onSearch={handleSearch}
-            onChange={(e) => setSearchText(e.target.value)}
-          />
-          {user.role === "admin" ? (
-            <div className="dashboard-header-buttons">
-              <Button
-                className="dashboard-header-button"
-                type="primary"
-                icon={<Plus />}
-                size="large"
-                onClick={showResourceModal}
-              >
-                Add new
-              </Button>
-              <Dropdown
-                menu={{ items: menuItems }}
-                trigger={["hover"]}
-                open={menuOpen}
-                onOpenChange={setMenuOpen}
-              >
-                <MenuIcon
-                  size={40}
-                  color="black"
-                  style={{ cursor: "pointer" }}
+          {!isSimpleHeaderPage && (
+              <>
+                <Search
+                    className="dashboard-header-search"
+                    placeholder="Find resources by name, description etc."
+                    allowClear
+                    size="large"
+                    value={searchText}
+                    onSearch={handleSearch}
+                    onChange={(e) => setSearchText(e.target.value)}
                 />
-              </Dropdown>
-            </div>
-          ) : (
-            <div className="dashboard-header-buttons">
-              <Dropdown
-                menu={{ items: menuItems }}
-                trigger={["hover"]}
-                open={menuOpen}
-                onOpenChange={setMenuOpen}
-              >
-                <MenuIcon size={40} style={{ cursor: "pointer" }} />
-              </Dropdown>
-            </div>
+
+                {user.role === "admin" ? (
+                    <div className="dashboard-header-buttons">
+                      <Button
+                          className="dashboard-header-button"
+                          type="primary"
+                          icon={<Plus />}
+                          size="large"
+                          onClick={showResourceModal}
+                      >
+                        Add new
+                      </Button>
+                      <Dropdown
+                          menu={{ items: menuItems }}
+                          trigger={["hover"]}
+                          open={menuOpen}
+                          onOpenChange={setMenuOpen}
+                      >
+                        <MenuIcon
+                            size={40}
+                            color="black"
+                            style={{ cursor: "pointer" }}
+                        />
+                      </Dropdown>
+                    </div>
+                ) : (
+                    <div className="dashboard-header-buttons">
+                      <Dropdown
+                          menu={{ items: menuItems }}
+                          trigger={["hover"]}
+                          open={menuOpen}
+                          onOpenChange={setMenuOpen}
+                      >
+                        <MenuIcon size={40} style={{ cursor: "pointer" }} />
+                      </Dropdown>
+                    </div>
+                )}
+              </>
           )}
         </header>
-      )}
-      <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/create_account" element={<CreateAccount />} />
-        <Route path="/resources/:resourceType?" element={<Resources />} />
-      </Routes>
-      {contextHolder}
-      <AddResourceModal
-        open={resourceModalOpen}
-        onCancel={handleResourceModalCancel}
-        onSubmit={handleResourceModalSubmit}
-        user={user}
-      />
-      <ManageUsersModal
-        open={manageUsersOpen}
-        onCancel={handleManageUsersCancel}
-        usersInfo={usersInfo}
-      />
-    </div>
+
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/create_account" element={<CreateAccount />} />
+          <Route path="/complete_profile" element={<UserProfileSetup />} />
+          <Route path="/resources/:resourceType?" element={<Resources />} />
+        </Routes>
+        {contextHolder}
+        <AddResourceModal
+            open={resourceModalOpen}
+            onCancel={handleResourceModalCancel}
+            onSubmit={handleResourceModalSubmit}
+            user={user}
+        />
+        <ManageUsersModal
+            open={manageUsersOpen}
+            onCancel={handleManageUsersCancel}
+            usersInfo={usersInfo}
+        />
+      </div>
   );
 }
 
