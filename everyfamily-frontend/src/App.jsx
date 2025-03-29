@@ -107,6 +107,13 @@ function App() {
     },
   ];
 
+  const isSimpleHeaderPage =
+      location.pathname === "/login" ||
+      location.pathname === "/create_account" ||
+      location.pathname === "/complete_profile";
+
+
+
   return (
       <div className="app">
         <header className="dashboard-header">
