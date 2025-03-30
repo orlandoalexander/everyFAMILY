@@ -11,7 +11,8 @@ const useModifyResource = () => {
 
     return useMutation({
         mutationFn: modifyResource,
-        onSuccess: () => {
+        onSuccess: (data) => {
+            console.log("Resource updated successfully:", data);
             queryClient.invalidateQueries(["resources"]);
         },
         onError: (error) => {

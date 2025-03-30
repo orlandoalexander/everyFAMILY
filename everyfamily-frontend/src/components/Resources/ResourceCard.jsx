@@ -19,15 +19,15 @@ function ResourceCard({
   featured,
 }) {
   const { user } = useContext(AuthContext);
-    const modifyResource = useModifyResource();
+  const modifyResource = useModifyResource();
   const safeLink = ensureHttps(link);
 
-    const handleFeatureToggle = () => {
-        modifyResource.mutate({
-            id,
-            featured: !featured,
-        });
-    };
+  const handleFeatureToggle = () => {
+      modifyResource.mutate({
+          id,
+          featured: !featured,
+      });
+  };
 
   return (
     <div>

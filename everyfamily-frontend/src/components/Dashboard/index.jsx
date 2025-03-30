@@ -73,6 +73,7 @@ function Dashboard() {
                     .map((resource, index) => (
                       <ResourceCard
                         key={index}
+                        id={resource.id}
                         title={resource.title}
                         link={resource.link}
                         description={resource.description}
@@ -103,6 +104,7 @@ function Dashboard() {
             children={resourceData.map((resource, index) => (
               <ResourceCard
                 key={index}
+                id={resource.id}
                 title={resource.title}
                 link={resource.link}
                 description={resource.description}
