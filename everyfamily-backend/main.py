@@ -83,36 +83,37 @@ def get_resources():
 
 @app.route("/resources/<int:resource_id>", methods=["PUT"])
 def modify_resource(resource_id):
+    data = request.get_json()
+    
     session = Session()
     resource = session.query(Resource).filter_by(id=resource_id).first()
+
     if not resource:
         session.close()
         return jsonify({"message": "Resource not found"}), 404
 
-    data = request.get_json()
-
-    # Update fields if provided in the request
-    if "title" in data:
+    # Update fields if provided
+    if data.get("title") is not None:
         resource.title = data["title"]
-    if "description" in data:
+    if data.get("description") is not None:
         resource.description = data["description"]
-    if "link" in data:
+    if data.get("link") is not None:
         resource.link = data["link"]
-    if "thumbnail_url" in data:
+    if data.get("thumbnail_url") is not None:
         resource.thumbnail_url = data["thumbnail_url"]
-    if "category" in data:
-        # Ensure category exists and get its id
+    if data.get("category") is not None:
         resource.category_id = add_category(session, data["category"])
-    if "type" in data:
-        # Ensure type exists and get its id
+    if data.get("type") is not None:
         resource.type_id = add_type(session, data["type"])
-    if "upload_user_id" in data:
+    if data.get("upload_user_id") is not None:
         resource.upload_user_id = data["upload_user_id"]
-
+    if data.get("featured") is not None:
+        resource.featured = data["featured"]
 
     session.commit()
     session.close()
     return jsonify({"message": "Resource updated successfully"}), 200
+
 
 @app.route("/resources/<int:resource_id>", methods=["DELETE"])
 def delete_resource(resource_id):
