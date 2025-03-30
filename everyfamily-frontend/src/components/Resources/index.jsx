@@ -78,6 +78,7 @@ function Resources() {
               filteredResources.map((resource, index) => (
                 <ResourceCard
                   key={index}
+                  id={resource.id}
                   title={resource.title}
                   link={resource.link}
                   description={resource.description}

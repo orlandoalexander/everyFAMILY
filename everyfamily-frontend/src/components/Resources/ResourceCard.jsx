@@ -3,10 +3,12 @@ import "./resourceCard.css";
 import { Card, Col, Button } from "antd";
 import { Grid, Tag, Bookmark, Star } from "react-feather";
 import AuthContext from "../../AuthContext";
+import useModifyResource from "../../hooks/useModifyResource";
 
 const ensureHttps = (url) => (url.startsWith("http") ? url : `https://${url}`);
 
 function ResourceCard({
+  id,
   title,
   description,
   link,
@@ -17,7 +19,15 @@ function ResourceCard({
   featured,
 }) {
   const { user } = useContext(AuthContext);
+    const modifyResource = useModifyResource();
   const safeLink = ensureHttps(link);
+
+    const handleFeatureToggle = () => {
+        modifyResource.mutate({
+            id,
+            featured: !featured,
+        });
+    };
 
   return (
     <div>
@@ -74,6 +84,7 @@ function ResourceCard({
               <div className="card-footer-buttons">
                 <Button
                   type="text"
+                  onClick={handleFeatureToggle}
                   icon={
                     <Star
                       color="gray"
