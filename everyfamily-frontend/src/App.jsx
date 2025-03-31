@@ -8,6 +8,7 @@ import UserProfileSetup from "./components/Auth/UserProfileSetup";
 import AddResourceModal from "./components/Resources/AddResourceModal";
 import ManageUsersModal from "./components/Dashboard/ManageUsersModal";
 import ReferralCodesModal from "./components/Dashboard/ReferralCodesModal.jsx";
+import ChangePasswordModal from "./components/Auth/ChangePasswordModal";
 import useAddResource from "./hooks/useAddResource";
 import logo from "./assets/everyFAMILY-logo.png";
 import AuthContext from "./AuthContext";
@@ -39,6 +40,7 @@ function App() {
   const [messageApi, contextHolder] = message.useMessage();
   const [searchText, setSearchText] = useState("");
   const [referralCodesOpen, setReferralCodesOpen] = useState(false);
+  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
   const addResource = useAddResource();
   const { data: users, isLoading, error } = useGetUsers();
   const { data: referralCodes } = useGetReferralCodes();
@@ -106,7 +108,11 @@ function App() {
     {
       key: "password",
       icon: <Key size={15} />,
-      label: "Change password",
+      label: (
+          <div onClick={() => setChangePasswordOpen(true)}>
+            Change password
+          </div>
+      ),
     },
     {
       key: "logout",
@@ -213,6 +219,10 @@ function App() {
             open={referralCodesOpen}
             onCancel={handleReferralCodesCancel}
             referralCodes={referralCodes}
+        />
+        <ChangePasswordModal
+            open={changePasswordOpen}
+            onCancel={() => setChangePasswordOpen(false)}
         />
 
       </div>
