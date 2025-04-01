@@ -1,9 +1,10 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import "./resourceCard.css";
 import { Card, Col, Button } from "antd";
 import { Grid, Tag, Bookmark, Star } from "react-feather";
 import AuthContext from "../../AuthContext";
 import useModifyResource from "../../hooks/useModifyResource";
+import useAddUserResource from "../../hooks/useAddUserResource";
 
 const ensureHttps = (url) => (url.startsWith("http") ? url : `https://${url}`);
 
@@ -18,23 +19,35 @@ function ResourceCard({
   saved,
   featured,
 }) {
+  const [isFeatured, setIsFeatured] = useState(featured);
+  const [isSaved, setIsSaved] = useState(saved);
   const { user } = useContext(AuthContext);
   const modifyResource = useModifyResource();
+  const addUserResource = useAddUserResource();
   const safeLink = ensureHttps(link);
 
   const handleFeatureToggle = () => {
-      modifyResource.mutate({
-          id,
-          featured: !featured,
-      });
+    setIsFeatured((prevState) => !prevState);
+    modifyResource.mutate({
+      id,
+      featured: !featured,
+    });
+  };
+
+  const handleSavedToggle = () => {
+    setIsSaved((prevState) => !prevState);
+    addUserResource.mutate({
+      user_id: user.id,
+      resource_id: id,
+    });
   };
 
   return (
     <div>
       <Col span={8}>
         <Card className="card-container" hoverable size="small">
-          <div className="outer-card">
-            <a href={safeLink} target="_blank" rel="noopener noreferrer">
+          <a href={safeLink} target="_blank" rel="noopener noreferrer">
+            <div className="outer-card">
               <Card
                 className="inner-card"
                 type="inner"
@@ -45,43 +58,32 @@ function ResourceCard({
                       thumbnail_url ||
                       "https://placehold.co/300x200/432666/FFF?text=Thumbnail+\n+Unavailable"
                     }
+                    onError={(e) =>
+                      (e.target.src =
+                        "https://placehold.co/300x200/432666/FFF?text=Thumbnail+\n+Unavailable")
+                    }
                   />
                 }
               />
-            </a>
-            <p
-              style={{
-                fontSize: 14,
-                fontWeight: "bold",
-                padding: 0,
-                margin: "10px 5px 5px 5px",
-              }}
-            >
-              {title}
-            </p>
-            <p
-              style={{
-                fontSize: 12,
-                padding: 0,
-                margin: "5px 5px 5px 5px",
-              }}
-            >
-              {description}
-            </p>
-          </div>
+
+              <p className="card-title">{title}</p>
+              <p className="card-description">{description}</p>
+            </div>
+          </a>
           <section className="card-footer">
             <div className="card-footer-details">
               <div>
                 <Tag color="gray" size={10} />
-                <p>{category}</p>
+                <span>{category}</span>
               </div>
               <div>
                 <Grid color="gray" size={10} />
-                <p>{type}</p>
+                <span>{type}</span>
               </div>
             </div>
+
             {user.role === "admin" ? (
-              <div className="card-footer-buttons">
+              <div>
                 <Button
                   type="text"
                   onClick={handleFeatureToggle}
@@ -89,20 +91,21 @@ function ResourceCard({
                     <Star
                       color="gray"
                       strokeWidth={1.5}
-                      size={27}
-                      fill={featured ? "gray" : "transparent"}
+                      size={23}
+                      fill={isFeatured ? "gray" : "transparent"}
                     />
                   }
                 />
 
                 <Button
                   type="text"
+                  onClick={handleSavedToggle}
                   icon={
                     <Bookmark
                       color="gray"
                       strokeWidth={1.5}
-                      size={27}
-                      fill={saved ? "gray" : "transparent"}
+                      size={23}
+                      fill={isSaved ? "gray" : "transparent"}
                     />
                   }
                 />
@@ -110,12 +113,13 @@ function ResourceCard({
             ) : (
               <Button
                 type="text"
+                onClick={handleSavedToggle}
                 icon={
                   <Bookmark
                     color="gray"
                     strokeWidth={1.5}
-                    size={27}
-                    fill={saved ? "gray" : ""}
+                    size={23}
+                    fill={isSaved ? "gray" : "transparent"}
                   />
                 }
               />

@@ -12,7 +12,7 @@ class User(Base):
     password = Column(String, nullable=False)
     first_name = Column(String, nullable=True)
     last_name = Column(String, nullable=True)
-    role = Column(String, nullable=True)
+    role = Column(String, nullable=True, default='basic')
     local_authority = Column(String, nullable=True)
     organisation = Column(String, nullable=True)
     organisation_role = Column(String, nullable=True)
@@ -49,7 +49,41 @@ def add_user(session, email, password, first_name=None, last_name=None, role=Non
         )
         session.add(new_user)
         session.commit()
-        return new_user.id
+        return new_user.id, new_user.role
 
-    return user.id
+    return user.id, user.role
 
+def modify_user(session, id, email=None, password=None, first_name=None, last_name=None, role=None, local_authority=None, organisation=None, organisation_role=None):
+    user = session.query(User).filter_by(id=id).first()
+
+    if not user:
+        raise ValueError(f"User with ID {id} does not exist.")
+
+    if email:
+        user.email = email
+    if password:
+        user.password = generate_password_hash(password)
+    if first_name:
+        user.first_name = first_name
+    if last_name:
+        user.last_name = last_name
+    if role:
+        user.role = role
+    if local_authority:
+        user.local_authority = local_authority
+    if organisation:
+        user.organisation = organisation
+    if organisation_role:
+        user.organisation_role = organisation_role
+
+    session.commit()
+
+
+def remove_user(session, id):
+    user = session.query(User).get(id)
+
+    if not user:
+        raise ValueError(f"User with ID {id} does not exist.")
+
+    session.delete(user)
+    session.commit()

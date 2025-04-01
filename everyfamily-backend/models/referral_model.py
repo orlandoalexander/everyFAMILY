@@ -12,9 +12,7 @@ class Referral(Base):
     def __repr__(self):
         return f"<Referral(id={self.id}, title={self.title}, status={self.status}>"
 
-def fetch_referral_codes(session, referral_id=None):
-    if referral_id:
-        return session.query(Referral).get(referral_id)
+def fetch_referral_codes(session):
     return session.query(Referral).all()
 
 def validate_referral_code(session, referral_code_title):
@@ -29,3 +27,25 @@ def add_referral_code(session, referral_code_title):
         session.commit()
         return new_referral_code.id
     return referral_code.id
+
+def modify_referral_code(session, id, status=None):
+    referral_code = session.query(Referral).get(id)
+
+    if not referral_code:
+        raise ValueError(f"Referral code with ID {id} does not exist.")
+
+    if status:
+        referral_code.status = status
+
+    session.commit()
+
+
+def remove_referral_code(session, id):
+    referral_code = session.query(Referral).get(id)
+
+    if not referral_code:
+        raise ValueError(f"Referral code with ID {id} does not exist.")
+
+    session.delete(referral_code)
+    session.commit()
+

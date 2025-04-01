@@ -1,16 +1,16 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "./api";
 
-const useAddType = () => {
+const useAddResource = () => {
   const queryClient = useQueryClient();
 
-  const addType = async (data) => {
+  const addResource = async (data) => {
     const response = await api.post("/resources", data);
     return response.data;
   };
 
   return useMutation({
-    mutationFn: addType,
+    mutationFn: addResource,
     onSuccess: () => {
       queryClient.invalidateQueries(["resources"]);
     },
@@ -20,4 +20,4 @@ const useAddType = () => {
   });
 };
 
-export default useAddType;
+export default useAddResource;

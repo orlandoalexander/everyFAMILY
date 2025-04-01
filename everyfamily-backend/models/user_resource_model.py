@@ -16,11 +16,13 @@ class UserResource(Base):
     def __repr__(self):
         return f"<UserResource(id={self.id}, user_id={self.user_id}, resource_id={self.resource_id})>"
 
-def add_user_resource(session, user_id, resource_id):
-    existing = session.query(UserResource).filter_by(user_id=user_id, resource_id=resource_id).first()
-    if not existing:
-        new_user_resource = UserResource(user_id=user_id, resource_id=resource_id)
-        session.add(new_user_resource)
+def modify_user_resource(session, user_id, resource_id):
+    user_resource = session.query(UserResource).filter_by(user_id=user_id, resource_id=resource_id).first()
+    if user_resource:
+        session.delete(user_resource)  # Remove if it exists
         session.commit()
-        return new_user_resource
+        return None
 
+    new_user_resource = UserResource(user_id=user_id, resource_id=resource_id)
+    session.add(new_user_resource)
+    session.commit()

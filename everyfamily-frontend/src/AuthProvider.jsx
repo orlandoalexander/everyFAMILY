@@ -2,8 +2,6 @@ import { useState } from "react";
 import AuthContext from "./AuthContext.jsx";
 
 function AuthProvider({ children }) {
-  localStorage.setItem("userId", 1);
-  localStorage.setItem("userRole", "admin");
   const [isLoggedIn, setIsLoggedIn] = useState(
     () => localStorage.getItem("isLoggedIn") === "true"
   );

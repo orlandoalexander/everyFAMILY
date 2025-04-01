@@ -2,6 +2,8 @@ from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean, c
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from . import Base
+from models.category_model import *
+from models.type_model import *
 from .category_model import Category  # Import Category model
 from .type_model import Type  # Import Type model
 from .user_resource_model import UserResource
@@ -15,9 +17,9 @@ class Resource(Base):
     link = Column(String, nullable=False)
     category_id = Column(Integer, ForeignKey('categories.id'), nullable=False)
     type_id = Column(Integer, ForeignKey('types.id'), nullable=False)
-    upload_user_id = Column(String, nullable=False)
+    upload_user_id = Column(String, nullable=True)
     created_at = Column(DateTime, default=func.now())
-    thumbnail_url = Column(String, nullable=False)
+    thumbnail_url = Column(String, nullable=True)
     featured = Column(Boolean, nullable=True, default=False)
 
     # Relationships
@@ -28,25 +30,82 @@ class Resource(Base):
     def __repr__(self):
         return f"<Resource(id={self.id}, title={self.title}, description={self.description}, link={self.link}, category_id={self.category_id}>"
 
-def fetch_resources(session, user_id=None, resource_id=None):
-    if resource_id:
-        return session.query(Resource).get(resource_id)
 
+def fetch_resources(session, user_id=None):
     query = (
         session.query(
             Resource,
             Category.title.label('category_title'),
             Type.title.label('type_title'),
-            case(
-                (UserResource.user_id == user_id, True),
-                else_=False
-            ).label('saved')
+            func.max(
+                case(
+                    (UserResource.user_id == user_id, True),
+                    else_=False
+                )
+            ).label('saved')  # Use aggregation to determine if the resource is saved by the user
         )
         .join(Category, Resource.category_id == Category.id)
         .join(Type, Resource.type_id == Type.id)
         .outerjoin(UserResource, Resource.id == UserResource.resource_id)
+        .group_by(Resource.id, Category.title, Type.title)  # Group by Resource and related columns
     )
 
     resources = query.all()
 
     return resources
+
+def add_resource(session, title, description, link, thumbnail_url, category, type, upload_user_id):
+    category_id = add_category(session, category)
+
+    type_id = add_type(session, type)
+
+    new_resource = Resource(
+        title=title,
+        description=description,
+        link=link,
+        thumbnail_url=thumbnail_url,
+        category_id=category_id,
+        type_id=type_id,
+        upload_user_id=upload_user_id
+    )
+
+    session.add(new_resource)
+    session.commit()
+
+    return new_resource.id, new_resource.title
+
+def modify_resource(session, id, title=None, description=None, link=None, thumbnail_url=None, category=None, type=None, featured=None):
+    resource = session.query(Resource).filter_by(id=id).first()
+
+    if not resource:
+        return ValueError(f"Resource with ID {id} does not exist.")
+
+    if title is not None:
+        resource.title = title
+    if description is not None:
+        resource.description = description
+    if link is not None:
+        resource.link = link
+    if thumbnail_url is not None:
+        resource.thumbnail_url = thumbnail_url
+    if category is not None:
+        resource.category_id = add_category(session, category)
+    if type is not None:
+        resource.type_id = add_type(session, type)
+    if featured is not None:
+        resource.featured = featured
+
+    session.commit()
+
+
+def remove_resource(session, id):
+    resource = session.query(Resource).get(id)
+
+    if not resource:
+        raise ValueError(f"Resource with ID {id} does not exist.")
+
+    session.delete(resource)
+    session.commit()
+
+
+

@@ -29,6 +29,7 @@ def home():
 @app.route("/resources", methods=["POST"])
 def create_resource():
     data = request.get_json()
+
     title = data.get("title")
     description = data.get("description", "")
     link = data.get("link")
@@ -37,15 +38,13 @@ def create_resource():
     type = data.get("type")
     upload_user_id = data.get("upload_user_id")
 
+    if not title or not link or not thumbnail_url or not category or not type:
+        return jsonify({"message": "Title, link, thumbnail, category and type is required"}), 400
+
     session = Session()
 
-    # Check if category and type exists and create if not
-    category_id = add_category(session, category)
-    type_id = add_type(session, type)
+    add_resource(session, title, description, link, thumbnail_url, category, type, upload_user_id)
 
-    new_resource = Resource(title=title, description=description, link=link, thumbnail_url=thumbnail_url, category_id=category_id, type_id=type_id, upload_user_id=upload_user_id)
-    session.add(new_resource)
-    session.commit()
     session.close()
 
     return jsonify({"message": "Resource uploaded successfully!"}), 201
@@ -82,53 +81,38 @@ def get_resources():
     return jsonify(resources_data)
 
 @app.route("/resources/<int:resource_id>", methods=["PUT"])
-def modify_resource(resource_id):
+def update_resource(resource_id):
     data = request.get_json()
-    
+
+    if not resource_id:
+        return jsonify({"message": "Resource id is required"}), 400
+
+
+    title = data.get("title")
+    description = data.get("description", "")
+    link = data.get("link")
+    thumbnail_url = data.get("thumbnail_url")
+    category = data.get("category")
+    type = data.get("type")
+    featured = data.get("featured")
+
     session = Session()
-    resource = session.query(Resource).filter_by(id=resource_id).first()
 
-    if not resource:
-        session.close()
-        return jsonify({"message": "Resource not found"}), 404
-
-    # Update fields if provided
-    if data.get("title") is not None:
-        resource.title = data["title"]
-    if data.get("description") is not None:
-        resource.description = data["description"]
-    if data.get("link") is not None:
-        resource.link = data["link"]
-    if data.get("thumbnail_url") is not None:
-        resource.thumbnail_url = data["thumbnail_url"]
-    if data.get("category") is not None:
-        resource.category_id = add_category(session, data["category"])
-    if data.get("type") is not None:
-        resource.type_id = add_type(session, data["type"])
-    if data.get("upload_user_id") is not None:
-        resource.upload_user_id = data["upload_user_id"]
-    if data.get("featured") is not None:
-        resource.featured = data["featured"]
-
-    session.commit()
+    modify_resource(session, resource_id, title, description, link, thumbnail_url, category, type, featured)
     session.close()
     return jsonify({"message": "Resource updated successfully"}), 200
 
 
 @app.route("/resources/<int:resource_id>", methods=["DELETE"])
 def delete_resource(resource_id):
-    if not resource_id:
-        return jsonify({"message": "Resource id is required"}), 400
-
     session = Session()
-    resource = fetch_resources(session,resource_id=resource_id)
 
-    if not resource:
+    try:
+        remove_resource(session, resource_id)
+    except ValueError as e:
         session.close()
-        return jsonify({"message": "Resource not found"}), 404
+        return jsonify({"error": str(e)}), 500
 
-    session.delete(resource)
-    session.commit()
     session.close()
     return jsonify({"message": "Resource deleted successfully"}), 200
 
@@ -162,7 +146,7 @@ def create_type():
     new_type_title = request.json.get('title', '').strip()
 
     if not new_type_title:
-        return jsonify({"message": "Type is required"}), 400
+        return jsonify({"message": "Type title is required"}), 400
 
     session = Session()
 
@@ -177,7 +161,7 @@ def create_category():
     new_category_title = request.json.get('title', '').strip()
 
     if not new_category_title:
-        return jsonify({"message": "Type is required"}), 400
+        return jsonify({"message": "Category title is required"}), 400
 
     session = Session()
 
@@ -211,13 +195,12 @@ def get_users():
 def delete_user(user_id):
     session = Session()
 
-    user = fetch_users(session, user_id=user_id)
+    try:
+        remove_user(session, user_id)
+    except ValueError as e:
+        session.close()
+        return jsonify({"error": str(e)}), 500
 
-    if not user:
-        return jsonify({"message": "User not found"}), 404
-
-    session.delete(user)
-    session.commit()
     session.close()
 
     return jsonify({"message": "User deleted successfully"}), 200
@@ -243,17 +226,19 @@ def create_user():
     if not referral_code_valid:
         return jsonify({"message": "Referral code is not valid"}), 400
 
-    user_id = add_user(session, email, password)
+    id, role = add_user(session, email, password)
 
     session.close()
 
-    return jsonify({"message": "Account created successfully", "user_id": user_id}), 201
+    return jsonify({"message": "Account created successfully", "id": id, "role": role }), 201
 
-@app.route('/users', methods=['PUT'])
-def modify_user():
+@app.route('/users/<int:user_id>', methods=['PUT'])
+def update_user(user_id):
     data = request.get_json()
 
-    user_id = data.get('id')
+    if not user_id:
+        return jsonify({"message": "User id is required"}), 400
+
     first_name = data.get('first_name')
     last_name = data.get('last_name')
     role = data.get('role')
@@ -261,31 +246,13 @@ def modify_user():
     organisation = data.get('organisation')
     organisation_role = data.get('organisation_role')
 
-    if not user_id:
-        return jsonify({"message": "User ID is required"}), 400
-
     session = Session()
-    user = get_users(session, user_id)
 
-    if not user:
+    try:
+        modify_user(session, user_id, first_name, last_name, role, local_authority, organisation, organisation_role)
+    except ValueError as e:
         session.close()
-        return jsonify({"message": "User not found"}), 404
-
-    if first_name is not None:
-        user.first_name = first_name
-    if last_name is not None:
-        user.last_name = last_name
-    if role is not None:
-        user.role = role
-    if local_authority is not None:
-        user.local_authority = local_authority
-    if organisation is not None:
-        user.organisation = organisation
-    if organisation_role is not None:
-        user.organisation_role = organisation_role
-
-    session.commit()
-    session.close()
+        return jsonify({"error": str(e)}), 404
 
     return jsonify({"message": "User updated successfully"}), 200
 
@@ -324,14 +291,14 @@ def get_referral_codes():
 def create_referral_code():
     data = request.get_json()
 
-    new_referral_code_title = data.get('title')
+    title = data.get('title')
 
-    if not new_referral_code_title:
+    if not title:
         return jsonify({"message": "Referral code is required"}), 400
 
     session = Session()
 
-    add_referral_code(session, new_referral_code_title)
+    add_referral_code(session, title)
 
     return jsonify({"message": "Referral code created successfully"}), 201
 
@@ -341,35 +308,29 @@ def update_referral_code(referral_id):
     data = request.get_json()
     status = data.get('status')
 
-    if not status:
-        return jsonify({"message": "Status is required"}), 400
+    if not referral_id:
+        return jsonify({"message": "Referral code id is required"}), 400
 
     session = Session()
 
-    referral_code = fetch_referral_codes(session, referral_id=referral_id)
+    try:
+        modify_referral_code(session, referral_id, status)
+    except ValueError as e:
+        session.close()
+        return jsonify({"error": str(e)}), 500
 
-    if not referral_code:
-        return jsonify({"message": "Referral code not found"}), 404
-
-    referral_code.status = status
-    session.commit()
-    session.close()
-
-    return jsonify({"message": "Referral code status updated successfully"}), 200
+    return jsonify({"message": "Referral code updated successfully"}), 200
 
 
 @app.route('/referrals/<int:referral_id>', methods=["DELETE"])
 def delete_referral_code(referral_id):
     session = Session()
 
-    referral_code = fetch_referral_codes(session, referral_id=referral_id)
-
-    if not referral_code:
-        return jsonify({"message": "Referral code not found"}), 404
-
-    session.delete(referral_code)
-    session.commit()
-    session.close()
+    try:
+        remove_referral_code(session, referral_id)
+    except ValueError as e:
+        session.close()
+        return jsonify({"error": str(e)}), 500
 
     return jsonify({"message": "Referral code deleted successfully"}), 200
 
@@ -386,11 +347,10 @@ def create_user_resource():
 
     session = Session()
 
-    add_user_resource(session, user_id, resource_id)
+    modify_user_resource(session, user_id, resource_id)
 
     session.close()
     return jsonify({"message": "Resource saved successfully."}), 201
-
 
 if __name__ == "__main__":
     app.run(port=5001, debug=True)

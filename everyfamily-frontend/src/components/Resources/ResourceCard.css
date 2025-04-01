@@ -5,15 +5,17 @@
     height: 250px;
 }
 .outer-card {
-    width: 100%;
+    width: 175px;
     height: 85%;
-    overflow: auto;
+    overflow: scroll;
+    text-wrap: auto;
+    color: black;
 }
 .outer-card::-webkit-scrollbar {
     display: none;
 }
 .inner-card {
-    overflow: hidden;
+    overflow: scroll;
     width: 175px;
     height: 100px;
 }
@@ -22,13 +24,26 @@
     object-fit: cover;
     height: 100px;
 }
+
+.card-title {
+  font-size: 14px;
+  font-weight: bold;
+  padding: 0;
+  margin: 5px;
+}
+
+.card-description {
+  font-size: 12px;
+  padding: 0;
+  margin: 5px;
+}
+
 .card-footer {
-    display: flex;
-    justify-content: space-between;
-    height: 30px;
-    width: 175px;
-    border-top: 1px solid #ddd;
-    padding-top: 7px;
+  display: flex;
+  justify-content: space-between;
+  height: 30px;
+  border-top: 1px solid #ddd;
+  padding-top: 7px;
 }
 
 .card-footer-details {
@@ -36,25 +51,25 @@
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
+  max-width: 60%;
 }
 
-.card-footer-details div {
-  height: 18px;;
+.card-footer-details > div{
   display: flex;
-  justify-content: center;
   align-items: center;
   gap: 5px;
-}
-
-.card-footer-details div p {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   font-size: 12px;
   color: gray;
+  text-wrap: nowrap;
+  max-width: 100%;
 }
 
-.card-footer-buttons {
-  display: flex;
-  gap: 5px
+.card-footer-details span {
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+
+.card-footer-details svg {
+  flex-shrink: 0;
 }

@@ -4,36 +4,33 @@ import { useContext } from "react";
 import AuthContext from "../AuthContext";
 import { useNavigate } from "react-router-dom";
 
-const useCreateAccount = () => {
+const useAddUser = () => {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const createAccount = async (data) => {
-    const { email, password, referralCode, remember } = data;
-
+  const addUser = async ({ email, password, referralCode, remember }) => {
     const payload = {
-      email: email,
-      password: password,
-      role: "user",
-      referral_code: referralCode
+      email,
+      password,
+      referral_code: referralCode,
     };
+    const { data } = await api.post("/users", payload);
 
-    const response = await api.post("/user", payload);
-    return {
-      ...response.data,
-      remember
-    };
+    return { ...data, remember };
   };
 
   return useMutation({
-    mutationFn: createAccount,
+    mutationFn: addUser,
     onSuccess: (data) => {
+      console.log(data);
       const { id, role, remember } = data;
-      if (!id || !role) throw new Error("Invalid response data");
       login({ role, id, remember: remember ?? false });
       navigate("/complete_profile");
+    },
+    onError: (error) => {
+      console.error(error);
     },
   });
 };
 
-export default useCreateAccount;
+export default useAddUser;

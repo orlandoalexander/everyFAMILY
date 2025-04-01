@@ -14,6 +14,7 @@ const useGetResources = () => {
   return useQuery({
     queryKey: ["resources"],
     queryFn: getResources,
+    refetchOnWindowFocus: false,
   });
 };
 

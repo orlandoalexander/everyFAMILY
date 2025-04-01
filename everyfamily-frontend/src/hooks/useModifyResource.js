@@ -1,24 +1,19 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import api from "./api";
 
 const useModifyResource = () => {
-    const queryClient = useQueryClient();
+  const modifyResource = async (data) => {
+    const response = await api.put(`/resources/${data.id}`, data);
+    return response.data;
+  };
 
-    const modifyResource = async (data) => {
-        const response = await api.put(`/resources/${data.id}`, data);
-        return response.data;
-    };
+  return useMutation({
+    mutationFn: modifyResource,
 
-    return useMutation({
-        mutationFn: modifyResource,
-        onSuccess: (data) => {
-            console.log("Resource updated successfully:", data);
-            queryClient.invalidateQueries(["resources"]);
-        },
-        onError: (error) => {
-            console.error(error);
-        },
-    });
+    onError: (error) => {
+      console.error(error);
+    },
+  });
 };
 
 export default useModifyResource;
