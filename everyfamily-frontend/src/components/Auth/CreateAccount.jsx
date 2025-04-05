@@ -1,22 +1,20 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Form, Input, Button, Divider } from "antd";
+import { Link } from "react-router-dom";
+import { Form, Input, Button } from "antd";
 import { EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
-import useCreateAccount from "../../hooks/useAddUser";
+import useAddUser from "../../hooks/useAddUser";
 import "./CreateAccount.css";
 
 function CreateAccount() {
-  const { mutate: createAccount, isPending, error } = useCreateAccount();
+  const { mutate: createAccount, isPending, error } = useAddUser();
 
   const onFinish = (values) => {
-    const { email, password, referralCode } = values;
+    const { email, password, referral_code } = values;
 
     createAccount({
       email,
       password,
-      referralCode,
-      role: "user",
-      remember: true,
+      referral_code,
     });
   };
 
@@ -28,7 +26,7 @@ function CreateAccount() {
         {error && (
           <div className="error-message">
             {error?.response?.data?.message ||
-              "Something went wrong. Please try again."}
+              "Something went wrong. Please try again later."}
           </div>
         )}
 
@@ -55,7 +53,7 @@ function CreateAccount() {
             label="Password"
             rules={[
               { required: true, message: "Please enter your password" },
-              { min: 6, message: "Password must be at least 6 characters" },
+              { min: 8, message: "Password must be at least 8 characters" },
             ]}
           >
             <Input.Password
@@ -68,7 +66,7 @@ function CreateAccount() {
           </Form.Item>
 
           <Form.Item
-            name="referralCode"
+            name="referral_code"
             label="Referral code"
             rules={[
               { required: true, message: "Please enter a referral code" },
@@ -88,8 +86,6 @@ function CreateAccount() {
               Create account
             </Button>
           </Form.Item>
-
-          <Divider style={{ marginBottom: 0 }} />
 
           <section>
             <p className="switch-text">Already have an account?</p>

@@ -1,18 +1,18 @@
 import { useState, useContext, useEffect } from "react";
 import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import ProtectedRoute from "./ProtectedRoute.jsx";
 import Dashboard from "./components/Dashboard/index";
 import Resources from "./components/Resources/index";
 import CreateAccount from "./components/Auth/CreateAccount";
 import Login from "./components/Auth/Login";
-import UserProfileSetup from "./components/Auth/UserProfileSetup";
-import AddResourceModal from "./components/Resources/AddResourceModal";
+import UserProfile from "./components/Auth/UserProfile.jsx";
+import ResourceModal from "./components/Resources/ResourceModal.jsx";
 import ManageUsersModal from "./components/Dashboard/ManageUsersModal";
-import ReferralCodesModal from "./components/Dashboard/ReferralCodesModal.jsx";
-import ChangePasswordModal from "./components/Auth/ChangePasswordModal";
-import useAddResource from "./hooks/useAddResource";
+import ManageReferralsModal from "./components/Dashboard/ManageReferralsModal.jsx";
+import ChangePasswordModal from "./components/Dashboard/ChangePasswordModal.jsx";
 import logo from "./assets/everyFAMILY-logo.png";
 import AuthContext from "./AuthContext";
-import { Input, Button, Dropdown, message } from "antd";
+import { Input, Button, Dropdown, Result } from "antd";
 import {
   Plus,
   Key,
@@ -23,53 +23,33 @@ import {
 } from "react-feather";
 import "@ant-design/v5-patch-for-react-19";
 import "./App.css";
-import useGetUsers from "./hooks/useGetUsers";
-import useGetReferralCodes from "./hooks/useGetReferralCodes";
 
 const { Search } = Input;
 
 function App() {
-  const { user, logout } = useContext(AuthContext);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const [resourceModalOpen, setResourceModalOpen] = useState(false);
+  const [manageUsersOpen, setManageUsersOpen] = useState(false);
+  const [referralCodesOpen, setReferralCodesOpen] = useState(false);
+  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
+
+  const { user, logout, isLoggedIn } = useContext(AuthContext);
+
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [resourceModalOpen, setResourceModalOpen] = useState(false);
-  const [manageUsersOpen, setManageUsersOpen] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [messageApi, contextHolder] = message.useMessage();
-  const [searchText, setSearchText] = useState("");
-  const [referralCodesOpen, setReferralCodesOpen] = useState(false);
-  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
-  const addResource = useAddResource();
-  const { data: users, isLoading, error } = useGetUsers();
-  const { data: referralCodes } = useGetReferralCodes();
+  const showChangePasswordModal = () => setChangePasswordOpen(true);
+  const hideChangePasswordModal = () => setChangePasswordOpen(false);
 
   const showManageUsersModal = () => setManageUsersOpen(true);
-  const handleManageUsersCancel = () => setManageUsersOpen(false);
+  const hideManageUsersModal = () => setManageUsersOpen(false);
 
   const showReferralCodesModal = () => setReferralCodesOpen(true);
-  const handleReferralCodesCancel = () => setReferralCodesOpen(false);
+  const hideReferralCodesModal = () => setReferralCodesOpen(false);
 
-  const showResourceModal = () => {
-    setResourceModalOpen(true);
-  };
-
-  const handleResourceModalCancel = () => {
-    setResourceModalOpen(false);
-  };
-
-  const handleResourceModalSubmit = (resourceData) => {
-    addResource.mutate(resourceData, {
-      onSuccess: () => {
-        setResourceModalOpen(false);
-        messageApi.success("Resource added successfully");
-        console.log("Resource added successfully!");
-      },
-      onError: (err) => {
-        console.error("Failed to add resource", err);
-      },
-    });
-  };
+  const showResourceModal = () => setResourceModalOpen(true);
+  const hideResourceModal = () => setResourceModalOpen(false);
 
   const handleSearch = (value) => {
     if (value === "") return;
@@ -108,9 +88,7 @@ function App() {
     {
       key: "password",
       icon: <Key size={15} />,
-      label: (
-        <div onClick={() => setChangePasswordOpen(true)}>Change password</div>
-      ),
+      label: <div onClick={showChangePasswordModal}>Change password</div>,
     },
     {
       key: "logout",
@@ -128,17 +106,22 @@ function App() {
     },
   ];
 
-  const isSimpleHeaderPage =
-    location.pathname === "/login" ||
-    location.pathname === "/create_account" ||
-    location.pathname === "/complete_profile";
+  const showHeader =
+    location.pathname === "/" || location.pathname === "/resources";
 
   return (
     <div className="app">
       <header className="dashboard-header">
-        <img src={logo} alt="everyFAMILY logo" onClick={() => navigate("/")} />
+        <img
+          src={logo}
+          alt="everyFAMILY logo"
+          onClick={() => {
+            navigate("/");
+            setSearchText("");
+          }}
+        />
 
-        {!isSimpleHeaderPage && (
+        {showHeader && (
           <>
             <Search
               className="dashboard-header-search"
@@ -191,32 +174,68 @@ function App() {
       </header>
 
       <Routes>
-        <Route path="/" element={<Dashboard />} />
         <Route path="/login" element={<Login />} />
         <Route path="/create_account" element={<CreateAccount />} />
-        <Route path="/complete_profile" element={<UserProfileSetup />} />
-        <Route path="/resources/:resourceType?" element={<Resources />} />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/user_profile"
+          element={
+            <ProtectedRoute>
+              <UserProfile />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/resources/:resourceType?"
+          element={
+            <ProtectedRoute>
+              <Resources />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="*"
+          element={
+            <Result
+              status="404"
+              title="404"
+              subTitle="Sorry, the page you visited does not exist."
+              extra={
+                <Button type="primary" href={isLoggedIn ? "/" : "/login"}>
+                  {isLoggedIn ? "Go home" : "Go to login"}
+                </Button>
+              }
+            />
+          }
+        />
       </Routes>
-      {contextHolder}
-      <AddResourceModal
+      <ResourceModal
         open={resourceModalOpen}
-        onCancel={handleResourceModalCancel}
-        onSubmit={handleResourceModalSubmit}
+        onCancel={hideResourceModal}
         user={user}
       />
       <ManageUsersModal
         open={manageUsersOpen}
-        onCancel={handleManageUsersCancel}
-        usersInfo={users || []}
+        onCancel={hideManageUsersModal}
+        user={user}
       />
-      <ReferralCodesModal
+      <ManageReferralsModal
         open={referralCodesOpen}
-        onCancel={handleReferralCodesCancel}
-        referralCodes={referralCodes}
+        onCancel={hideReferralCodesModal}
       />
       <ChangePasswordModal
         open={changePasswordOpen}
-        onCancel={() => setChangePasswordOpen(false)}
+        onCancel={hideChangePasswordModal}
       />
     </div>
   );

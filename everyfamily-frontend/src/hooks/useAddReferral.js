@@ -1,18 +1,18 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "./api";
 
-const useDeleteResource = () => {
+const useAddReferral = () => {
   const queryClient = useQueryClient();
 
-  const deleteResource = async (id) => {
-    const response = await api.delete(`/resources/${id}`);
+  const addReferral = async () => {
+    const response = await api.post("/referrals");
     return response.data;
   };
 
   return useMutation({
-    mutationFn: deleteResource,
+    mutationFn: addReferral,
     onSuccess: () => {
-      queryClient.invalidateQueries(["resources"]);
+      queryClient.invalidateQueries(["referrals"]);
     },
     onError: (error) => {
       console.error(error);
@@ -20,4 +20,4 @@ const useDeleteResource = () => {
   });
 };
 
-export default useDeleteResource;
+export default useAddReferral;

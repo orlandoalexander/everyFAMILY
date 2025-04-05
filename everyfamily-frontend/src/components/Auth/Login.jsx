@@ -1,18 +1,21 @@
-import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Form, Input, Button, Checkbox, Divider, message } from "antd";
+import { Form, Input, Button, Checkbox, message } from "antd";
 import { EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
 import useLogin from "../../hooks/useLogin";
-import useForgotPassword from "../../hooks/useForgotPassword";
+import useResetPassword from "../../hooks/useResetPassword";
 import "./index.css";
 import "./Login.css";
 
 function Login() {
   const navigate = useNavigate();
   const [form] = Form.useForm();
-  const { mutate: login, isPending, error } = useLogin();
-  const { mutate: forgotPassword, isPending: isForgotPasswordPending } =
-    useForgotPassword();
+  const {
+    mutate: login,
+    isPending: loginIsPending,
+    error: loginError,
+  } = useLogin();
+  const { mutate: resetPassword, isPending: resetPasswordIsPending } =
+    useResetPassword();
   const [messageApi, contextHolder] = message.useMessage();
 
   const onFinish = (values) => {
@@ -28,7 +31,7 @@ function Login() {
     );
   };
 
-  const handleForgotPassword = () => {
+  const handleResetPassword = () => {
     const email = form.getFieldValue("email");
 
     if (!email) {
@@ -36,21 +39,20 @@ function Login() {
       return;
     }
 
-    // Validate email format
-    if (!/^\S+@\S+\.\S+$/.test(email)) {
-      messageApi.error("Please enter a valid email address");
-      return;
-    }
-
-    forgotPassword(
+    resetPassword(
       { email },
       {
         onSuccess: () => {
-          messageApi.success("Password reset link has been sent to your email");
+          messageApi.success(
+            `New password has been sent to '${email}'. Remember to check your junk/spam.`,
+            10
+          );
         },
         onError: (error) => {
           messageApi.error(
-            error.message || "Failed to send reset link. Please try again."
+            error?.response?.data?.message ||
+              "Failed to send reset link. Please try again.",
+            10
           );
         },
       }
@@ -63,9 +65,10 @@ function Login() {
         {contextHolder}
         <h1 className="auth-form-title">Log in</h1>
 
-        {error && (
+        {loginError && (
           <div className="error-message">
-            {error.message || "Something went wrong. Please try again."}
+            {loginError?.response?.data?.message ||
+              "Error logging in. Please try again later."}
           </div>
         )}
 
@@ -73,10 +76,10 @@ function Login() {
           name="login"
           className="auth-form"
           form={form}
-          onFinish={onFinish}
           layout="vertical"
           requiredMark={false}
-          initialValues={{ remember: false }}
+          onFinish={onFinish}
+          validateTrigger="onSubmit"
         >
           <Form.Item
             name="email"
@@ -110,8 +113,8 @@ function Login() {
             <Button
               className="forgot-password"
               type="link"
-              onClick={handleForgotPassword}
-              loading={isForgotPasswordPending}
+              onClick={handleResetPassword}
+              loading={resetPasswordIsPending}
             >
               Forgot your password
             </Button>
@@ -121,15 +124,13 @@ function Login() {
             <Button
               type="primary"
               htmlType="submit"
-              loading={isPending}
+              loading={loginIsPending}
               block
               className="submit-button"
             >
               Log in
             </Button>
           </Form.Item>
-
-          <Divider style={{ marginBottom: 0 }} />
 
           <section>
             <p className="switch-text">Don't have an account?</p>

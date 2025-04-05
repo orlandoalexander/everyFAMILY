@@ -54,6 +54,8 @@
 .dashboard-category-title span {
   font-size: 9px;
   color: gray;
+  font-weight: 600;
+  cursor: pointer;
 }
 
 .ant-input-affix-wrapper {

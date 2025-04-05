@@ -12,28 +12,24 @@
   font-weight: 500;
 }
 
-.ant-form-item {
+.resource-form .ant-form-item {
   margin-bottom: 0px;
 }
 
-.ant-form-item-row {
+.resource-form .ant-form-item-row {
   display: flex;
 }
 
-.ant-form-item-label {
+.resource-form .ant-form-item-label {
   display: flex;
   flex: 0.4 !important;
   justify-content: flex-start;
 }
 
-.ant-modal-footer button {
-  box-shadow: none !important;
-}
-
-.ant-modal-content {
+.resource-form .ant-modal-content {
   height: 100% !important;
 }
 
-.ant-modal-body {
+.resource-form .ant-modal-body {
   max-height: 500px !important;
 }

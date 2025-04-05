@@ -8,24 +8,22 @@ const useAddUser = () => {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const addUser = async ({ email, password, referralCode, remember }) => {
-    const payload = {
+  const addUser = async ({ email, password, referral_code }) => {
+    const response = await api.post("/users", {
       email,
       password,
-      referral_code: referralCode,
-    };
-    const { data } = await api.post("/users", payload);
+      referral_code,
+    });
 
-    return { ...data, remember };
+    return response.data;
   };
 
   return useMutation({
     mutationFn: addUser,
     onSuccess: (data) => {
-      console.log(data);
-      const { id, role, remember } = data;
-      login({ role, id, remember: remember ?? false });
-      navigate("/complete_profile");
+      const { id, role } = data;
+      login({ role, id, remember: true });
+      navigate("/user_profile");
     },
     onError: (error) => {
       console.error(error);

@@ -1,14 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AuthContext from "./AuthContext.jsx";
+import useGetUsers from "./hooks/useGetUsers";
+import useUpdateUser from "./hooks/useUpdateUser.js";
 
 function AuthProvider({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(
-    () => localStorage.getItem("isLoggedIn") === "true"
+    () => sessionStorage.getItem("isLoggedIn") === "true"
   );
   const [user, setUser] = useState({
-    role: localStorage.getItem("userRole"),
-    id: localStorage.getItem("userId"),
+    role: sessionStorage.getItem("userRole"),
+    id: parseInt(sessionStorage.getItem("userId")),
   });
+
+  const { data: users } = useGetUsers(user.id);
+  const updateUser = useUpdateUser();
 
   const login = ({ role, id, remember }) => {
     setIsLoggedIn(true);
@@ -17,16 +22,31 @@ function AuthProvider({ children }) {
       localStorage.setItem("isLoggedIn", "true");
       localStorage.setItem("userId", id);
       localStorage.setItem("userRole", role);
-    } else localStorage.setItem("isLoggedIn", "false"); // clear local storage
+    }
+    sessionStorage.setItem("isLoggedIn", "true");
+    sessionStorage.setItem("userId", id);
+    sessionStorage.setItem("userRole", role);
   };
 
   const logout = () => {
+    updateUser.mutate({ id: user.id, logged_in: false });
     setIsLoggedIn(false);
     setUser({ role: null, id: null });
-    localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("userId");
-    localStorage.removeItem("userRole");
+    sessionStorage.removeItem("isLoggedIn");
+    sessionStorage.removeItem("userId");
+    sessionStorage.removeItem("userRole");
   };
+
+  useEffect(() => {
+    if (
+      users?.length > 0 &&
+      users[0].id === user.id &&
+      users[0].role !== user.role
+    ) {
+      sessionStorage.setItem("userRole", users[0].role);
+      setUser((prevState) => ({ ...prevState, role: users[0].role }));
+    }
+  }, [users, user.id, user.role]);
 
   return (
     <AuthContext.Provider value={{ isLoggedIn, user, login, logout }}>

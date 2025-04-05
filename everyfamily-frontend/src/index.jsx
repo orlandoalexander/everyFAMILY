@@ -15,16 +15,17 @@ createRoot(document.getElementById("root")).render(
       theme={{
         token: {
           colorPrimary: "#92278F", // Custom primary color for the theme
+          boxShadow: "none !important",
         },
       }}
     >
-      <AuthProvider>
-        <QueryClientProvider client={queryClient}>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
           <BrowserRouter>
             <App />
           </BrowserRouter>
-        </QueryClientProvider>
-      </AuthProvider>
+        </AuthProvider>
+      </QueryClientProvider>
     </ConfigProvider>
   </StrictMode>
 );

@@ -1,28 +1,24 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Form, Input, Button, message } from "antd";
-import useUpdateProfile from "../../hooks/useUpdateProfile";
-import { useContext } from "react";
-import AuthContext from "../../AuthContext";
+import useUpdateUser from "../../hooks/useUpdateUser";
 import "../Auth/index.css";
 
-function UserProfileSetup() {
+function UserProfile() {
   const navigate = useNavigate();
-  const { user } = useContext(AuthContext);
   const [messageApi, contextHolder] = message.useMessage();
 
-  const updateProfile = useUpdateProfile();
+  const updateUser = useUpdateUser();
 
   const onFinish = (values) => {
-    updateProfile.mutate(values, {
+    updateUser.mutate(values, {
       onSuccess: () => {
-        messageApi.success("Profile updated successfully");
-        setTimeout(() => navigate("/"), 1500);
+        navigate("/");
       },
       onError: (error) => {
         messageApi.error(
           error?.response?.data?.message ||
-            "Failed to update profile. Please try again."
+            "Failed to create account. Please try again."
         );
       },
     });
@@ -34,9 +30,9 @@ function UserProfileSetup() {
         {contextHolder}
         <h1 className="auth-form-title">Complete your profile</h1>
 
-        {updateProfile.isError && (
+        {updateUser.isError && (
           <div className="error-message">
-            {updateProfile.error?.response?.data?.message ||
+            {updateUser.error?.response?.data?.message ||
               "Something went wrong. Please try again."}
           </div>
         )}
@@ -49,7 +45,7 @@ function UserProfileSetup() {
           requiredMark={false}
         >
           <Form.Item
-            name="firstName"
+            name="first_name"
             label="First Name"
             rules={[
               { required: true, message: "Please enter your first name" },
@@ -59,7 +55,7 @@ function UserProfileSetup() {
           </Form.Item>
 
           <Form.Item
-            name="lastName"
+            name="last_name"
             label="Last Name"
             rules={[{ required: true, message: "Please enter your last name" }]}
           >
@@ -67,7 +63,7 @@ function UserProfileSetup() {
           </Form.Item>
 
           <Form.Item
-            name="localAuthority"
+            name="local_authority"
             label="Local Authority"
             rules={[
               { required: true, message: "Please enter your local authority" },
@@ -87,7 +83,7 @@ function UserProfileSetup() {
           </Form.Item>
 
           <Form.Item
-            name="organisationRole"
+            name="organisation_role"
             label="Organisation Role"
             rules={[
               {
@@ -103,7 +99,7 @@ function UserProfileSetup() {
             <Button
               type="primary"
               htmlType="submit"
-              loading={updateProfile.isPending}
+              loading={updateUser.isPending}
               block
               className="submit-button"
             >
@@ -116,4 +112,4 @@ function UserProfileSetup() {
   );
 }
 
-export default UserProfileSetup;
+export default UserProfile;

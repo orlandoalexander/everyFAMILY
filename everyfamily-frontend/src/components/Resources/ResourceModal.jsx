@@ -14,7 +14,8 @@ import useGetCategories from "../../hooks/useGetCategories";
 import useGetTypes from "../../hooks/useGetTypes";
 import useAddType from "../../hooks/useAddType";
 import useAddCategory from "../../hooks/useAddCategory";
-import "./AddResourceModal.css";
+import useAddResource from "../../hooks/useAddResource";
+import "./ResourceModal.css";
 import {
   Type,
   Link,
@@ -43,7 +44,7 @@ const fetchLinkThumbnail = async (url) => {
   return data;
 };
 
-function AddResourceModal({ open, onCancel, onSubmit, user }) {
+function AddResourceModal({ open, onCancel, user, resourceData }) {
   const [newType, setNewType] = useState("");
   const [newCategory, setNewCategory] = useState("");
   const [linkURL, setLinkURL] = useState(null);
@@ -54,6 +55,7 @@ function AddResourceModal({ open, onCancel, onSubmit, user }) {
 
   const addType = useAddType();
   const addCategory = useAddCategory();
+  const addResource = useAddResource();
 
   const { data: categoryData } = useGetCategories();
   const { data: typeData } = useGetTypes();
@@ -68,13 +70,25 @@ function AddResourceModal({ open, onCancel, onSubmit, user }) {
           messageApi.error("Please enter a valid URL");
           return;
         }
-        onSubmit({
+        const data = {
           ...values,
           thumbnail_url: thumbnailURL,
           upload_user_id: user.id,
+        };
+
+        addResource.mutate(data, {
+          onSuccess: (success) => {
+            handleClose();
+            messageApi.success(success.message);
+          },
+          onError: (error) => {
+            messageApi.error(
+              error?.response?.data?.message ||
+                "Error adding resource. Please try again."
+            );
+          },
         });
 
-        form.resetFields();
         setThumbnailURL(null);
         setLinkURL(null);
       })
@@ -129,7 +143,6 @@ function AddResourceModal({ open, onCancel, onSubmit, user }) {
       if (linkURL) {
         const isValid = isValidURL(linkURL);
         if (isValid) {
-          console.log("URL is valid, fetching metadata...");
           try {
             const data = await fetchLinkThumbnail(linkURL);
             setThumbnailURL(data.image || null);
@@ -145,13 +158,27 @@ function AddResourceModal({ open, onCancel, onSubmit, user }) {
     fetchData();
   }, [linkURL]);
 
+  useEffect(() => {
+    if (open && resourceData) {
+      form.setFieldsValue({
+        title: resourceData.title,
+        description: resourceData.description,
+        type: resourceData.type,
+        category: resourceData.category,
+        link: resourceData.link,
+      });
+      setLinkURL(resourceData.link);
+      setThumbnailURL(resourceData.thumbnail_url || null);
+    }
+  }, [open, resourceData, form]);
+
   return (
     <Modal
-      title="Add new resource"
+      title={resourceData ? "Edit Resource" : "Add New Resource"}
       open={open}
       onCancel={handleClose}
       onOk={handleSubmit}
-      okText="Submit"
+      okText={resourceData ? "Save changes" : "Submit"}
       cancelText="Cancel"
       maskClosable={false}
       width={600}
@@ -334,15 +361,6 @@ function AddResourceModal({ open, onCancel, onSubmit, user }) {
               src={thumbnailURL}
               fallback="https://placehold.co/600x400/432666/FFF?text=Thumbnail+\n+Unavailable"
             />
-
-            {/* <Upload
-              name="thumbnail"
-              listType="picture"
-              maxCount={1}
-              beforeUpload={() => false} // Prevent auto upload
-            >
-              <Button>Upload Thumbnail</Button>
-            </Upload> */}
           </Form.Item>
         )}
       </Form>

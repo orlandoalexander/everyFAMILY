@@ -4,8 +4,8 @@ from sqlalchemy.sql import func
 from . import Base
 from models.category_model import *
 from models.type_model import *
-from .category_model import Category  # Import Category model
-from .type_model import Type  # Import Type model
+from .category_model import Category
+from .type_model import Type
 from .user_resource_model import UserResource
 
 class Resource(Base):
@@ -23,7 +23,7 @@ class Resource(Base):
     featured = Column(Boolean, nullable=True, default=False)
 
     # Relationships
-    category = relationship(Category, back_populates="resources")
+    category = relationship("Category", back_populates="resources")
     type = relationship("Type", back_populates="resources")
     user_resources = relationship("UserResource", back_populates="resource")
 

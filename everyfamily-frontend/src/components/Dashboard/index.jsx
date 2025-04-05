@@ -4,22 +4,16 @@ import ResourceCard from "../Resources/ResourceCard.jsx";
 import useGetCategories from "../../hooks/useGetCategories.js";
 import useGetResources from "../../hooks/useGetResources.js";
 import feature1 from "../../assets/everyFAMILY-feature1.png";
+import feature2 from "../../assets/everyFAMILY-feature2.png";
+import feature3 from "../../assets/everyFAMILY-feature3.png";
+
 import Category from "./Category.jsx";
 
 function Dashboard() {
   const navigate = useNavigate();
 
-  const {
-    data: categoryData,
-    isLoading: categoryIsLoading,
-    isError: categoryIsError,
-  } = useGetCategories();
-
-  const {
-    data: resourceData,
-    isLoading: resourceIsLoading,
-    isError: resourceIsError,
-  } = useGetResources();
+  const { data: categoryData } = useGetCategories();
+  const { data: resourceData } = useGetResources();
 
   return (
     <div className="dashboard">
@@ -35,20 +29,29 @@ function Dashboard() {
           className="dashboard-featured-container"
           onClick={() => navigate("/resources?filter=featured")}
         >
-          <img src={feature1} />
+          <img src={feature2} />
           <h2>Featured</h2>
         </div>
         <div
           className="dashboard-featured-container"
           onClick={() => navigate("/resources?filter=saved")}
         >
-          <img src={feature1} />
+          <img src={feature3} />
           <h2>Saved</h2>
         </div>
       </section>
       {resourceData && (
         <div className="dashboard-category">
-          <h1>Browse by category</h1>
+          <div className="dashboard-category-title">
+            <h1>Browse by category</h1>
+            <span
+              onClick={() => {
+                navigate("/resources");
+              }}
+            >
+              View all
+            </span>
+          </div>
           {categoryData &&
             categoryData.map((category, index) => (
               <Category
@@ -85,35 +88,6 @@ function Dashboard() {
                 }
               />
             ))}
-
-          <Category
-            key="all"
-            categoryKey="all"
-            label={
-              <div className="dashboard-category-title">
-                All resources
-                <span
-                  onClick={() => {
-                    navigate("/resources");
-                  }}
-                >
-                  View all
-                </span>
-              </div>
-            }
-            children={resourceData.map((resource, index) => (
-              <ResourceCard
-                key={index}
-                id={resource.id}
-                title={resource.title}
-                link={resource.link}
-                description={resource.description}
-                type={resource.type_title}
-                category={resource.category_title}
-                thumbnail_url={resource.thumbnail_url}
-              />
-            ))}
-          />
         </div>
       )}
     </div>
