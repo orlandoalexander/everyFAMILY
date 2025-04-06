@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
-import "./resourceCard.css";
-import { Card, Col, Button, Dropdown, message } from "antd";
+import "./ResourceCard.css";
+import { Card, Col, Button, Dropdown } from "antd";
 import { Grid, Tag, Bookmark, Star } from "react-feather";
 import AuthContext from "../../AuthContext";
 import ResourceModal from "./ResourceModal";
