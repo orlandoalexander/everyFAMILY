@@ -8,6 +8,7 @@ import Login from "./components/Auth/Login";
 import UserProfile from "./components/Auth/UserProfile.jsx";
 import ResourceModal from "./components/Resources/ResourceModal.jsx";
 import ManageUsersModal from "./components/Dashboard/ManageUsersModal";
+import UserDetailsModal from "./components/Dashboard/UserDetailsModal";
 import ManageReferralsModal from "./components/Dashboard/ManageReferralsModal.jsx";
 import ChangePasswordModal from "./components/Dashboard/ChangePasswordModal.jsx";
 import logo from "./assets/everyFAMILY-logo.png";
@@ -18,6 +19,7 @@ import {
   Key,
   Menu as MenuIcon,
   Users,
+  User,
   LogOut,
   Hash,
 } from "react-feather";
@@ -31,6 +33,7 @@ function App() {
   const [searchText, setSearchText] = useState("");
   const [resourceModalOpen, setResourceModalOpen] = useState(false);
   const [manageUsersOpen, setManageUsersOpen] = useState(false);
+  const [userDetailsOpen, setUserDetailsOpen] = useState(false);
   const [referralCodesOpen, setReferralCodesOpen] = useState(false);
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
 
@@ -44,6 +47,9 @@ function App() {
 
   const showManageUsersModal = () => setManageUsersOpen(true);
   const hideManageUsersModal = () => setManageUsersOpen(false);
+
+  const showUserDetailsModal = () => setUserDetailsOpen(true);
+  const hideUserDetailsModal = () => setUserDetailsOpen(false);
 
   const showReferralCodesModal = () => setReferralCodesOpen(true);
   const hideReferralCodesModal = () => setReferralCodesOpen(false);
@@ -67,6 +73,11 @@ function App() {
   }, [location]);
 
   const menuItems = [
+    {
+      key: "user",
+      icon: <User size={15} />,
+      label: <div onClick={showUserDetailsModal}>Your account</div>,
+    },
     user.role === "admin" && {
       key: "users",
       icon: <Users size={15} />,
@@ -227,6 +238,11 @@ function App() {
       <ManageUsersModal
         open={manageUsersOpen}
         onCancel={hideManageUsersModal}
+        user={user}
+      />
+      <UserDetailsModal
+        open={userDetailsOpen}
+        onCancel={hideUserDetailsModal}
         user={user}
       />
       <ManageReferralsModal

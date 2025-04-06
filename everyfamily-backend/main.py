@@ -17,7 +17,7 @@ load_dotenv()
 
 app = Flask(__name__)
 
-CORS(app, resources={r"/api/*": {"origins": "https://everyfamily.netlify.app"}})
+CORS(app)
 
 EMAIL = os.getenv("EMAIL")
 PASSWORD = os.getenv("PASSWORD")
