@@ -40,8 +40,7 @@ function AuthProvider({ children }) {
   useEffect(() => {
     if (
       users?.length > 0 &&
-      users[0].id === user.id &&
-      users[0].role !== user.role
+      users.find((u) => u.id === user.id)?.role !== user.role
     ) {
       sessionStorage.setItem("userRole", users[0].role);
       setUser((prevState) => ({ ...prevState, role: users[0].role }));
