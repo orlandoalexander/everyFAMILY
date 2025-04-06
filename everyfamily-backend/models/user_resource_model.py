@@ -18,6 +18,7 @@ class UserResource(Base):
 
 def modify_user_resource(session, user_id, resource_id):
     user_resource = session.query(UserResource).filter_by(user_id=user_id, resource_id=resource_id).first()
+
     if user_resource:
         session.delete(user_resource)  # Remove if it exists
         session.commit()

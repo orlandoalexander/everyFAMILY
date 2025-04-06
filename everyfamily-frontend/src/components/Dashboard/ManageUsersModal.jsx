@@ -50,7 +50,7 @@ function ManageUsersModal({ open, onCancel, user }) {
         <Table
           bordered
           dataSource={filteredUsers}
-          pagination={true}
+          pagination={{ pageSize: 5 }}
           scroll={{ x: "max-content" }}
           rowKey="id"
         >

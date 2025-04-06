@@ -25,7 +25,7 @@ class Resource(Base):
     # Relationships
     category = relationship("Category", back_populates="resources")
     type = relationship("Type", back_populates="resources")
-    user_resources = relationship("UserResource", back_populates="resource")
+    user_resources = relationship("UserResource", back_populates="resource", cascade='all, delete')
 
     def __repr__(self):
         return f"<Resource(id={self.id}, title={self.title}, description={self.description}, link={self.link}, category_id={self.category_id}>"

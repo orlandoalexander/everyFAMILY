@@ -94,7 +94,7 @@ def update_resource(resource_id):
         return jsonify({"message": "Resource id is required"}), 400
 
     title = data.get("title")
-    description = data.get("description", "")
+    description = data.get("description")
     link = data.get("link")
     thumbnail_url = data.get("thumbnail_url")
     category = data.get("category")
@@ -242,10 +242,10 @@ def create_user():
         referral_code_valid = validate_referral_code(session, referral_code)
 
         if session.query(User).filter_by(email=email).first():
-            return jsonify({"message": "Account with this email already exists"}), 400
+            return jsonify({"message": "Account with this email already exists"}), 401
 
         if not referral_code_valid:
-            return jsonify({"message": "Referral code is invalid"}), 400
+            return jsonify({"message": "Referral code is invalid"}), 401
 
         id, role = add_user(session, email, password)
 

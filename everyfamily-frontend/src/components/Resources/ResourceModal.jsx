@@ -15,6 +15,7 @@ import useGetTypes from "../../hooks/useGetTypes";
 import useAddType from "../../hooks/useAddType";
 import useAddCategory from "../../hooks/useAddCategory";
 import useAddResource from "../../hooks/useAddResource";
+import useUpdateResource from "../../hooks/useUpdateResource";
 import "./ResourceModal.css";
 import {
   Type,
@@ -44,7 +45,7 @@ const fetchLinkThumbnail = async (url) => {
   return data;
 };
 
-function AddResourceModal({ open, onCancel, user, resourceData }) {
+function AddResourceModal({ open, onCancel, user, resourceData, id }) {
   const [newType, setNewType] = useState("");
   const [newCategory, setNewCategory] = useState("");
   const [linkURL, setLinkURL] = useState(null);
@@ -56,6 +57,7 @@ function AddResourceModal({ open, onCancel, user, resourceData }) {
   const addType = useAddType();
   const addCategory = useAddCategory();
   const addResource = useAddResource();
+  const updateResource = useUpdateResource();
 
   const { data: categoryData } = useGetCategories();
   const { data: typeData } = useGetTypes();
@@ -72,23 +74,35 @@ function AddResourceModal({ open, onCancel, user, resourceData }) {
         }
         const data = {
           ...values,
+          id,
           thumbnail_url: thumbnailURL,
           upload_user_id: user.id,
         };
-
-        addResource.mutate(data, {
-          onSuccess: (success) => {
-            handleClose();
-            messageApi.success(success.message);
-          },
-          onError: (error) => {
-            messageApi.error(
-              error?.response?.data?.message ||
-                "Error adding resource. Please try again."
-            );
-          },
-        });
-
+        id
+          ? updateResource.mutate(data, {
+              onSuccess: (success) => {
+                handleClose();
+                messageApi.success(success.message);
+              },
+              onError: (error) => {
+                messageApi.error(
+                  error?.response?.data?.message ||
+                    "Error adding resource. Please try again."
+                );
+              },
+            })
+          : addResource.mutate(data, {
+              onSuccess: (success) => {
+                handleClose();
+                messageApi.success(success.message);
+              },
+              onError: (error) => {
+                messageApi.error(
+                  error?.response?.data?.message ||
+                    "Error adding resource. Please try again."
+                );
+              },
+            });
         setThumbnailURL(null);
         setLinkURL(null);
       })

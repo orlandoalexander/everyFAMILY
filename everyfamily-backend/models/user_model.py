@@ -21,7 +21,7 @@ class User(Base):
     last_login = Column(DateTime, nullable=True)
     logged_in = Column(Boolean, nullable=True)
 
-    user_resources = relationship("UserResource", back_populates="user")
+    user_resources = relationship("UserResource", back_populates="user", cascade='all, delete')
 
     def __repr__(self):
         return f"<User(id={self.id}, email={self.email}, first_name={self.first_name}, last_name={self.last_name})>"

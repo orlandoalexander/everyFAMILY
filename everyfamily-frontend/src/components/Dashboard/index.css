@@ -41,7 +41,11 @@
   transform: translate(-50%, -50%);
 }
 
-.dashboard-category h1{
+.dashboard-category {
+  margin-bottom: 1rem;
+}
+
+.dashboard-category-title h1{
   font-size: 1.7rem;
 }
 

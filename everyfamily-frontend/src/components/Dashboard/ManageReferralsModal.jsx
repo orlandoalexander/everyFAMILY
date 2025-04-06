@@ -51,6 +51,7 @@ function ReferralsModal({ open, onCancel }) {
       width={700}
       open={open}
       onCancel={onCancel}
+      pagination={{ pageSize: 5 }}
       footer={null}
       loading={isFetching || isLoading}
     >

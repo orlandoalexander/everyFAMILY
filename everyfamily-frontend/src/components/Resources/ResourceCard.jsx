@@ -52,15 +52,7 @@ function ResourceCard({
     if (action === "delete") deleteResource.mutate(id);
   };
 
-  const handleResourceModalCancel = () => {
-    setResourceModalOpen(false);
-  };
-
-  const handleResourceModalSubmit = (resourceData) => {
-    updateResource.mutate({
-      id,
-      ...resourceData,
-    });
+  const hideResourceModal = () => {
     setResourceModalOpen(false);
   };
 
@@ -173,9 +165,9 @@ function ResourceCard({
       </Col>
       <ResourceModal
         open={resourceModalOpen}
-        onCancel={handleResourceModalCancel}
-        onSubmit={handleResourceModalSubmit}
+        onCancel={hideResourceModal}
         user={user}
+        id={id}
         resourceData={{
           title: title,
           description: description,
