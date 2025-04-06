@@ -17,7 +17,14 @@ load_dotenv()
 
 app = Flask(__name__)
 
-CORS(app, origins=["https://everyfamily.netlify.app"], supports_credentials=True)
+allowed_origins = ["https://everyfamily.netlify.app", "https://another-origin.com"]
+
+def get_cors_origin(origin):
+    if origin in allowed_origins:
+        return origin
+    return None  
+
+CORS(app, origins=get_cors_origin, supports_credentials=True)
 
 EMAIL = os.getenv("EMAIL")
 PASSWORD = os.getenv("PASSWORD")
