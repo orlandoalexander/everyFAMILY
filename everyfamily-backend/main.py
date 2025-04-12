@@ -17,7 +17,17 @@ load_dotenv()
 
 app = Flask(__name__)
 
-CORS(app, origins=["https://everyfamily.netlify.app"])
+ALLOWED_URL = "https://everyfamily.netlify.app"
+
+CORS(app, origins=[ALLOWED_URL])
+
+@app.before_request
+def allow_only_specific_url():
+    origin = request.headers.get('Origin', '')
+    referer = request.headers.get('Referer', '')
+
+    if origin != ALLOWED_URL and referer != ALLOWED_URL:
+        return "Requests from this origin are not allowed", 403
 
 EMAIL = os.getenv("EMAIL")
 PASSWORD = os.getenv("PASSWORD")
