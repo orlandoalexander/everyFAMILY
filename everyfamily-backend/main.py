@@ -25,10 +25,10 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 engine = create_engine(DATABASE_URL)
 Session = sessionmaker(bind=engine)
 
+
 @app.route("/", methods=["GET"])
 def home():
     return "API working successfully"
-
 
 @app.route("/resources", methods=["POST"])
 def create_resource():
@@ -449,4 +449,4 @@ def create_user_resource():
 
 
 if __name__ == "__main__":
-    app.run(port=5001, debug=True)
+    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))

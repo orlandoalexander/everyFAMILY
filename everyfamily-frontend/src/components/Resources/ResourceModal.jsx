@@ -195,7 +195,7 @@ function AddResourceModal({ open, onCancel, user, resourceData, id }) {
       okText={resourceData ? "Save changes" : "Submit"}
       cancelText="Cancel"
       maskClosable={false}
-      width={600}
+      width={500}
     >
       <Form className="resource-form" form={form} layout="horizontal">
         {contextHolder}
