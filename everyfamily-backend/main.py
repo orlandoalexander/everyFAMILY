@@ -15,9 +15,9 @@ from email.mime.text import MIMEText
 
 load_dotenv()
 
-app = Flask(__name__, origins=["https://everyfamily.netlify.app"])
+app = Flask(__name__)
 
-CORS(app)
+CORS(app, origins=["https://everyfamily.netlify.app"])
 
 EMAIL = os.getenv("EMAIL")
 PASSWORD = os.getenv("PASSWORD")
