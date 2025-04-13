@@ -17,21 +17,21 @@ load_dotenv()
 
 app = Flask(__name__)
 
-ALLOWED_URL = "https://everyfamily.netlify.app"
+EMAIL = os.getenv("EMAIL")
+PASSWORD = os.getenv("PASSWORD")
+DATABASE_URL = os.getenv("DATABASE_URL")
+FRONTEND_URL=os.getenv("FRONTEND_URL")
 
-CORS(app, origins=[ALLOWED_URL])
+CORS(app, origins=[FRONTEND_URL])
 
 @app.before_request
 def allow_only_specific_url():
     origin = request.headers.get('Origin', '')
     referer = request.headers.get('Referer', '')
 
-    if origin != ALLOWED_URL and referer != ALLOWED_URL:
+    if origin != FRONTEND_URL and referer != FRONTEND_URL:
         return "Requests from this origin are not allowed", 403
 
-EMAIL = os.getenv("EMAIL")
-PASSWORD = os.getenv("PASSWORD")
-DATABASE_URL = os.getenv("DATABASE_URL")
 engine = create_engine(DATABASE_URL)
 Session = sessionmaker(bind=engine)
 
@@ -52,8 +52,8 @@ def create_resource():
     type = data.get("type")
     upload_user_id = data.get("upload_user_id")
 
-    if not title or not link or not thumbnail_url or not category or not type:
-        return jsonify({"message": "Title, link, thumbnail, category and type is required"}), 400
+    if not title or not link or not category or not type:
+        return jsonify({"message": "Name, type, category and link are required"}), 400
 
     session = Session()
 
@@ -456,7 +456,10 @@ def create_user_resource():
         return jsonify({"message": "Error saving resource", "error": str(e)}), 500
     finally:
         session.close()
-
+#
+#
+# if __name__ == "__main__":
+#     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
+    app.run(debug=True)
