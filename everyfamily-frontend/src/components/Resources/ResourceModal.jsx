@@ -8,6 +8,7 @@ import {
   Divider,
   Space,
   Form,
+  Spin,
   message,
 } from "antd";
 import useGetCategories from "../../hooks/useGetCategories";
@@ -30,9 +31,7 @@ import {
 const thumbnailURLAPIKey = import.meta.env.VITE_LINK_PREVIEW_API_KEY;
 
 const isValidURL = (url) => {
-  // Regular expression to check URL structure
-  const regex =
-    /^(https?:\/\/)?([a-z0-9]+([-\w]*[a-z0-9])*\.)+[a-z0-9]{2,}(:\d+)?(\/[-\w]*)*(\?[;&a-z0-9%_+=-]*)?(#[a-z0-9_-]*)?$/i;
+  const regex = /^(https?:\/\/|www\.)[^\s/$.?#].[^\s]*$/i;
   return regex.test(url);
 };
 
@@ -83,6 +82,8 @@ function AddResourceModal({ open, onCancel, user, resourceData, id }) {
               onSuccess: (success) => {
                 handleClose();
                 messageApi.success(success.message);
+                setThumbnailURL(null);
+                setLinkURL(null);
               },
               onError: (error) => {
                 messageApi.error(
@@ -95,6 +96,8 @@ function AddResourceModal({ open, onCancel, user, resourceData, id }) {
               onSuccess: (success) => {
                 handleClose();
                 messageApi.success(success.message);
+                setThumbnailURL(null);
+                setLinkURL(null);
               },
               onError: (error) => {
                 messageApi.error(
@@ -103,8 +106,6 @@ function AddResourceModal({ open, onCancel, user, resourceData, id }) {
                 );
               },
             });
-        setThumbnailURL(null);
-        setLinkURL(null);
       })
       .catch((error) => {
         messageApi.error("Please complete all the fields");
@@ -197,187 +198,195 @@ function AddResourceModal({ open, onCancel, user, resourceData, id }) {
       maskClosable={false}
       width={500}
     >
-      <Form className="resource-form" form={form} layout="horizontal">
-        {contextHolder}
-        <Form.Item
-          name="title"
-          label={
-            <div className="resource-form-item-title">
-              <Type size={15} color="gray" />
-              <p>Name</p>
-            </div>
-          }
-          rules={[{ required: true, message: "" }]}
-          colon={false}
-          required={false}
-        >
-          <Input placeholder="Enter resource name" />
-        </Form.Item>
-        <Form.Item
-          name="description"
-          label={
-            <div className="resource-form-item-title">
-              <AlignJustify size={15} color="gray" />
-              <p>Description</p>
-            </div>
-          }
-          rules={[{ required: false }]}
-          colon={false}
-        >
-          <Input.TextArea placeholder="Enter resource description" />
-        </Form.Item>
-
-        <Form.Item
-          name="type"
-          label={
-            <div className="resource-form-item-title">
-              <Grid size={15} color="gray" />
-              <p>Type</p>
-            </div>
-          }
-          rules={[{ required: true, message: "" }]}
-          colon={false}
-          required={false}
-        >
-          <Select
-            placeholder="Select resource type"
-            dropdownRender={(menu) => (
-              <>
-                {menu}
-                <Divider
-                  style={{
-                    margin: "8px 0",
-                  }}
-                />
-                <Space
-                  style={{
-                    padding: "0 8px 4px",
-                  }}
-                >
-                  <Input
-                    placeholder="New resource type"
-                    value={newType}
-                    onChange={(e) => setNewType(e.target.value)}
-                    onKeyDown={(e) => e.stopPropagation()}
-                  />
-                  {contextHolder}
-                  <Button
-                    type="text"
-                    icon={<Plus />}
-                    onClick={handleSetNewType}
-                  >
-                    Add
-                  </Button>
-                </Space>
-              </>
-            )}
-          >
-            {typeData &&
-              typeData.map((item, index) => (
-                <Select.Option key={item.title} value={item.title}>
-                  {item.title}
-                </Select.Option>
-              ))}
-          </Select>
-        </Form.Item>
-
-        <Form.Item
-          name="category"
-          label={
-            <div className="resource-form-item-title">
-              <Tag size={15} color="gray" />
-              <p>Category</p>
-            </div>
-          }
-          rules={[{ required: true, message: "" }]}
-          colon={false}
-          required={false}
-        >
-          <Select
-            placeholder="Select category"
-            dropdownRender={(menu) => (
-              <>
-                {menu}
-                <Divider
-                  style={{
-                    margin: "8px 0",
-                  }}
-                />
-                <Space
-                  style={{
-                    padding: "0 8px 4px",
-                  }}
-                >
-                  <Input
-                    placeholder="New category"
-                    value={newCategory}
-                    onChange={(e) => setNewCategory(e.target.value)}
-                    onKeyDown={(e) => e.stopPropagation()}
-                  />
-                  {contextHolder}
-                  <Button
-                    type="text"
-                    icon={<Plus />}
-                    onClick={handleSetNewCategory}
-                  >
-                    Add
-                  </Button>
-                </Space>
-              </>
-            )}
-          >
-            {categoryData &&
-              categoryData.map((item, index) => (
-                <Select.Option key={index} value={item.title}>
-                  {item.title}
-                </Select.Option>
-              ))}
-          </Select>
-        </Form.Item>
-
-        <Form.Item
-          name="link"
-          label={
-            <div className="resource-form-item-title">
-              <Link size={15} color="gray" />
-              <p>Link</p>
-            </div>
-          }
-          rules={[{ required: true, message: "" }]}
-          colon={false}
-          required={false}
-        >
-          <Input
-            placeholder="Enter resource link"
-            value={linkURL}
-            onChange={(e) => setLinkURL(e.target.value)}
-          />
-        </Form.Item>
-
-        {linkURL && (
+      <Spin
+        spinning={
+          updateResource.isPending === true || addResource.isPending === true
+        }
+        tip="Submitting..."
+        size="large"
+      >
+        <Form className="resource-form" form={form} layout="horizontal">
+          {contextHolder}
           <Form.Item
-            name="thumbnail"
+            name="title"
             label={
-              <div className="resource-item-title">
-                <ImageIcon size={15} color="gray" />
-                <p>Thumbnail</p>
+              <div className="resource-form-item-title">
+                <Type size={15} color="gray" />
+                <p>Name</p>
               </div>
             }
-            rules={[
-              {
-                required: false,
-              },
-            ]}
+            rules={[{ required: true, message: "" }]}
+            colon={false}
+            required={false}
+          >
+            <Input placeholder="Enter resource name" />
+          </Form.Item>
+          <Form.Item
+            name="description"
+            label={
+              <div className="resource-form-item-title">
+                <AlignJustify size={15} color="gray" />
+                <p>Description</p>
+              </div>
+            }
+            rules={[{ required: false }]}
             colon={false}
           >
-            <Image
-              width={150}
-              src={thumbnailURL}
-              fallback="https://placehold.co/600x400/432666/FFF?text=Thumbnail+\n+Unavailable"
+            <Input.TextArea placeholder="Enter resource description" />
+          </Form.Item>
+
+          <Form.Item
+            name="type"
+            label={
+              <div className="resource-form-item-title">
+                <Grid size={15} color="gray" />
+                <p>Type</p>
+              </div>
+            }
+            rules={[{ required: true, message: "" }]}
+            colon={false}
+            required={false}
+          >
+            <Select
+              placeholder="Select resource type"
+              dropdownRender={(menu) => (
+                <>
+                  {menu}
+                  <Divider
+                    style={{
+                      margin: "8px 0",
+                    }}
+                  />
+                  <Space
+                    style={{
+                      padding: "0 8px 4px",
+                    }}
+                  >
+                    <Input
+                      placeholder="New resource type"
+                      value={newType}
+                      onChange={(e) => setNewType(e.target.value)}
+                      onKeyDown={(e) => e.stopPropagation()}
+                    />
+                    {contextHolder}
+                    <Button
+                      type="text"
+                      icon={<Plus />}
+                      onClick={handleSetNewType}
+                    >
+                      Add
+                    </Button>
+                  </Space>
+                </>
+              )}
+            >
+              {typeData &&
+                typeData.map((item, index) => (
+                  <Select.Option key={item.title} value={item.title}>
+                    {item.title}
+                  </Select.Option>
+                ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            name="category"
+            label={
+              <div className="resource-form-item-title">
+                <Tag size={15} color="gray" />
+                <p>Category</p>
+              </div>
+            }
+            rules={[{ required: true, message: "" }]}
+            colon={false}
+            required={false}
+          >
+            <Select
+              placeholder="Select category"
+              dropdownRender={(menu) => (
+                <>
+                  {menu}
+                  <Divider
+                    style={{
+                      margin: "8px 0",
+                    }}
+                  />
+                  <Space
+                    style={{
+                      padding: "0 8px 4px",
+                    }}
+                  >
+                    <Input
+                      placeholder="New category"
+                      value={newCategory}
+                      onChange={(e) => setNewCategory(e.target.value)}
+                      onKeyDown={(e) => e.stopPropagation()}
+                    />
+                    {contextHolder}
+                    <Button
+                      type="text"
+                      icon={<Plus />}
+                      onClick={handleSetNewCategory}
+                    >
+                      Add
+                    </Button>
+                  </Space>
+                </>
+              )}
+            >
+              {categoryData &&
+                categoryData.map((item, index) => (
+                  <Select.Option key={index} value={item.title}>
+                    {item.title}
+                  </Select.Option>
+                ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            name="link"
+            label={
+              <div className="resource-form-item-title">
+                <Link size={15} color="gray" />
+                <p>Link</p>
+              </div>
+            }
+            rules={[{ required: true, message: "" }]}
+            colon={false}
+            required={false}
+          >
+            <Input
+              placeholder="Enter resource link"
+              value={linkURL}
+              onChange={(e) => setLinkURL(e.target.value)}
             />
           </Form.Item>
-        )}
-      </Form>
+
+          {linkURL && (
+            <Form.Item
+              name="thumbnail"
+              label={
+                <div className="resource-item-title">
+                  <ImageIcon size={15} color="gray" />
+                  <p>Thumbnail</p>
+                </div>
+              }
+              rules={[
+                {
+                  required: false,
+                },
+              ]}
+              colon={false}
+            >
+              <Image
+                width={150}
+                src={thumbnailURL}
+                fallback="https://placehold.co/600x400/432666/FFF?text=Thumbnail+\n+Unavailable"
+              />
+            </Form.Item>
+          )}
+        </Form>
+      </Spin>
     </Modal>
   );
 }
