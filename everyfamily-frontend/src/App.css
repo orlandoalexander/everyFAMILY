@@ -42,7 +42,7 @@
   box-shadow: none !important;
 }
 
-line {
+.menu > line {
   stroke: black;
   stroke-width: 2;
 }
