@@ -176,7 +176,11 @@ function App() {
                   open={menuOpen}
                   onOpenChange={setMenuOpen}
                 >
-                  <MenuIcon size={40} style={{ cursor: "pointer" }} />
+                  <MenuIcon 
+                    size={40} 
+                    color="black"
+                    tyle={{ cursor: "pointer" }} 
+                  />
                 </Dropdown>
               </div>
             )}
