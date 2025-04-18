@@ -41,8 +41,3 @@
 .ant-input-outlined:focus-within {
   box-shadow: none !important;
 }
-
-.menu > line {
-  stroke: black;
-  stroke-width: 2;
-}

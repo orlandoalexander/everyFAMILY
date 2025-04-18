@@ -49,7 +49,7 @@ function Resources() {
 
   return (
     <div className="resources-container">
-      <h2>
+      <h2 style={{ color: "black" }}>
         {resourceFilter
           ? `${
               resourceFilter.charAt(0).toUpperCase() +
