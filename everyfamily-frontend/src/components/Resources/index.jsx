@@ -47,7 +47,7 @@ function Resources() {
     return matchesType && matchesCategory && matchesSearch && matchesFilter;
   });
 
-  if (resourceFilter === "recent") {
+  if (resourceFilter === "recent" && filteredResources) {
     filteredResources.sort(
       (a, b) => new Date(b.created_at) - new Date(a.created_at)
     );
