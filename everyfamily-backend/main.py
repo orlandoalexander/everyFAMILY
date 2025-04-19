@@ -74,7 +74,7 @@ def get_resources():
 
     resources = fetch_resources(session, user_id=user_id)
 
-    resources.sort(key=lambda x: x.Resource.created_at, reverse=True)
+    resources.sort(key=lambda x: x.Resource.title)
 
     resources_data = [{
         "id": resource.Resource.id,
