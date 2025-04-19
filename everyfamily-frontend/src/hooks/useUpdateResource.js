@@ -9,8 +9,14 @@ const useUpdateResource = () => {
   };
 
   return useMutation({
-    onSuccess: () => {
-      queryClient.invalidateQueries(["resources"]);
+    onSuccess: (success, data) => {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (
+        (urlParams.get("filter") === "featured" &&
+          data.featured !== undefined) ||
+        data.featured === undefined
+      )
+        queryClient.invalidateQueries(["resources"]);
     },
     mutationFn: updateResource,
   });
