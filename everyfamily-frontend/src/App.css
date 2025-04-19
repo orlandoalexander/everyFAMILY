@@ -45,6 +45,7 @@
   font-size: 14px;
   color: #6b7280;
   padding-bottom: 1.2rem;
+  margin-top: auto;
 }
 
 .ant-input-outlined:focus {
