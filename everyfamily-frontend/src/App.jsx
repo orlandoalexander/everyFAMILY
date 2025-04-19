@@ -161,11 +161,7 @@ function App() {
                   open={menuOpen}
                   onOpenChange={setMenuOpen}
                 >
-                  <MenuIcon
-                    size={40}
-                    color="black"
-                    style={{ cursor: "pointer" }}
-                  />
+                  <MenuIcon size={40} className="menu" />
                 </Dropdown>
               </div>
             ) : (
@@ -176,11 +172,7 @@ function App() {
                   open={menuOpen}
                   onOpenChange={setMenuOpen}
                 >
-                  <MenuIcon 
-                    size={40} 
-                    color="black"
-                    tyle={{ cursor: "pointer" }} 
-                  />
+                  <MenuIcon size={40} className="menu" />
                 </Dropdown>
               </div>
             )}
@@ -257,6 +249,12 @@ function App() {
         open={changePasswordOpen}
         onCancel={hideChangePasswordModal}
       />
+
+      <footer className="footer-credit">
+        © {new Date().getFullYear()} everyFAMILY. Website by 180DC Bristol —
+        Orlando Alexander, Oliver Flowerdew, Karena Ho, Sahithi Sesham & Sarthak
+        Kasturi.
+      </footer>
     </div>
   );
 }

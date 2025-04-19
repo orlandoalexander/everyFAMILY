@@ -6,6 +6,12 @@
   padding-left: 0 !important;
 }
 
+.dashboard-category-flex {
+  overflow-y: auto;
+  white-space: nowrap;
+  width: 100%;
+}
+
 .dashboard-category-flex::-webkit-scrollbar {
   display: none;
 }
