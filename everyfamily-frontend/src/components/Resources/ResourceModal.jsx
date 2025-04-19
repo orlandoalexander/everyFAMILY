@@ -193,7 +193,7 @@ function AddResourceModal({ open, onCancel, user, resourceData, id }) {
       open={open}
       onCancel={handleClose}
       onOk={handleSubmit}
-      okText={resourceData ? "Save changes" : "Submit"}
+      okText={resourceData ? "Save changes" : "Add resource"}
       cancelText="Cancel"
       maskClosable={false}
       width={500}
@@ -202,7 +202,7 @@ function AddResourceModal({ open, onCancel, user, resourceData, id }) {
         spinning={
           updateResource.isPending === true || addResource.isPending === true
         }
-        tip="Submitting..."
+        tip={resourceData ? "Saving changes" : "Adding resource..."}
         size="large"
       >
         <Form className="resource-form" form={form} layout="horizontal">

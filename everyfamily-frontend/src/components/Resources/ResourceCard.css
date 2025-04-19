@@ -10,6 +10,8 @@
     overflow: scroll;
     text-wrap: auto;
     color: black;
+    -webkit-user-select: none;
+    user-select: none;
 }
 .outer-card::-webkit-scrollbar {
     display: none;
