@@ -81,6 +81,7 @@ function AddResourceModal({ open, onCancel, user, resourceData, id }) {
         id
           ? updateResource.mutate(data, {
               onSuccess: (success) => {
+                messageApi.success(success.message);
                 handleClose();
                 setThumbnailURL(null);
                 setLinkURL(null);
@@ -94,6 +95,7 @@ function AddResourceModal({ open, onCancel, user, resourceData, id }) {
             })
           : addResource.mutate(data, {
               onSuccess: (success) => {
+                messageApi.success(success.message);
                 handleClose();
                 setThumbnailURL(null);
                 setLinkURL(null);
