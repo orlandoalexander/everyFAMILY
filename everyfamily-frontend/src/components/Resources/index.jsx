@@ -47,6 +47,12 @@ function Resources() {
     return matchesType && matchesCategory && matchesSearch && matchesFilter;
   });
 
+  if (resourceFilter === "recent" && filteredResources) {
+    filteredResources.sort(
+      (a, b) => new Date(b.created_at) - new Date(a.created_at)
+    );
+  }
+
   return (
     <div className="resources-container">
       <h2 style={{ color: "black" }}>
