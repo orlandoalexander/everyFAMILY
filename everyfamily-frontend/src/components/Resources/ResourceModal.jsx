@@ -49,6 +49,7 @@ function AddResourceModal({ open, onCancel, user, resourceData, id }) {
   const [newCategory, setNewCategory] = useState("");
   const [linkURL, setLinkURL] = useState(null);
   const [thumbnailURL, setThumbnailURL] = useState(null);
+  const [urlFetching, setURLFetching] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
 
   const [form] = Form.useForm();
@@ -81,7 +82,6 @@ function AddResourceModal({ open, onCancel, user, resourceData, id }) {
           ? updateResource.mutate(data, {
               onSuccess: (success) => {
                 handleClose();
-                messageApi.success(success.message);
                 setThumbnailURL(null);
                 setLinkURL(null);
               },
@@ -95,7 +95,6 @@ function AddResourceModal({ open, onCancel, user, resourceData, id }) {
           : addResource.mutate(data, {
               onSuccess: (success) => {
                 handleClose();
-                messageApi.success(success.message);
                 setThumbnailURL(null);
                 setLinkURL(null);
               },
@@ -159,17 +158,20 @@ function AddResourceModal({ open, onCancel, user, resourceData, id }) {
         const isValid = isValidURL(linkURL);
         if (isValid) {
           try {
+            setURLFetching(true);
             const data = await fetchLinkThumbnail(linkURL);
             setThumbnailURL(data.image || null);
+            setURLFetching(false);
           } catch (error) {
             setThumbnailURL(null);
+            setURLFetching(false);
           }
         } else {
           setThumbnailURL(null);
+          setURLFetching(false);
         }
       }
     };
-
     fetchData();
   }, [linkURL]);
 
@@ -196,7 +198,13 @@ function AddResourceModal({ open, onCancel, user, resourceData, id }) {
       okText={resourceData ? "Save changes" : "Add resource"}
       cancelText="Cancel"
       maskClosable={false}
-      width={500}
+      width={700}
+      okButtonProps={{
+        disabled: urlFetching,
+      }}
+      cancelButtonProps={{
+        disabled: urlFetching,
+      }}
     >
       <Spin
         spinning={
@@ -232,7 +240,7 @@ function AddResourceModal({ open, onCancel, user, resourceData, id }) {
             rules={[{ required: false }]}
             colon={false}
           >
-            <Input.TextArea placeholder="Enter resource description" />
+            <Input.TextArea placeholder="Enter resource description" rows={3} />
           </Form.Item>
 
           <Form.Item
@@ -366,7 +374,7 @@ function AddResourceModal({ open, onCancel, user, resourceData, id }) {
             <Form.Item
               name="thumbnail"
               label={
-                <div className="resource-item-title">
+                <div className="resource-form-item-title">
                   <ImageIcon size={15} color="gray" />
                   <p>Thumbnail</p>
                 </div>
@@ -378,11 +386,16 @@ function AddResourceModal({ open, onCancel, user, resourceData, id }) {
               ]}
               colon={false}
             >
-              <Image
-                width={150}
-                src={thumbnailURL}
-                fallback="https://placehold.co/600x400/432666/FFF?text=Thumbnail+\n+Unavailable"
-              />
+              {urlFetching ? (
+                <Spin />
+              ) : (
+                <Image
+                  width={150}
+                  src={thumbnailURL}
+                  fallback="https://placehold.co/600x400/432666/FFF?text=Thumbnail+\n+Unavailable"
+                  preview={false}
+                />
+              )}
             </Form.Item>
           )}
         </Form>
