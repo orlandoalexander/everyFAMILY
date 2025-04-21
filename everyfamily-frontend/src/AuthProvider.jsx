@@ -5,8 +5,11 @@ import useUpdateUser from "./hooks/useUpdateUser.js";
 
 function AuthProvider({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(
-    () => sessionStorage.getItem("isLoggedIn") === "true"
+    () =>
+      sessionStorage.getItem("isLoggedIn") ||
+      localStorage.getItem("isLoggedIn") === "true"
   );
+
   const [user, setUser] = useState({
     role:
       sessionStorage.getItem("userRole") || localStorage.getItem("userRole"),
@@ -22,6 +25,7 @@ function AuthProvider({ children }) {
     setIsLoggedIn(true);
     setUser({ role: role, id: id });
     if (remember) {
+      console.log("hey");
       localStorage.setItem("isLoggedIn", "true");
       localStorage.setItem("userId", id);
       localStorage.setItem("userRole", role);

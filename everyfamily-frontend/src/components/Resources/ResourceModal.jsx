@@ -124,8 +124,7 @@ function AddResourceModal({ open, onCancel, user, resourceData, id }) {
     if (!newType) {
       messageApi.warning("Please enter new resource type");
     } else if (
-      typeData &&
-      typeData.some(
+      typeData?.some(
         (item) => item.title.toLowerCase() === newType.toLowerCase()
       )
     ) {
@@ -290,12 +289,11 @@ function AddResourceModal({ open, onCancel, user, resourceData, id }) {
                 </>
               )}
             >
-              {typeData &&
-                typeData.map((item, index) => (
-                  <Select.Option key={item.title} value={item.title}>
-                    {item.title}
-                  </Select.Option>
-                ))}
+              {typeData?.map((item, index) => (
+                <Select.Option key={item.title} value={item.title}>
+                  {item.title}
+                </Select.Option>
+              ))}
             </Select>
           </Form.Item>
 
