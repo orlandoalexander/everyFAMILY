@@ -456,10 +456,6 @@ def create_user_resource():
         return jsonify({"message": "Error saving resource", "error": str(e)}), 500
     finally:
         session.close()
-#
-#
-# if __name__ == "__main__":
-#     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
