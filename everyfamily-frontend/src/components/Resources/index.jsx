@@ -78,7 +78,7 @@ function Resources() {
               <Empty
                 description="No resources found"
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
-                style={{ position: "absolute", top: "50%", left: "50%" }}
+                style={{ position: "absolute", top: "45%", left: "45%" }}
               />
             ) : (
               filteredResources.map((resource, index) => (
