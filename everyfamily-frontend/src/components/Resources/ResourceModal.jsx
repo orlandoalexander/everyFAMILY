@@ -241,7 +241,11 @@ function AddResourceModal({ open, onCancel, user, resourceData, id }) {
             rules={[{ required: false }]}
             colon={false}
           >
-            <Input.TextArea placeholder="Enter resource description" rows={3} />
+            <Input.TextArea
+              placeholder="Enter resource description"
+              rows={4}
+              style={{ resize: "none" }}
+            />
           </Form.Item>
 
           <Form.Item
