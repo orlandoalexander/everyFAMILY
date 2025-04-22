@@ -6,15 +6,17 @@ import useUpdateUser from "./hooks/useUpdateUser.js";
 function AuthProvider({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(
     () =>
-      sessionStorage.getItem("isLoggedIn") ||
-      localStorage.getItem("isLoggedIn") === "true"
+      sessionStorage.getItem("everyfamily_isLoggedIn") === "true" ||
+      localStorage.getItem("everyfamily_isLoggedIn") === "true"
   );
 
   const [user, setUser] = useState({
     role:
-      sessionStorage.getItem("userRole") || localStorage.getItem("userRole"),
+      sessionStorage.getItem("everyfamily_userRole") ||
+      localStorage.getItem("everyfamily_userRole"),
     id: parseInt(
-      sessionStorage.getItem("userId") || localStorage.getItem("userRole")
+      sessionStorage.getItem("everyfamily_userId") ||
+        localStorage.getItem("everyfamily_userId")
     ),
   });
 
@@ -25,14 +27,13 @@ function AuthProvider({ children }) {
     setIsLoggedIn(true);
     setUser({ role: role, id: id });
     if (remember) {
-      console.log("hey");
-      localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("userId", id);
-      localStorage.setItem("userRole", role);
+      localStorage.setItem("everyfamily_isLoggedIn", "true");
+      localStorage.setItem("everyfamily_userId", id);
+      localStorage.setItem("everyfamily_userRole", role);
     }
-    sessionStorage.setItem("isLoggedIn", "true");
-    sessionStorage.setItem("userId", id);
-    sessionStorage.setItem("userRole", role);
+    sessionStorage.setItem("everyfamily_isLoggedIn", "true");
+    sessionStorage.setItem("everyfamily_userId", id);
+    sessionStorage.setItem("everyfamily_userRole", role);
   };
 
   const logout = () => {
@@ -53,7 +54,7 @@ function AuthProvider({ children }) {
       users.find((u) => u.id === user.id) &&
       users.find((u) => u.id === user.id).role !== user.role
     ) {
-      sessionStorage.setItem("userRole", users[0].role);
+      sessionStorage.setItem("everyfamily_userRole", users[0].role);
       setUser((prevState) => ({ ...prevState, role: users[0].role }));
     }
   }, [users, user.id, user.role]);
