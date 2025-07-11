@@ -12,8 +12,9 @@ function ManageUsersModal({ open, onCancel, user }) {
   const updateUser = useUpdateUser();
   const { data: users, isFetching, isLoading } = useGetUsers();
 
-  const filteredUsers =
-    users?.filter((userData) => userData.id !== user.id) || [];
+  const filteredUsers = (
+    users?.filter((userData) => userData.id !== user.id) || []
+  ).sort((a, b) => new Date(b.last_login) - new Date(a.last_login));
 
   const handleDelete = (id) => {
     deleteUser.mutate(id, {
