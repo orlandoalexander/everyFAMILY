@@ -3,21 +3,27 @@ import AuthContext from "./AuthContext.jsx";
 import useGetUsers from "./hooks/useGetUsers";
 import useUpdateUser from "./hooks/useUpdateUser.js";
 
+const isDemo = import.meta.env.VITE_DEMO;
+
 function AuthProvider({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(
     () =>
       sessionStorage.getItem("everyfamily_isLoggedIn") === "true" ||
-      localStorage.getItem("everyfamily_isLoggedIn") === "true"
+      localStorage.getItem("everyfamily_isLoggedIn") === "true" ||
+      isDemo === "true"
   );
 
   const [user, setUser] = useState({
-    role:
-      sessionStorage.getItem("everyfamily_userRole") ||
-      localStorage.getItem("everyfamily_userRole"),
     id: parseInt(
-      sessionStorage.getItem("everyfamily_userId") ||
-        localStorage.getItem("everyfamily_userId")
+      isDemo
+        ? "10"
+        : sessionStorage.getItem("everyfamily_userId") ||
+            localStorage.getItem("everyfamily_userId")
     ),
+    role: isDemo
+      ? "admin"
+      : sessionStorage.getItem("everyfamily_userRole") ||
+        localStorage.getItem("everyfamily_userRole"),
   });
 
   const { data: users } = useGetUsers(user.id);

@@ -1,5 +1,5 @@
-from flask import Flask, request, jsonify
-from sqlalchemy import create_engine
+from flask import Flask, request, jsonify, session
+from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 from models.resource_model import *
 from models.category_model import *
@@ -8,38 +8,80 @@ from models.type_model import *
 from models.user_model import *
 from models.user_resource_model import *
 from dotenv import load_dotenv
+from datetime import datetime
 import os
+import tempfile
+import uuid
+import shutil
 from flask_cors import CORS
-import secrets, string, bcrypt, smtplib
+import secrets
+import string
+import smtplib
+import sqlite3
 from email.mime.text import MIMEText
 
 load_dotenv()
-
-app = Flask(__name__)
 
 EMAIL = os.getenv("EMAIL")
 PASSWORD = os.getenv("PASSWORD")
 DATABASE_URL = os.getenv("DATABASE_URL")
 FRONTEND_URL=os.getenv("FRONTEND_URL")
+SEED_DB_PATH = "demo_data.db"
+TEMP_DIR = tempfile.gettempdir()
+FLASK_SECRET_KEY = os.getenv('FLASK_SECRET_KEY')
 
-CORS(app, origins=[FRONTEND_URL])
+app = Flask(__name__)
+app.secret_key = FLASK_SECRET_KEY
+
+
+CORS(app, origins=[FRONTEND_URL], supports_credentials=True)
+
+def get_demo_db_path():
+    if "demo_db_path" not in session:
+        db_copy_path = os.path.join(TEMP_DIR, f"demo_{uuid.uuid4().hex}.db")
+        shutil.copy(SEED_DB_PATH, db_copy_path)
+        session["demo_db_path"] = db_copy_path
+    print(session["demo_db_path"])
+    return session["demo_db_path"]
+
+def get_db_session():
+    """Return a SQLAlchemy session using demo DB if path starts with /demo/, else main DB."""
+    if request.path.startswith("/demo/"):
+        db_path = get_demo_db_path()
+        demo_engine = create_engine(f"sqlite:///{db_path}", future=True)
+        DemoSession = sessionmaker(bind=demo_engine, autoflush=False, autocommit=False)
+        return DemoSession()
+    else:
+        return Session()
+
+engine = create_engine(DATABASE_URL, future=True)
+Session = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
 @app.before_request
 def allow_only_specific_url():
     origin = request.headers.get('Origin', '')
     referer = request.headers.get('Referer', '')
 
-    if origin != FRONTEND_URL and referer != FRONTEND_URL:
-        return "Requests from this origin are not allowed", 403
-
-engine = create_engine(DATABASE_URL)
-Session = sessionmaker(bind=engine)
+    # if origin != FRONTEND_URL and referer != FRONTEND_URL:
+    #     return "Requests from this origin are not allowed", 403
 
 
 @app.route("/", methods=["GET"])
 def home():
     return "API working successfully"
 
+@app.route("/demo/reset-db", methods=["POST"])
+def reset_demo_db():
+    old_db_path = session.get("demo_db_path")
+    if old_db_path and os.path.exists(old_db_path):
+        os.remove(old_db_path)
+
+    session.clear()
+    get_demo_db_path()  # creates a fresh copy
+
+    return jsonify({"message": "Demo database has been reset."}), 200
+
+@app.route("/demo/resources", methods=["POST"])
 @app.route("/resources", methods=["POST"])
 def create_resource():
     data = request.get_json()
@@ -55,7 +97,7 @@ def create_resource():
     if not title or not link or not category or not type:
         return jsonify({"message": "Name, type, category and link are required"}), 400
 
-    session = Session()
+    session = get_db_session()
 
     try:
         add_resource(session, title, description, link, thumbnail_url, category, type, upload_user_id)
@@ -66,9 +108,10 @@ def create_resource():
         session.close()
 
 
+@app.route("/demo/resources", methods=["GET"])
 @app.route("/resources", methods=["GET"])
 def get_resources():
-    session = Session()
+    session = get_db_session()
 
     user_id = request.args.get("user_id")
 
@@ -96,6 +139,7 @@ def get_resources():
 
     return jsonify(resources_data)
 
+@app.route("/demo/resources/<int:resource_id>", methods=["PUT"])
 @app.route("/resources/<int:resource_id>", methods=["PUT"])
 def update_resource(resource_id):
     data = request.get_json()
@@ -111,7 +155,7 @@ def update_resource(resource_id):
     type = data.get("type")
     featured = data.get("featured")
 
-    session = Session()
+    session = get_db_session()
 
     session.close()
 
@@ -125,9 +169,10 @@ def update_resource(resource_id):
         session.close()
 
 
+@app.route("/demo/resources/<int:resource_id>", methods=["DELETE"])
 @app.route("/resources/<int:resource_id>", methods=["DELETE"])
 def delete_resource(resource_id):
-    session = Session()
+    session = get_db_session()
 
     try:
         remove_resource(session, resource_id)
@@ -137,9 +182,10 @@ def delete_resource(resource_id):
     finally:
         session.close()
 
+@app.route("/demo/categories" , methods=["GET"])
 @app.route("/categories" , methods=["GET"])
 def get_categories():
-    session = Session()
+    session = get_db_session()
 
     categories = fetch_categories(session)
 
@@ -150,9 +196,10 @@ def get_categories():
     return jsonify(categories_list)
 
 
+@app.route("/demo/types" , methods=["GET"])
 @app.route("/types" , methods=["GET"])
 def get_types():
-    session = Session()
+    session = get_db_session()
 
     types = fetch_types(session)
 
@@ -163,6 +210,7 @@ def get_types():
     return jsonify(types_list)
 
 
+@app.route("/demo/types", methods=["POST"])
 @app.route("/types", methods=["POST"])
 def create_type():
     new_type_title = request.json.get('title', '').strip()
@@ -170,7 +218,7 @@ def create_type():
     if not new_type_title:
         return jsonify({"message": "Type title is required"}), 400
 
-    session = Session()
+    session = get_db_session()
 
     try:
         add_type(session, new_type_title)
@@ -181,6 +229,7 @@ def create_type():
         session.close()
 
 
+@app.route("/demo/categories", methods=["POST"])
 @app.route("/categories", methods=["POST"])
 def create_category():
     new_category_title = request.json.get('title', '').strip()
@@ -188,7 +237,7 @@ def create_category():
     if not new_category_title:
         return jsonify({"message": "Category title is required"}), 400
 
-    session = Session()
+    session = get_db_session()
 
     try:
         add_category(session, new_category_title)
@@ -198,10 +247,12 @@ def create_category():
     finally:
         session.close()
 
+@app.route('/demo/users', defaults={'user_id': None}, methods=['GET'])
+@app.route('/demo/users/<int:user_id>', methods=['GET'])
 @app.route('/users', defaults={'user_id': None}, methods=['GET'])
 @app.route('/users/<int:user_id>', methods=['GET'])
 def get_users(user_id):
-    session = Session()
+    session = get_db_session()
 
     users = fetch_users(session, id=user_id)
     users = users if isinstance(users, list) else ([users] if users else [])
@@ -223,9 +274,10 @@ def get_users(user_id):
 
     return jsonify(users_list), 200
 
+@app.route('/demo/users/<int:user_id>', methods=["DELETE"])
 @app.route('/users/<int:user_id>', methods=["DELETE"])
 def delete_user(user_id):
-    session = Session()
+    session = get_db_session()
 
     try:
         remove_user(session, user_id)
@@ -235,6 +287,7 @@ def delete_user(user_id):
     finally:
         session.close()
 
+@app.route('/demo/users', methods=['POST'])
 @app.route('/users', methods=['POST'])
 def create_user():
     data = request.get_json()
@@ -246,7 +299,7 @@ def create_user():
     if not email or not password:
         return jsonify({"message": "Email and password is required"}), 400
 
-    session = Session()
+    session = get_db_session()
 
     try:
         referral_code_valid = validate_referral_code(session, referral_code)
@@ -268,6 +321,7 @@ def create_user():
         session.close()
 
 
+@app.route('/demo/users/<int:user_id>', methods=['PUT'])
 @app.route('/users/<int:user_id>', methods=['PUT'])
 def update_user(user_id):
     data = request.get_json()
@@ -283,7 +337,7 @@ def update_user(user_id):
     organisation_role = data.get('organisation_role')
     logged_in = data.get('logged_in')
 
-    session = Session()
+    session = get_db_session()
 
     try:
         modify_user(session, user_id, first_name=first_name, role=role, last_name=last_name,
@@ -295,6 +349,7 @@ def update_user(user_id):
     finally:
         session.close()
 
+@app.route('/demo/login', methods=['POST'])
 @app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
@@ -302,7 +357,7 @@ def login():
     email = data.get('email')
     password = data.get('password')
 
-    session = Session()
+    session = get_db_session()
 
     try:
         user = validate_user(session, email, password)
@@ -317,6 +372,7 @@ def login():
     finally:
         session.close()
 
+@app.route("/demo/change_password", methods=['PUT'])
 @app.route("/change_password", methods=['PUT'])
 def change_password():
     data = request.get_json()
@@ -325,7 +381,7 @@ def change_password():
     current_password = data.get('current_password')
     new_password = data.get('new_password')
 
-    session = Session()
+    session = get_db_session()
 
     try:
         user = fetch_users(session, id=user_id)
@@ -339,9 +395,10 @@ def change_password():
     finally:
         session.close()
 
+@app.route("/demo/reset_password/<string:email>", methods=['GET'])
 @app.route("/reset_password/<string:email>", methods=['GET'])
 def reset_password(email):
-    session = Session()
+    session = get_db_session()
 
     try:
         password = ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(12))
@@ -379,9 +436,10 @@ def reset_password(email):
     return jsonify({"message": "Password successfully reset"}), 200
 
 
+@app.route('/demo/referrals', methods=["GET"])
 @app.route('/referrals', methods=["GET"])
 def get_referral_codes():
-    session = Session()
+    session = get_db_session()
 
     referral_codes = fetch_referral_codes(session)
 
@@ -392,9 +450,10 @@ def get_referral_codes():
     return jsonify(referral_codes_list), 200
 
 
+@app.route('/demo/referrals', methods=["POST"])
 @app.route('/referrals', methods=["POST"])
 def create_referral_code():
-    session = Session()
+    session = get_db_session()
 
     try:
         add_referral_code(session)
@@ -405,6 +464,7 @@ def create_referral_code():
         session.close()
 
 
+@app.route('/demo/referrals/<int:referral_id>', methods=["PUT"])
 @app.route('/referrals/<int:referral_id>', methods=["PUT"])
 def update_referral_code(referral_id):
     data = request.get_json()
@@ -414,7 +474,7 @@ def update_referral_code(referral_id):
     if not referral_id:
         return jsonify({"message": "Referral code id is required"}), 400
 
-    session = Session()
+    session = get_db_session()
 
     try:
         modify_referral_code(session, referral_id, title=title, status=status)
@@ -425,9 +485,10 @@ def update_referral_code(referral_id):
         session.close()
 
 
+@app.route('/demo/referrals/<int:referral_id>', methods=["DELETE"])
 @app.route('/referrals/<int:referral_id>', methods=["DELETE"])
 def delete_referral_code(referral_id):
-    session = Session()
+    session = get_db_session()
 
     try:
         remove_referral_code(session, referral_id)
@@ -437,6 +498,7 @@ def delete_referral_code(referral_id):
     finally:
         session.close()
 
+@app.route("/demo/user_resources", methods=["POST"])
 @app.route("/user_resources", methods=["POST"])
 def create_user_resource():
     data = request.get_json()
@@ -447,7 +509,7 @@ def create_user_resource():
     if not user_id or not resource_id:
         return jsonify({"message": "User ID and resource ID is required"}), 400
 
-    session = Session()
+    session = get_db_session()
 
     try:
         modify_user_resource(session, user_id, resource_id)

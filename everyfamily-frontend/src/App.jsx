@@ -1,5 +1,11 @@
-import { useState, useContext, useEffect } from "react";
-import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import { useState, useContext, useEffect, useRef } from "react";
+import {
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+  Navigate,
+} from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute.jsx";
 import Dashboard from "./components/Dashboard/index";
 import Resources from "./components/Resources/index";
@@ -11,9 +17,10 @@ import ManageUsersModal from "./components/Dashboard/ManageUsersModal";
 import UserDetailsModal from "./components/Dashboard/UserDetailsModal";
 import ManageReferralsModal from "./components/Dashboard/ManageReferralsModal.jsx";
 import ChangePasswordModal from "./components/Dashboard/ChangePasswordModal.jsx";
+import useResetDemoDb from "./hooks/useResetDemoDb";
 import logo from "./assets/everyFAMILY-logo.png";
 import AuthContext from "./AuthContext";
-import { Input, Button, Dropdown, Result } from "antd";
+import { Input, Button, Dropdown, Result, notification } from "antd";
 import {
   Plus,
   Key,
@@ -22,13 +29,17 @@ import {
   User,
   LogOut,
   Hash,
+  RefreshCcw,
 } from "react-feather";
 import "@ant-design/v5-patch-for-react-19";
 import "./App.css";
 
+const isDemo = import.meta.env.VITE_DEMO;
+
 const { Search } = Input;
 
 function App() {
+  const demoNotificationShown = useRef(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [resourceModalOpen, setResourceModalOpen] = useState(false);
@@ -38,6 +49,8 @@ function App() {
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
 
   const { user, logout, isLoggedIn } = useContext(AuthContext);
+
+  const { mutate: resetDemo, isLoading } = useResetDemoDb();
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -63,6 +76,21 @@ function App() {
     searchParams.set("search", value);
     navigate(`/resources?${searchParams.toString()}`);
   };
+
+  useEffect(() => {
+    if (
+      !demoNotificationShown.current &&
+      import.meta.env.VITE_DEMO === "true"
+    ) {
+      notification.warning({
+        message: "Demo Mode",
+        description: "You are in demo mode. Some actions are disabled.",
+        duration: 0,
+        placement: "topRight",
+      });
+      demoNotificationShown.current = true;
+    }
+  }, []);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -130,6 +158,15 @@ function App() {
             navigate("/");
             setSearchText("");
           }}
+          style={{
+            userSelect: "none",
+            WebkitUserSelect: "none",
+            MozUserSelect: "none",
+            msUserSelect: "none",
+            pointerEvents: "auto",
+            cursor: "pointer",
+          }}
+          draggable={false}
         />
 
         {showHeader && (
@@ -155,14 +192,26 @@ function App() {
                 >
                   Add new
                 </Button>
-                <Dropdown
-                  menu={{ items: menuItems }}
-                  trigger={["hover"]}
-                  open={menuOpen}
-                  onOpenChange={setMenuOpen}
-                >
-                  <MenuIcon size={40} className="menu" />
-                </Dropdown>
+                {isDemo === "true" ? (
+                  <Button
+                    loading={isLoading}
+                    onClick={() => resetDemo()}
+                    size="large"
+                    icon={<RefreshCcw size={14} />}
+                    style={{ marginLeft: "-20px" }}
+                  >
+                    Reset Demo
+                  </Button>
+                ) : (
+                  <Dropdown
+                    menu={{ items: menuItems }}
+                    trigger={["hover"]}
+                    open={menuOpen}
+                    onOpenChange={setMenuOpen}
+                  >
+                    <MenuIcon size={40} className="menu" />
+                  </Dropdown>
+                )}
               </div>
             ) : (
               <div className="dashboard-header-buttons">
@@ -181,8 +230,14 @@ function App() {
       </header>
 
       <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/create_account" element={<CreateAccount />} />
+        <Route
+          path="/login"
+          element={isDemo ? <Navigate to="/" replace /> : <Login />}
+        />
+        <Route
+          path="/create_account"
+          element={isDemo ? <Navigate to="/" replace /> : <CreateAccount />}
+        />
         <Route
           path="/"
           element={
