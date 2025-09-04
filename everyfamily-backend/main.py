@@ -8,7 +8,6 @@ from models.type_model import *
 from models.user_model import *
 from models.user_resource_model import *
 from dotenv import load_dotenv
-from datetime import datetime
 import os
 import tempfile
 import uuid
@@ -17,7 +16,6 @@ from flask_cors import CORS
 import secrets
 import string
 import smtplib
-import sqlite3
 from email.mime.text import MIMEText
 
 load_dotenv()
@@ -26,6 +24,7 @@ EMAIL = os.getenv("EMAIL")
 PASSWORD = os.getenv("PASSWORD")
 DATABASE_URL = os.getenv("DATABASE_URL")
 FRONTEND_URL=os.getenv("FRONTEND_URL")
+FRONTEND_URL_DEMO=os.getenv("FRONTEND_URL_DEMO")
 SEED_DB_PATH = "demo_data.db"
 TEMP_DIR = tempfile.gettempdir()
 FLASK_SECRET_KEY = os.getenv('FLASK_SECRET_KEY')
@@ -34,14 +33,13 @@ app = Flask(__name__)
 app.secret_key = FLASK_SECRET_KEY
 
 
-CORS(app, origins=[FRONTEND_URL], supports_credentials=True)
+CORS(app, origins=[FRONTEND_URL, FRONTEND_URL_DEMO], supports_credentials=True)
 
 def get_demo_db_path():
     if "demo_db_path" not in session:
         db_copy_path = os.path.join(TEMP_DIR, f"demo_{uuid.uuid4().hex}.db")
         shutil.copy(SEED_DB_PATH, db_copy_path)
         session["demo_db_path"] = db_copy_path
-    print(session["demo_db_path"])
     return session["demo_db_path"]
 
 def get_db_session():
@@ -62,8 +60,8 @@ def allow_only_specific_url():
     origin = request.headers.get('Origin', '')
     referer = request.headers.get('Referer', '')
 
-    # if origin != FRONTEND_URL and referer != FRONTEND_URL:
-    #     return "Requests from this origin are not allowed", 403
+    if origin != FRONTEND_URL and referer != FRONTEND_URL:
+        return "Requests from this origin are not allowed", 403
 
 
 @app.route("/", methods=["GET"])
