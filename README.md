@@ -9,3 +9,5 @@ Responsive web portal for volunteer training, allowing efficient resource manage
 ![Slide5](https://github.com/user-attachments/assets/0e2d953e-6757-455b-aac2-ef7ce1e7628b)
 ![Slide6](https://github.com/user-attachments/assets/3324d2d7-31ff-42c0-b03b-d2f87f580acd)
 ![Slide7](https://github.com/user-attachments/assets/e9fbf910-4f37-4f51-9aa5-174a0b1d57e8)
+<br/>
+[Download Complete Presentation.pdf](https://github.com/user-attachments/files/22283618/everyFAMILY.Final.presentation.pdf)
