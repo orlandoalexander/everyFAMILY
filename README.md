@@ -6,7 +6,7 @@ Client rated project deliverables **5/5**, stating it exceeded expectations.
 <br/>
 Developed for **everyFAMILY** as a **Data Science Consultant** at 180DC Bristol.  
 
-[🔗 View Live Demo](https://example-demo-link.netlify.app)  
+[🔗 View Live Demo](https://everyfamily-demo.netlify.app)  
 [🔗 Download Complete Presentation (PDF)](https://github.com/user-attachments/files/22283618/everyFAMILY.Final.presentation.pdf)  
 
 ## 🛠 Tech Stack
@@ -16,7 +16,7 @@ Developed for **everyFAMILY** as a **Data Science Consultant** at 180DC Bristol.
 - **Deployment:** Netlify (frontend) and Dockerised Flask backend on Google Cloud Run
   
 
-## 📸 Screenshots
+## 📝 Project Overview
 ![Slide 1](https://github.com/user-attachments/assets/f0fd3cc1-bd8d-4cd0-aee9-5b8d28ff2e49)  
 ![Slide 2](https://github.com/user-attachments/assets/ec8360cd-4786-42f2-a8eb-ce8802a36ff9)  
 ![Slide 3](https://github.com/user-attachments/assets/e2d55e1a-ad18-4e5c-8aff-14fea404b9e9)  
