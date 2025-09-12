@@ -10,10 +10,10 @@ Developed for **everyFAMILY** as a **Software Consultant** at 180DC Bristol.
 
 ## 🛠 Tech Stack
 
-- **Frontend:** React (Vite, Tailwind CSS)
-- **Backend:** Flask (REST API, bcrypt for password security), **Dockerised on Google Cloud Run**
+- **Frontend:** React 19 (Vite, React Query, Ant Design, React Feather)
+- **Backend:** Flask (SQLAlchemy ORM, bcrypt)
 - **Database:** MySQL (Google Cloud SQL)
-- **Deployment:** Netlify (frontend)<br><br>
+- **Deployment:** frontend on Netlify and Google Cloud Run (dockerised backend)<br><br>
 
 ## 📝 Project Overview
 
