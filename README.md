@@ -1,7 +1,7 @@
 # Resource Management Platform
 
 **Responsive web portal** for volunteer training, enabling organised data management and **reducing training time by 30%**.
-Client rated project deliverables **5/5**, stating it *"exceeded expectations"*.
+Client rated **project deliverables 5/5**, stating it *"exceeded expectations"*.
 
 Developed for **everyFAMILY** as a **Software Consultant Team Lead** at 180 Degrees Consulting Bristol.
 
