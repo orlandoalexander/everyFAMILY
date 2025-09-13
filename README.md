@@ -10,10 +10,10 @@ Developed for **everyFAMILY** as a **Software Consultant Team Lead** at 180 Degr
 
 ## 🛠 Tech Stack
 
-- **Frontend:** React 19 (Vite, React Query, Ant Design, React Feather)
-- **Backend:** Flask (SQLAlchemy ORM, bcrypt)
-- **Database:** MySQL (Google Cloud SQL)
-- **Deployment:** frontend on Netlify and Google Cloud Run (dockerised backend)<br><br>
+- **Frontend:** React 19, Vite, React Query, Ant Design, React Feather
+- **Backend:** Flask (API + server logic) with bcrypt for secure login, SQLAlchemy ORM for database interactions
+- **Database:** MySQL (hosted on Google Cloud SQL)
+- **Deployment:** Netlify (frontend) and Google Cloud Run (dockerised backend)<br><br>
 
 ## 📝 Project Overview
 
