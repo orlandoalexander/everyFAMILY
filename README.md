@@ -6,7 +6,7 @@ Client rated **project deliverables 5/5**, stating it *"exceeded expectations"*.
 Developed for **everyFAMILY** as a **Software Consultant Team Lead** at 180 Degrees Consulting Bristol.
 
 🔗 [View Live Demo](https://everyfamily-demo.netlify.app)<br>
-💾 [Download Project Presentation (PDF)](https://github.com/user-attachments/files/22283618/everyFAMILY.Final.presentation.pdf)<br><br>
+📊 [Download Project Presentation](https://github.com/user-attachments/files/22283618/everyFAMILY.Final.presentation.pdf)<br><br>
 
 ## 🛠 Tech Stack
 
