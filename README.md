@@ -1,6 +1,6 @@
 # Resource Management Platform
 
-**Responsive web app** for volunteer training, enabling organised data management and **reducing onboarding time by 30%**.
+**Modern web app** for volunteer training, enabling organised data management and **reducing onboarding time by 30%**.
 Client rated **project deliverables 5/5**, stating it *"exceeded expectations"*.
 
 Developed for **everyFAMILY** as a **Software Consultant Team Lead** at 180 Degrees Consulting Bristol.
