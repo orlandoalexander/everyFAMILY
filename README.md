@@ -1,7 +1,7 @@
 # Resource Management Platform
 
-**Modern web app** for volunteer training, enabling organised data management and **reducing onboarding time by 30%**.
-Client rated **project deliverables 5/5**, stating it *"exceeded expectations"*.
+**Modern web app** for volunteer training, improving data management and **reducing onboarding time by 30%**.
+Scalabale solution **rated 5/5** by client for *'exceeding expectations'*.
 
 Developed for **everyFAMILY** as a **Software Consultant Team Lead** at 180 Degrees Consulting Bristol.
 
