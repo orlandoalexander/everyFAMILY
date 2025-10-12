@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, session
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from models.resource_model import *
 from models.category_model import *
@@ -17,6 +17,7 @@ import secrets
 import string
 import smtplib
 from email.mime.text import MIMEText
+import sqlite3
 
 load_dotenv()
 
@@ -25,8 +26,6 @@ PASSWORD = os.getenv("PASSWORD")
 DATABASE_URL = os.getenv("DATABASE_URL")
 FRONTEND_URL=os.getenv("FRONTEND_URL")
 FRONTEND_URL_DEMO=os.getenv("FRONTEND_URL_DEMO")
-SEED_DB_PATH = "demo_data.db"
-TEMP_DIR = tempfile.gettempdir()
 FLASK_SECRET_KEY = os.getenv('FLASK_SECRET_KEY')
 
 app = Flask(__name__)
@@ -35,12 +34,24 @@ app.secret_key = FLASK_SECRET_KEY
 
 CORS(app, origins=[FRONTEND_URL, FRONTEND_URL_DEMO], supports_credentials=True)
 
+TEMP_DIR = tempfile.gettempdir()
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))  # folder containing main.py
+SEED_DB_PATH = os.path.join(BASE_DIR, "demo_data.db")
+
+# Regular app DB
+engine = create_engine(DATABASE_URL, future=True)
+Session = sessionmaker(bind=engine, autoflush=False, autocommit=False)
+
+
 def get_demo_db_path():
     if "demo_db_path" not in session:
+        os.makedirs(TEMP_DIR, exist_ok=True)
         db_copy_path = os.path.join(TEMP_DIR, f"demo_{uuid.uuid4().hex}.db")
-        shutil.copy(SEED_DB_PATH, db_copy_path)
+        shutil.copy(SEED_DB_PATH, db_copy_path)  # copy from same folder as main.py
         session["demo_db_path"] = db_copy_path
+
     return session["demo_db_path"]
+
 
 def get_db_session():
     """Return a SQLAlchemy session using demo DB if path starts with /demo/, else main DB."""
@@ -49,24 +60,31 @@ def get_db_session():
         demo_engine = create_engine(f"sqlite:///{db_path}", future=True)
         DemoSession = sessionmaker(bind=demo_engine, autoflush=False, autocommit=False)
         return DemoSession()
-    else:
-        return Session()
-
-engine = create_engine(DATABASE_URL, future=True)
-Session = sessionmaker(bind=engine, autoflush=False, autocommit=False)
+    return Session()
 
 @app.before_request
 def allow_only_specific_url():
     origin = request.headers.get('Origin', '')
     referer = request.headers.get('Referer', '')
 
-    if origin != FRONTEND_URL and referer != FRONTEND_URL:
+    if origin not in [FRONTEND_URL, FRONTEND_URL_DEMO] and referer not in [FRONTEND_URL, FRONTEND_URL_DEMO]:
         return "Requests from this origin are not allowed", 403
 
 
 @app.route("/", methods=["GET"])
 def home():
-    return "API working successfully"
+    if "demo_db_path" not in session:
+        return "Demo DB not created yet", 400
+
+    conn = sqlite3.connect(session["demo_db_path"])
+    cursor = conn.cursor()
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+    tables = [row[0] for row in cursor.fetchall()]
+    conn.close()
+
+    return f"API working successfully. Tables in demo DB: {tables} {session['demo_db_path']}"
+
+
 
 @app.route("/demo/reset-db", methods=["POST"])
 def reset_demo_db():
