@@ -20,8 +20,9 @@ function ResourceCard({
   category,
   saved,
   featured,
+  setResourceModalOpen,
+  setResourceModalData,
 }) {
-  const [resourceModalOpen, setResourceModalOpen] = useState(false);
   const [isFeatured, setIsFeatured] = useState(featured);
   const [isSaved, setIsSaved] = useState(saved);
   const { user } = useContext(AuthContext);
@@ -48,12 +49,19 @@ function ResourceCard({
   };
 
   const handleDropdownItemClick = (action) => {
-    if (action === "modify") setResourceModalOpen(true);
+    if (action === "modify") {
+      setResourceModalOpen(true);
+      setResourceModalData({
+        title: title,
+        description: description,
+        type: type,
+        category: category,
+        link: link,
+        thumbnail_url: thumbnail_url,
+        id: id,
+      });
+    }
     if (action === "delete") deleteResource.mutate(id);
-  };
-
-  const hideResourceModal = () => {
-    setResourceModalOpen(false);
   };
 
   return (
@@ -163,20 +171,6 @@ function ResourceCard({
           </Card>
         </Dropdown>
       </Col>
-      <ResourceModal
-        open={resourceModalOpen}
-        onCancel={hideResourceModal}
-        user={user}
-        id={id}
-        resourceData={{
-          title: title,
-          description: description,
-          type: type,
-          category: category,
-          link: link,
-          thumbnail_url: thumbnail_url,
-        }}
-      />
     </div>
   );
 }

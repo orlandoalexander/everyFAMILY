@@ -44,7 +44,7 @@ const fetchLinkThumbnail = async (url) => {
   return data;
 };
 
-function AddResourceModal({ open, onCancel, user, resourceData, id }) {
+function ResourceModal({ open, onCancel, user, resourceData, id }) {
   const [newType, setNewType] = useState("");
   const [newCategory, setNewCategory] = useState("");
   const [linkURL, setLinkURL] = useState(null);
@@ -131,8 +131,18 @@ function AddResourceModal({ open, onCancel, user, resourceData, id }) {
       messageApi.warning("Resource type already exists");
     }
     {
-      addType.mutate({ title: newType });
-      setNewType("");
+      addType.mutate(
+        { title: newType },
+        {
+          onSuccess: () => {
+            form.setFieldsValue({ type: newType });
+            setNewType("");
+            // Close the dropdown if the Select is focused
+            const select = document.activeElement;
+            if (select) select.blur();
+          },
+        }
+      );
     }
   };
 
@@ -148,8 +158,18 @@ function AddResourceModal({ open, onCancel, user, resourceData, id }) {
       messageApi.warning("Resource category already exists");
     }
     {
-      addCategory.mutate({ title: newCategory });
-      setNewCategory("");
+      addType.mutate(
+        { title: newCategory },
+        {
+          onSuccess: () => {
+            form.setFieldsValue({ category: newCategory });
+            setNewType("");
+            // Close the dropdown if the Select is focused
+            const select = document.activeElement;
+            if (select) select.blur();
+          },
+        }
+      );
     }
   };
 
@@ -279,7 +299,12 @@ function AddResourceModal({ open, onCancel, user, resourceData, id }) {
                       placeholder="New resource type"
                       value={newType}
                       onChange={(e) => setNewType(e.target.value)}
-                      onKeyDown={(e) => e.stopPropagation()}
+                      onKeyDown={(e) => {
+                        e.stopPropagation();
+                        if (e.key === "Enter") {
+                          handleSetNewType();
+                        }
+                      }}
                     />
                     {contextHolder}
                     <Button
@@ -332,7 +357,12 @@ function AddResourceModal({ open, onCancel, user, resourceData, id }) {
                       placeholder="New category"
                       value={newCategory}
                       onChange={(e) => setNewCategory(e.target.value)}
-                      onKeyDown={(e) => e.stopPropagation()}
+                      onKeyDown={(e) => {
+                        e.stopPropagation();
+                        if (e.key === "Enter") {
+                          handleSetNewCategory();
+                        }
+                      }}
                     />
                     {contextHolder}
                     <Button
@@ -408,4 +438,4 @@ function AddResourceModal({ open, onCancel, user, resourceData, id }) {
   );
 }
 
-export default AddResourceModal;
+export default ResourceModal;

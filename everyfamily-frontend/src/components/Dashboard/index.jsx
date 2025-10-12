@@ -13,7 +13,7 @@ import Category from "./Category.jsx";
 
 const isDemo = import.meta.env.VITE_DEMO;
 
-function Dashboard() {
+function Dashboard({ setResourceModalOpen, setResourceModalData }) {
   const [expanded, setExpanded] = useState(false);
   const navigate = useNavigate();
 
@@ -248,6 +248,8 @@ function Dashboard() {
                         type={resource.type_title}
                         category={resource.category_title}
                         thumbnail_url={resource.thumbnail_url}
+                        setResourceModalOpen={setResourceModalOpen}
+                        setResourceModalData={setResourceModalData}
                       />
                     ))
                 }

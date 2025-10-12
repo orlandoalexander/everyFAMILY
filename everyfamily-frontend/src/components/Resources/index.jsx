@@ -4,7 +4,7 @@ import ResourceCard from "./ResourceCard.jsx";
 import { Row, Empty, Spin } from "antd";
 import "./index.css";
 
-function Resources() {
+function Resources({ setResourceModalOpen, setResourceModalData }) {
   const location = useLocation();
 
   const queryParams = new URLSearchParams(location.search);
@@ -20,17 +20,17 @@ function Resources() {
 
   const filteredResources = data?.filter((resource) => {
     const matchesType = resourceType
-      ? resource.type_title.toLowerCase().includes(resourceType.toLowerCase())
+      ? resource.type_title?.toLowerCase().includes(resourceType.toLowerCase())
       : true;
     const matchesCategory = resourceCategory
       ? resource.category_title
-          .toLowerCase()
+          ?.toLowerCase()
           .includes(resourceCategory.toLowerCase())
       : true;
     const matchesSearch = searchQuery
-      ? resource.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      ? resource.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         resource.description
-          .toLowerCase()
+          ?.toLowerCase()
           .includes(searchQuery.toLowerCase()) ||
         resource.category_title.toLowerCase() === searchQuery.toLowerCase()
       : true;
@@ -93,6 +93,8 @@ function Resources() {
                   category={resource.category_title}
                   saved={resource.saved}
                   featured={resource.featured}
+                  setResourceModalOpen={setResourceModalOpen}
+                  setResourceModalData={setResourceModalData}
                 />
               ))
             ))}

@@ -47,6 +47,7 @@ function App() {
   const [userDetailsOpen, setUserDetailsOpen] = useState(false);
   const [referralCodesOpen, setReferralCodesOpen] = useState(false);
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
+  const [resourceModalData, setResourceModalData] = useState({});
 
   const { user, logout, isLoggedIn } = useContext(AuthContext);
 
@@ -173,7 +174,7 @@ function App() {
           <>
             <Search
               className="dashboard-header-search"
-              placeholder="Find resources by name, description etc."
+              placeholder="Find resources by name, description, type or category"
               allowClear
               size="large"
               value={searchText}
@@ -242,7 +243,10 @@ function App() {
           path="/"
           element={
             <ProtectedRoute>
-              <Dashboard />
+              <Dashboard
+                setResourceModalOpen={setResourceModalOpen}
+                setResourceModalData={setResourceModalData}
+              />
             </ProtectedRoute>
           }
         />
@@ -260,7 +264,10 @@ function App() {
           path="/resources/:resourceType?"
           element={
             <ProtectedRoute>
-              <Resources />
+              <Resources
+                setResourceModalOpen={setResourceModalOpen}
+                setResourceModalData={setResourceModalData}
+              />
             </ProtectedRoute>
           }
         />
@@ -285,6 +292,8 @@ function App() {
         open={resourceModalOpen}
         onCancel={hideResourceModal}
         user={user}
+        id={resourceModalData.id}
+        resourceData={resourceModalData}
       />
       <ManageUsersModal
         open={manageUsersOpen}
