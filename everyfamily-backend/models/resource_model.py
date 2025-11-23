@@ -96,6 +96,8 @@ def modify_resource(session, id, title=None, description=None, link=None, thumbn
 
     session.commit()
 
+    return None
+
 
 def remove_resource(session, id):
     resource = session.query(Resource).get(id)
