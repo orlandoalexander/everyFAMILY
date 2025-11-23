@@ -198,7 +198,7 @@ function ResourceModal({ open, onCancel, user, resourceData, setResourceModalDat
   };
 
   useEffect(() => {
-    if (!linkURL) return;
+    if (!linkURL || linkURL === resourceData.link) return;
 
     const timeout = setTimeout(() => {
       fetchThumbnailURL();
