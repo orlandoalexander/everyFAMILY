@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 import "./ResourceCard.css";
-import { Card, Col, Button, Dropdown } from "antd";
+import { Card, Col, Button, Dropdown, Popconfirm } from "antd";
 import { Grid, Tag, Bookmark, Star } from "react-feather";
 import AuthContext from "../../AuthContext";
 import useUpdateResource from "../../hooks/useUpdateResource";
@@ -67,23 +67,27 @@ function ResourceCard({
     <div>
       <Col span={8}>
         <Dropdown
-          menu={
-            user.role === "admin"
-              ? {
-                onClick: (e) => handleDropdownItemClick(e.key),
-                items: [
-                  {
-                    label: "Edit resource",
-                    key: "modify",
-                  },
-                  {
-                    label: "Delete resource",
-                    key: "delete",
-                  },
-                ],
-              }
-              : {}
-          }
+          menu={{
+            items: [
+              {
+                key: "modify",
+                label: <span onClick={() => handleDropdownItemClick("modify")}>Edit resource</span>,
+              },
+              {
+                key: "delete",
+                label: (
+                  <Popconfirm
+                    title="Are you sure you want to delete this resource?"
+                    onConfirm={() => handleDropdownItemClick("delete")}
+                    okText="Yes"
+                    cancelText="No"
+                  >
+                    <span>Delete resource</span>
+                  </Popconfirm>
+                ),
+              },
+            ],
+          }}
           trigger={["contextMenu"]}
           disabled={user.role !== "admin"}
         >
