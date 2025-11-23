@@ -86,14 +86,13 @@ def modify_resource(session, id, title=None, description=None, link=None, thumbn
         resource.description = description
     if link is not None:
         resource.link = link
-    if thumbnail_url is not None:
-        resource.thumbnail_url = thumbnail_url
     if category is not None:
         resource.category_id = add_category(session, category)
     if type is not None:
         resource.type_id = add_type(session, type)
     if featured is not None:
         resource.featured = featured
+    resource.thumbnail_url = thumbnail_url # set even if null as can set thumbnail url to be null
 
     session.commit()
 
