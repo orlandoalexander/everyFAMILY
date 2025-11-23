@@ -172,9 +172,7 @@ def update_resource(resource_id):
     featured = data.get("featured")
 
     session = get_db_session()
-
-    session.close()
-
+    
     try:
         modify_resource(session, resource_id, title=title, description=description, link=link,
                         thumbnail_url=thumbnail_url, category=category, type=type, featured=featured)
