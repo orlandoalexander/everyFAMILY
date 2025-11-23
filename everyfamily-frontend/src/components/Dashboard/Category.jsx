@@ -1,20 +1,17 @@
 import "./Category.css";
-import { Collapse, Flex, Row } from "antd";
+import { Typography } from "antd";
 
-function Category({ categoryKey, label, children }) {
-  const item = [
-    {
-      key: categoryKey,
-      label: label,
-      children: (
-        <Row gutter={16}>
-          <Flex className="dashboard-category-flex">{children}</Flex>
-        </Row>
-      ),
-    },
-  ];
+const { Title } = Typography;
 
-  return <Collapse items={item} size="large" bordered={false} ghost />;
+function Category({ label, children }) {
+  return (
+    <div className="dashboard-category">
+      <Title level={4}>{label}</Title>
+      <div className="dashboard-category-scroll">
+        {children}
+      </div>
+    </div>
+  );
 }
 
 export default Category;

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Modal,
   Input,
@@ -26,6 +26,8 @@ import {
   Plus,
   Image as ImageIcon,
   AlignJustify,
+  Upload,
+  Trash
 } from "react-feather";
 
 const thumbnailURLAPIKey = import.meta.env.VITE_LINK_PREVIEW_API_KEY;
@@ -53,6 +55,7 @@ function ResourceModal({ open, onCancel, user, resourceData, id }) {
   const [messageApi, contextHolder] = message.useMessage();
 
   const [form] = Form.useForm();
+  const fileInputRef = useRef(null);
 
   const addType = useAddType();
   const addCategory = useAddCategory();
@@ -80,33 +83,33 @@ function ResourceModal({ open, onCancel, user, resourceData, id }) {
         };
         id
           ? updateResource.mutate(data, {
-              onSuccess: (success) => {
-                messageApi.success(success.message);
-                handleClose();
-                setThumbnailURL(null);
-                setLinkURL(null);
-              },
-              onError: (error) => {
-                messageApi.error(
-                  error?.response?.data?.message ||
-                    "Error adding resource. Please try again."
-                );
-              },
-            })
+            onSuccess: (success) => {
+              messageApi.success(success.message);
+              handleClose();
+              setThumbnailURL(null);
+              setLinkURL(null);
+            },
+            onError: (error) => {
+              messageApi.error(
+                error?.response?.data?.message ||
+                "Error adding resource. Please try again."
+              );
+            },
+          })
           : addResource.mutate(data, {
-              onSuccess: (success) => {
-                messageApi.success(success.message);
-                handleClose();
-                setThumbnailURL(null);
-                setLinkURL(null);
-              },
-              onError: (error) => {
-                messageApi.error(
-                  error?.response?.data?.message ||
-                    "Error adding resource. Please try again."
-                );
-              },
-            });
+            onSuccess: (success) => {
+              messageApi.success(success.message);
+              handleClose();
+              setThumbnailURL(null);
+              setLinkURL(null);
+            },
+            onError: (error) => {
+              messageApi.error(
+                error?.response?.data?.message ||
+                "Error adding resource. Please try again."
+              );
+            },
+          });
       })
       .catch((error) => {
         messageApi.error("Please complete all the fields");
@@ -158,7 +161,7 @@ function ResourceModal({ open, onCancel, user, resourceData, id }) {
       messageApi.warning("Resource category already exists");
     }
     {
-      addType.mutate(
+      addCategory.mutate(
         { title: newCategory },
         {
           onSuccess: () => {
@@ -173,27 +176,28 @@ function ResourceModal({ open, onCancel, user, resourceData, id }) {
     }
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (linkURL) {
-        const isValid = isValidURL(linkURL);
-        if (isValid) {
-          try {
-            setURLFetching(true);
-            const data = await fetchLinkThumbnail(linkURL);
-            setThumbnailURL(data.image || null);
-            setURLFetching(false);
-          } catch (error) {
-            setThumbnailURL(null);
-            setURLFetching(false);
-          }
-        } else {
-          setThumbnailURL(null);
-          setURLFetching(false);
-        }
+  const fetchThumbnailURL = async () => {
+    const isValid = isValidURL(linkURL);
+    if (isValid) {
+      try {
+        setURLFetching(true);
+        const data = await fetchLinkThumbnail(linkURL);
+        setThumbnailURL(data.image || null);
+        setURLFetching(false);
+      } catch (error) {
+        setThumbnailURL(null);
+        setURLFetching(false);
       }
-    };
-    fetchData();
+    } else {
+      setThumbnailURL(resourceData.thumbnail_url);
+      setURLFetching(false);
+    }
+
+  };
+
+  useEffect(() => {
+    if (linkURL && linkURL !== resourceData.link)
+      fetchThumbnailURL();
   }, [linkURL]);
 
   useEffect(() => {
@@ -413,22 +417,56 @@ function ResourceModal({ open, onCancel, user, resourceData, id }) {
                   <p>Thumbnail</p>
                 </div>
               }
-              rules={[
-                {
-                  required: false,
-                },
-              ]}
+              rules={[{ required: false }]}
               colon={false}
             >
               {urlFetching ? (
                 <Spin />
               ) : (
-                <Image
-                  width={150}
-                  src={thumbnailURL}
-                  fallback="https://placehold.co/600x400/432666/FFF?text=Thumbnail+\n+Unavailable"
-                  preview={false}
-                />
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", maxWidth: '40%' }}>
+                  <Image
+                    width={'100%'}
+                    src={thumbnailURL}
+                    fallback="https://placehold.co/600x400/432666/FFF?text=Thumbnail+Unavailable"
+                    preview={false}
+                  />
+                  <Button size='small' style={{ fontSize: '10px' }} icon={<Upload size={10} />} onClick={() => fileInputRef.current.click()}>Upload Custom Thumbnail</Button>
+                  {thumbnailURL?.startsWith('https://res.cloudinary.com/') && (<Button size='small' style={{ fontSize: '10px' }} icon={<Trash size={10} color='red' />} danger onClick={() => { setThumbnailURL(null); fetchThumbnailURL() }}>Delete Custom Thumbnail</Button>)}
+
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={async (e) => {
+                      const file = e.target.files[0];
+                      if (!file) return;
+
+                      const formData = new FormData();
+                      formData.append("file", file);
+                      formData.append("upload_preset", import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET);
+
+                      try {
+                        setURLFetching(true);
+                        const response = await fetch(
+                          `https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME}/image/upload`,
+                          {
+                            method: "POST",
+                            body: formData,
+                          }
+                        );
+                        const data = await response.json();
+                        setThumbnailURL(data.secure_url);
+                        messageApi.success("Thumbnail uploaded successfully");
+                        setURLFetching(false);
+                      } catch (err) {
+                        setURLFetching(false);
+                        messageApi.error("Failed to upload thumbnail");
+                      }
+                    }}
+                  />
+
+                </div>
               )}
             </Form.Item>
           )}

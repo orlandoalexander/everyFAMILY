@@ -3,7 +3,6 @@ import "./ResourceCard.css";
 import { Card, Col, Button, Dropdown } from "antd";
 import { Grid, Tag, Bookmark, Star } from "react-feather";
 import AuthContext from "../../AuthContext";
-import ResourceModal from "./ResourceModal";
 import useUpdateResource from "../../hooks/useUpdateResource";
 import useAddUserResource from "../../hooks/useAddUserResource";
 import useDeleteResource from "../../hooks/useDeleteResource";
@@ -71,18 +70,18 @@ function ResourceCard({
           menu={
             user.role === "admin"
               ? {
-                  onClick: (e) => handleDropdownItemClick(e.key),
-                  items: [
-                    {
-                      label: "Edit resource",
-                      key: "modify",
-                    },
-                    {
-                      label: "Delete resource",
-                      key: "delete",
-                    },
-                  ],
-                }
+                onClick: (e) => handleDropdownItemClick(e.key),
+                items: [
+                  {
+                    label: "Edit resource",
+                    key: "modify",
+                  },
+                  {
+                    label: "Delete resource",
+                    key: "delete",
+                  },
+                ],
+              }
               : {}
           }
           trigger={["contextMenu"]}
@@ -102,8 +101,8 @@ function ResourceCard({
                         "https://placehold.co/300x200/432666/FFF?text=Thumbnail+\n+Unavailable"
                       }
                       onError={(e) =>
-                        (e.target.src =
-                          "https://placehold.co/300x200/432666/FFF?text=Thumbnail+\n+Unavailable")
+                      (e.target.src =
+                        "https://placehold.co/300x200/432666/FFF?text=Thumbnail+\n+Unavailable")
                       }
                     />
                   }

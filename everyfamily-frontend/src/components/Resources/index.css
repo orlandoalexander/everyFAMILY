@@ -5,3 +5,17 @@
   padding-left: 0.7rem;
   padding-bottom: 2rem;
 }
+
+.resources-header {
+  display: flex;
+  justify-content: space-between;
+  margin-top: -10px;
+  margin-bottom: 20px;
+}
+
+.resources-filter-container {
+  display: flex;
+  gap: 1rem;
+  color: black;
+  font-size: 0.9rem;
+}

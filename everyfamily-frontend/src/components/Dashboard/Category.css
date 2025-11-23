@@ -15,3 +15,22 @@
 .dashboard-category-flex::-webkit-scrollbar {
   display: none;
 }
+
+.dashboard-category-scroll {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scroll-behavior: smooth;
+
+  /* Hide scrollbar for all browsers */
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE 10+ */
+}
+
+.dashboard-category-scroll::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari, Edge */
+}

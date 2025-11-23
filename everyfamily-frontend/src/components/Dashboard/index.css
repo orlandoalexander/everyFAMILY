@@ -43,24 +43,27 @@
 }
 
 .dashboard-category {
-  margin-bottom: 1rem;
-}
-
-.dashboard-category-title h1{
-  font-size: 1.7rem;
+  margin-bottom: 2rem;
 }
 
 .dashboard-category-title {
   display: flex;
   gap: 0.6rem;
   align-items: center;
+  font-size: 1.4rem;
+}
+
+
+.dashboard-category-title h1 {
+  font-size: 1.7rem;
 }
 
 .dashboard-category-title span {
-  font-size: 9px;
+  font-size: 0.8rem;
   color: gray;
   font-weight: 600;
   cursor: pointer;
+
 }
 
 .ant-input-affix-wrapper {
@@ -85,7 +88,7 @@
 
 .capo-description {
   color: #92278f;
-  font-weight: 700;
+  font-weight: 600;
   margin-bottom: 1.5rem;
 }
 
