@@ -4,6 +4,7 @@ import api from "./api";
 const useUpdateResource = () => {
   const queryClient = useQueryClient();
   const updateResource = async (data) => {
+    console.log(data)
     const response = await api.put(`/resources/${data.id}`, data);
     return response.data;
   };

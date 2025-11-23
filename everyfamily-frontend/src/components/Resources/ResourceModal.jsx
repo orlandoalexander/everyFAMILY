@@ -46,7 +46,7 @@ const fetchLinkThumbnail = async (url) => {
   return data;
 };
 
-function ResourceModal({ open, onCancel, user, resourceData, id }) {
+function ResourceModal({ open, onCancel, user, resourceData, setResourceModalData, id }) {
   const [newType, setNewType] = useState("");
   const [newCategory, setNewCategory] = useState("");
   const [linkURL, setLinkURL] = useState(null);
@@ -81,7 +81,7 @@ function ResourceModal({ open, onCancel, user, resourceData, id }) {
           thumbnail_url: thumbnailURL,
           upload_user_id: user.id,
         };
-        console.log(data)
+
         id
           ? updateResource.mutate(data, {
             onSuccess: (success) => {
@@ -122,6 +122,7 @@ function ResourceModal({ open, onCancel, user, resourceData, id }) {
     form.resetFields();
     setThumbnailURL(null);
     setLinkURL(null);
+    setResourceModalData({})
   };
 
   const handleSetNewType = () => {
@@ -200,6 +201,7 @@ function ResourceModal({ open, onCancel, user, resourceData, id }) {
     if (linkURL && linkURL !== resourceData.link)
       fetchThumbnailURL();
   }, [linkURL]);
+
 
   useEffect(() => {
     if (open && resourceData) {

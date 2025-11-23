@@ -293,6 +293,7 @@ function App() {
         onCancel={hideResourceModal}
         user={user}
         id={resourceModalData.id}
+        setResourceModalData={setResourceModalData}
         resourceData={resourceModalData}
       />
       <ManageUsersModal
