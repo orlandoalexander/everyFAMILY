@@ -81,6 +81,7 @@ function ResourceModal({ open, onCancel, user, resourceData, id }) {
           thumbnail_url: thumbnailURL,
           upload_user_id: user.id,
         };
+        console.log(data)
         id
           ? updateResource.mutate(data, {
             onSuccess: (success) => {
