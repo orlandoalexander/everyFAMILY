@@ -6,6 +6,7 @@ const useUpdateResource = () => {
   const updateResource = async (data) => {
     console.log(data)
     const response = await api.put(`/resources/${data.id}`, data);
+    console.log(response)
     return response.data;
   };
 
